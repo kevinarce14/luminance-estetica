@@ -1,0 +1,2523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luminance Studio by Cande | Especialista en Pestañas, Cejas & Estética</title>
+    <meta name="description" content="Cande - Especialista en lifting de pestañas, diseño de cejas, depilación láser y estética corporal. 5 años de experiencia. Cursos profesionales de laminado.">
+    <meta name="keywords" content="pestañas lifting, cejas laminado, henna cejas, depilación láser, estética corporal, aparatología, pedicuría, cursos belleza, Cande esteticista">
+    <meta name="author" content="Cande - Luminance Studio">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Luminance Studio by Cande | Belleza Profesional">
+    <meta property="og:description" content="5 años de experiencia en estética. Especialista en pestañas, cejas, depilación láser y tratamientos corporales.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===== VARIABLES Y ESTILOS GLOBALES ===== */
+        :root {
+            --rosa-claro: #f8d7e6;
+            --rosa-medio: #e75480;
+            --rosa-fuerte: #d81b60;
+            --lila-claro: #f4f0ff;
+            --lila-medio: #9c89b8;
+            --lila-oscuro: #7b4bbd;
+            --violeta: #6a4c93;
+            --dorado: #d4af37;
+            --dorado-claro: #f1c40f;
+            --blanco: #ffffff;
+            --gris-claro: #f8f9fa;
+            --gris-medio: #e9ecef;
+            --texto-oscuro: #2d3436;
+            --texto-medio: #636e72;
+            --sombra: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --sombra-hover: 0 20px 40px rgba(0, 0, 0, 0.12);
+            --transicion: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            --border-radius: 15px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--blanco);
+            color: var(--texto-oscuro);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .section-padding {
+            padding: 100px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-title h2 {
+            font-size: 2.8rem;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 15px;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, var(--rosa-medio), var(--lila-oscuro));
+            border-radius: 2px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transicion);
+            cursor: pointer;
+            border: none;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-rosa {
+            background: linear-gradient(135deg, var(--rosa-medio), var(--rosa-fuerte));
+            color: var(--blanco);
+            box-shadow: 0 6px 20px rgba(231, 84, 128, 0.3);
+        }
+        
+        .btn-rosa:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(231, 84, 128, 0.4);
+        }
+        
+        .btn-lila {
+            background: linear-gradient(135deg, var(--lila-medio), var(--lila-oscuro));
+            color: var(--blanco);
+            box-shadow: 0 6px 20px rgba(123, 75, 189, 0.3);
+        }
+        
+        .btn-lila:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(123, 75, 189, 0.4);
+        }
+        
+        .btn-dorado {
+            background: linear-gradient(135deg, var(--dorado), var(--dorado-claro));
+            color: var(--texto-oscuro);
+            font-weight: 700;
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+        }
+        
+        .btn-dorado:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(212, 175, 55, 0.4);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-promo {
+            background: linear-gradient(to right, var(--dorado), var(--dorado-claro));
+            color: var(--texto-oscuro);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* ===== HEADER Y NAVEGACIÓN ===== */
+        header {
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: var(--transicion);
+        }
+        
+        header.scrolled {
+            padding: 5px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            transition: var(--transicion);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 10px;
+        }
+        
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--rosa-fuerte), var(--lila-oscuro));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .logo-subtitle {
+            font-size: 12px;
+            color: var(--texto-medio);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: -5px;
+        }
+        
+        .logo-dot {
+            color: var(--dorado);
+        }
+        
+        .nav-desktop {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--texto-oscuro);
+            font-weight: 600;
+            font-size: 16px;
+            transition: var(--transicion);
+            position: relative;
+            padding: 5px 0;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--rosa-fuerte), var(--lila-oscuro));
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+        
+        .nav-links a:hover {
+            color: var(--rosa-fuerte);
+        }
+        
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: var(--blanco);
+            min-width: 220px;
+            box-shadow: var(--sombra-hover);
+            border-radius: var(--border-radius);
+            padding: 15px 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transicion);
+            z-index: 100;
+        }
+        
+        .dropdown:hover .dropdown-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-content a {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            color: var(--texto-oscuro);
+            transition: var(--transicion);
+        }
+        
+        .dropdown-content a:hover {
+            background-color: var(--gris-claro);
+            color: var(--rosa-fuerte);
+            padding-left: 30px;
+        }
+        
+        .dropdown-content i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .whatsapp-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transicion);
+        }
+        
+        .whatsapp-nav:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+        }
+        
+        .menu-toggle {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--rosa-fuerte);
+            transition: var(--transicion);
+        }
+        
+        .menu-toggle:hover {
+            transform: rotate(90deg);
+        }
+        
+        /* ===== HERO SECTION ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--rosa-claro) 0%, var(--lila-claro) 100%);
+            padding: 180px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(216, 27, 96, 0.05) 0%, transparent 50%);
+        }
+        
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        .hero-text {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero h1 {
+            font-size: 3.2rem;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, var(--violeta), var(--rosa-fuerte));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: fadeInUp 1s ease;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 35px;
+            color: var(--texto-medio);
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+        
+        .hero-image {
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .hero-image img {
+            width: 100%;
+            border-radius: var(--border-radius);
+            box-shadow: var(--sombra-hover);
+            transition: var(--transicion);
+        }
+        
+        .hero-image:hover img {
+            transform: scale(1.02);
+        }
+        
+        .hero-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--rosa-fuerte), var(--lila-oscuro));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--texto-medio);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+        
+        /* ===== BIO SECTION ===== */
+        .bio-section {
+            background-color: var(--blanco);
+        }
+        
+        .bio-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        .bio-image {
+            position: relative;
+        }
+        
+        .bio-image img {
+            width: 100%;
+            border-radius: var(--border-radius);
+            box-shadow: var(--sombra);
+            transition: var(--transicion);
+        }
+        
+        .bio-image:hover img {
+            transform: translateY(-10px);
+            box-shadow: var(--sombra-hover);
+        }
+        
+        .certificado-float {
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            background: var(--blanco);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--sombra-hover);
+            width: 220px;
+            text-align: center;
+            transition: var(--transicion);
+            z-index: 2;
+            border-top: 4px solid var(--dorado);
+        }
+        
+        .certificado-float:hover {
+            transform: translateY(-10px);
+        }
+        
+        .certificado-float i {
+            color: var(--rosa-fuerte);
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .certificado-float p {
+            font-size: 0.9rem;
+            color: var(--texto-medio);
+            margin-bottom: 5px;
+        }
+        
+        .certificado-float small {
+            font-weight: 600;
+            color: var(--lila-oscuro);
+        }
+        
+        .bio-text h2 {
+            font-size: 2.8rem;
+            color: var(--violeta);
+            margin-bottom: 25px;
+        }
+        
+        .bio-text p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: var(--texto-medio);
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, var(--rosa-claro) 0%, var(--rosa-claro) 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 90%;
+            padding: 0 5px;
+            font-weight: 600;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .benefit-card {
+            background-color: var(--gris-claro);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            transition: var(--transicion);
+            border-left: 4px solid var(--dorado);
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-10px);
+            background-color: var(--blanco);
+            box-shadow: var(--sombra-hover);
+        }
+        
+        .benefit-card i {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            color: var(--lila-medio);
+        }
+        
+        /* ===== SERVICIOS DETALLADOS ===== */
+        .services-detailed {
+            background-color: var(--gris-claro);
+        }
+        
+        .service-category {
+            margin-bottom: 80px;
+        }
+        
+        .service-category h3 {
+            font-size: 2.2rem;
+            color: var(--rosa-fuerte);
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .service-category h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, var(--rosa-medio), var(--lila-oscuro));
+        }
+        
+        .services-grid-detailed {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .service-item {
+            background-color: var(--blanco);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--sombra);
+            transition: var(--transicion);
+            border-top: 4px solid var(--lila-medio);
+        }
+        
+        .service-item:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--sombra-hover);
+        }
+        
+        .service-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--rosa-claro), var(--lila-claro));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--rosa-fuerte);
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+        
+        .service-title h4 {
+            font-size: 1.4rem;
+            color: var(--violeta);
+            margin-bottom: 5px;
+        }
+        
+        .service-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--lila-oscuro);
+            margin-top: 15px;
+        }
+        
+        .service-features {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .service-features li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .service-features i {
+            color: var(--dorado);
+        }
+        
+        .service-duration {
+            display: inline-block;
+            background-color: var(--gris-claro);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--texto-medio);
+            margin-top: 10px;
+        }
+        
+        /* ===== APARATOLOGÍA SECTION ===== */
+        .aparato-section {
+            background-color: var(--blanco);
+        }
+        
+        .aparato-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .aparato-card {
+            background: linear-gradient(135deg, var(--lila-claro), var(--rosa-claro));
+            border-radius: var(--border-radius);
+            padding: 40px 30px;
+            text-align: center;
+            transition: var(--transicion);
+        }
+        
+        .aparato-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--sombra-hover);
+        }
+        
+        .aparato-icon {
+            font-size: 3.5rem;
+            color: var(--lila-oscuro);
+            margin-bottom: 20px;
+        }
+        
+        /* ===== CURSOS SECTION ===== */
+        .courses {
+            background-color: var(--gris-claro);
+        }
+        
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        
+        .course-card {
+            background-color: var(--blanco);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--sombra);
+            transition: var(--transicion);
+            position: relative;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-15px);
+            box-shadow: var(--sombra-hover);
+        }
+        
+        .course-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--dorado), var(--dorado-claro));
+            color: var(--texto-oscuro);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            z-index: 2;
+        }
+        
+        .course-header {
+            background: linear-gradient(135deg, var(--lila-medio), var(--violeta));
+            color: var(--blanco);
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .course-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .course-content {
+            padding: 30px;
+        }
+        
+        .course-content h3 {
+            font-size: 1.6rem;
+            color: var(--rosa-fuerte);
+            margin-bottom: 15px;
+        }
+        
+        .course-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .detail-item i {
+            color: var(--lila-medio);
+        }
+        
+        .course-includes {
+            background-color: var(--gris-claro);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .course-includes h4 {
+            color: var(--violeta);
+            margin-bottom: 15px;
+        }
+        
+        .course-includes ul {
+            list-style: none;
+        }
+        
+        .course-includes li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .course-includes i {
+            color: var(--dorado);
+        }
+        
+        .course-price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--lila-oscuro);
+            text-align: center;
+            margin: 25px 0;
+        }
+        
+        .course-installment {
+            text-align: center;
+            color: var(--texto-medio);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        
+        /* ===== FORMACIÓN SECTION ===== */
+        .formacion-section {
+            background-color: var(--blanco);
+        }
+        
+        .formacion-timeline {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .formacion-timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--rosa-claro), var(--lila-claro));
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .timeline-year {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--rosa-medio), var(--lila-oscuro));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-right: 30px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .timeline-content {
+            background-color: var(--gris-claro);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            flex: 1;
+            box-shadow: var(--sombra);
+        }
+        
+        .timeline-content h4 {
+            color: var(--violeta);
+            margin-bottom: 10px;
+        }
+        
+        /* ===== TESTIMONIOS ===== */
+        .testimonials {
+            background-color: var(--gris-claro);
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .testimonial-card {
+            background-color: var(--blanco);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--sombra);
+            transition: var(--transicion);
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--sombra-hover);
+        }
+        
+        .client-rating {
+            color: var(--dorado);
+            margin-bottom: 20px;
+        }
+        
+        .client-text {
+            font-style: italic;
+            color: var(--texto-medio);
+            margin-bottom: 25px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .client-text::before {
+            content: '"';
+            position: absolute;
+            left: 0;
+            top: -10px;
+            font-size: 3rem;
+            color: var(--rosa-claro);
+            font-family: Georgia, serif;
+        }
+        
+        .client-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .client-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--rosa-claro), var(--lila-claro));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--rosa-fuerte);
+            font-weight: 600;
+        }
+        
+        /* ===== CONTACTO ===== */
+        .contact-section {
+            background: linear-gradient(135deg, var(--lila-claro) 0%, var(--rosa-claro) 100%);
+        }
+        
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+        
+        .contact-info h2 {
+            color: var(--violeta);
+            margin-bottom: 25px;
+        }
+        
+        .contact-details {
+            margin: 30px 0;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+        
+        .contact-icon {
+            background: linear-gradient(135deg, var(--rosa-medio), var(--lila-oscuro));
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        
+        .contact-form {
+            background-color: var(--blanco);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--sombra-hover);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--texto-oscuro);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--gris-medio);
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: var(--transicion);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--lila-medio);
+            box-shadow: 0 0 0 3px rgba(123, 75, 189, 0.1);
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        /* ===== WHATSAPP FLOTANTE ===== */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: var(--blanco);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.3);
+            z-index: 999;
+            transition: var(--transicion);
+            text-decoration: none;
+        }
+        
+        .whatsapp-float:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 15px 30px rgba(37, 211, 102, 0.4);
+        }
+        
+        .whatsapp-pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: 50%;
+            animation: pulse-ring 2s infinite;
+            z-index: -1;
+        }
+        
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        
+        /* ===== FOOTER ===== */
+        footer {
+            background: linear-gradient(135deg, var(--texto-oscuro), #1a1a1a);
+            color: var(--blanco);
+            padding-top: 80px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+        
+        .footer-logo h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .footer-logo p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 25px;
+        }
+        
+        .footer-links h3 {
+            color: var(--dorado);
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transicion);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .footer-links a:hover {
+            color: var(--dorado);
+            padding-left: 5px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: var(--blanco);
+            font-size: 18px;
+            transition: var(--transicion);
+        }
+        
+        .social-links a:hover {
+            background: linear-gradient(135deg, var(--rosa-medio), var(--lila-oscuro));
+            transform: translateY(-5px);
+        }
+        
+        .payment-methods {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .payment-icon {
+            font-size: 2.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            transition: var(--transicion);
+        }
+        
+        .payment-icon:hover {
+            color: var(--dorado);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .nav-desktop {
+                display: none;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .hero-content,
+            .bio-container,
+            .contact-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .hero {
+                padding: 150px 0 80px;
+            }
+            
+            .hero-text {
+                text-align: center;
+            }
+            
+            .hero-buttons {
+                justify-content: center;
+            }
+            
+            .certificado-float {
+                position: relative;
+                bottom: 0;
+                right: 0;
+                width: 100%;
+                margin-top: 20px;
+            }
+            
+            .services-grid-detailed,
+            .aparato-grid,
+            .courses-grid,
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .formacion-timeline::before {
+                left: 20px;
+            }
+            
+            .timeline-year {
+                margin-right: 20px;
+                width: 50px;
+                height: 50px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .section-padding {
+                padding: 80px 0;
+            }
+            
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2.2rem;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-form {
+                padding: 30px 25px;
+            }
+            
+            .course-details {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .btn {
+                padding: 12px 25px;
+                width: 100%;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+            
+            .service-category h3 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        
+        /* ===== MOBILE MENU ===== */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background-color: var(--blanco);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            transition: var(--transicion);
+            padding: 100px 40px 40px;
+            overflow-y: auto;
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+        }
+        
+        .mobile-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--gris-medio);
+        }
+        
+        .mobile-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--rosa-fuerte);
+        }
+        
+        .mobile-nav {
+            list-style: none;
+        }
+        
+        .mobile-nav li {
+            margin-bottom: 20px;
+        }
+        
+        .mobile-nav a {
+            display: block;
+            padding: 15px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--texto-oscuro);
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: var(--transicion);
+        }
+        
+        .mobile-nav a:hover {
+            color: var(--rosa-fuerte);
+            border-bottom-color: var(--rosa-fuerte);
+            padding-left: 10px;
+        }
+        
+        .mobile-dropdown {
+            padding-left: 20px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .mobile-dropdown.active {
+            display: block;
+        }
+        
+        .mobile-dropdown a {
+            font-size: 1rem;
+            padding: 10px 0;
+            color: var(--texto-medio);
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transicion);
+        }
+        
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* ===== LOADING ANIMATION ===== */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--rosa-claro), var(--lila-claro));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loader {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+        
+        .loader:before {
+            content: '';
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 8px solid transparent;
+            border-top-color: var(--rosa-fuerte);
+            border-bottom-color: var(--rosa-fuerte);
+            animation: spin 1s linear infinite;
+            position: absolute;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== LOADING ===== -->
+    <div class="loading" id="loading">
+        <div class="loader"></div>
+    </div>
+
+    <!-- ===== HEADER ===== -->
+    <header id="header">
+        <div class="container nav-container">
+            <a href="#inicio" class="logo">
+                <div>
+                    <div class="logo-text">Luminance<span class="logo-dot">.</span></div>
+                    <div class="logo-subtitle">by Cande | Estética Profesional</div>
+                </div>
+            </a>
+            
+            <nav class="nav-desktop">
+                <ul class="nav-links">
+                    <li><a href="#inicio" class="active">Inicio</a></li>
+                    <li class="dropdown">
+                        <a href="#servicios">Servicios <i class="fas fa-chevron-down"></i></a>
+                        <div class="dropdown-content">
+                            <a href="#pestanas"><i class="fas fa-eye"></i> Pestañas</a>
+                            <a href="#cejas"><i class="fas fa-eye-brow"></i> Cejas</a>
+                            <a href="#depilacion"><i class="fas fa-spa"></i> Depilación Láser</a>
+                            <a href="#aparato"><i class="fas fa-user-md"></i> Aparatología</a>
+                            <a href="#pies"><i class="fas fa-shoe-prints"></i> Pedicuría</a>
+                        </div>
+                    </li>
+                    <li><a href="#cursos">Cursos</a></li>
+                    <li><a href="#sobremi">Sobre Mí</a></li>
+                    <li><a href="#formacion">Formación</a></li>
+                    <li><a href="#testimonios">Testimonios</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+                
+                <div class="nav-actions">
+                    <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Vi%20tu%20página%20y%20quisiera%20consultarte%20por..." 
+                       class="whatsapp-nav" target="_blank">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>11 6281-5014</span>
+                    </a>
+                </div>
+            </nav>
+            
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MOBILE MENU ===== -->
+    <div class="overlay" id="overlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <div>
+                <h3 class="logo-text">Luminance<span class="logo-dot">.</span></h3>
+                <div class="logo-subtitle">by Cande</div>
+            </div>
+            <div class="mobile-close" id="mobileClose">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+        
+        <ul class="mobile-nav">
+            <li><a href="#inicio">Inicio</a></li>
+            <li>
+                <a href="#servicios" class="mobile-dropdown-toggle">Servicios <i class="fas fa-chevron-down"></i></a>
+                <div class="mobile-dropdown" id="mobileDropdown">
+                    <a href="#pestanas">Pestañas</a>
+                    <a href="#cejas">Cejas</a>
+                    <a href="#depilacion">Depilación Láser</a>
+                    <a href="#aparato">Aparatología</a>
+                    <a href="#pies">Pedicuría</a>
+                </div>
+            </li>
+            <li><a href="#cursos">Cursos</a></li>
+            <li><a href="#sobremi">Sobre Mí</a></li>
+            <li><a href="#formacion">Formación</a></li>
+            <li><a href="#testimonios">Testimonios</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+        </ul>
+        
+        <div style="margin-top: 40px;">
+            <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Vi%20tu%20página%20y%20quisiera%20consultarte%20por..." 
+               class="btn btn-rosa" 
+               style="width: 100%;"
+               target="_blank">
+                <i class="fab fa-whatsapp"></i> WhatsApp Directo
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="hero" id="inicio">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text fade-in">
+                    <span class="badge badge-promo">
+                        <i class="fas fa-star"></i> 5 años de experiencia
+                    </span>
+                    
+                    <h1>Belleza Profesional con Resultados que Hablan por Sí Solos</h1>
+                    
+                    <p>Soy <span class="highlight">Cande</span>, especialista en estética con 5 años transformando miradas y realzando belleza natural. Mi pasión está en cada detalle, desde el lifting de pestañas hasta los tratamientos corporales más avanzados.</p>
+                    
+                    <div class="hero-buttons">
+                        <a href="#servicios" class="btn btn-rosa">
+                            <i class="fas fa-spa"></i> Ver Servicios
+                        </a>
+                        <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Vi%20tu%20página%20y%20quisiera%20consultarte%20por..." 
+                           class="btn btn-lila" target="_blank">
+                            <i class="fab fa-whatsapp"></i> Reservar por WhatsApp
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="hero-image fade-in" style="animation-delay: 0.2s;">
+                    <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                         alt="Cande - Especialista en estética" 
+                         loading="lazy">
+                </div>
+            </div>
+            
+            <div class="hero-stats fade-in" style="animation-delay: 0.4s;">
+                <div class="stat-item">
+                    <div class="stat-number">5+</div>
+                    <div class="stat-label">Años de Experiencia</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Clientes Satisfechas</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Alumnas Formadas</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Dedicación</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== BIO SECTION ===== -->
+    <section class="bio-section section-padding" id="sobremi">
+        <div class="container">
+            <div class="bio-container">
+                <div class="bio-image">
+                    <img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                         alt="Cande - Especialista en estética" 
+                         loading="lazy">
+                    
+                    <div class="certificado-float">
+                        <i class="fas fa-graduation-cap"></i>
+                        <p>Formación Continua</p>
+                        <small>Tecnicatura en Cosmetología 2024</small>
+                    </div>
+                </div>
+                
+                <div class="bio-text">
+                    <h2>¡Hola, soy Cande!</h2>
+                    
+                    <p>Desde hace <span class="highlight">5 años</span>, me dedico apasionadamente a realzar la belleza natural de mis clientas a través de técnicas profesionales y personalizadas.</p>
+                    
+                    <p>Mi especialidad está en <span class="highlight">pestañas y cejas</span>, donde combino precisión y arte para crear resultados que superen expectativas. Cada rostro es único, y mi misión es destacar su esencia natural.</p>
+                    
+                    <p>Este 2024 inicio mi <span class="highlight">Tecnicatura en Cosmetología</span>, para incorporar los conocimientos científicos más actualizados y ofrecerte tratamientos aún más efectivos y seguros.</p>
+                    
+                    <p>Creo firmemente en la <span class="highlight">educación continua</span>, por eso además de mis servicios, comparto mi experiencia a través de cursos donde enseño a otras emprendedoras las técnicas que he perfeccionado a lo largo de estos años.</p>
+                    
+                    <div class="benefits-grid">
+                        <div class="benefit-card">
+                            <i class="fas fa-hand-sparkles"></i>
+                            <h3>Precisión</h3>
+                            <p>Técnicas milimétricas en cada tratamiento</p>
+                        </div>
+                        
+                        <div class="benefit-card">
+                            <i class="fas fa-heart"></i>
+                            <h3>Pasión</h3>
+                            <p>Amor por cada detalle del proceso</p>
+                        </div>
+                        
+                        <div class="benefit-card">
+                            <i class="fas fa-award"></i>
+                            <h3>Calidad</h3>
+                            <p>Productos premium y tecnología de vanguardia</p>
+                        </div>
+                        
+                        <div class="benefit-card">
+                            <i class="fas fa-users"></i>
+                            <h3>Confianza</h3>
+                            <p>Relaciones duraderas con mis clientas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SERVICIOS DETALLADOS ===== -->
+    <section class="services-detailed section-padding" id="servicios">
+        <div class="container">
+            <div class="section-title">
+                <h2>Mis Servicios Especializados</h2>
+                <p style="color: var(--texto-medio); max-width: 700px; margin: 0 auto;">Tratamientos profesionales diseñados para realzar tu belleza natural</p>
+            </div>
+            
+            <!-- PESTAÑAS -->
+            <div class="service-category" id="pestanas">
+                <h3><i class="fas fa-eye"></i> Pestañas</h3>
+                <div class="services-grid-detailed">
+                    <div class="service-item">
+                        <div class="service-header">
+                            <div class="service-icon">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="service-title">
+                                <h4>Lifting de Pestañas</h4>
+                                <small>Realza tu mirada naturalmente</small>
+                            </div>
+                        </div>
+                        <p>Transformación completa de tus pestañas naturales mediante un alisado y curvado profesional. Resultados que duran 6-8 semanas sin necesidad de extensiones.</p>
+                        <ul class="service-features">
+                            <li><i class="fas fa-check"></i> Duración: 6-8 semanas</li>
+                            <li><i class="fas fa-check"></i> Incluye limpieza y cuidado previo</li>
+                            <li><i class="fas fa-check"></i> Sin daño a pestañas naturales</li>
+                            <li><i class="fas fa-check"></i> Efecto de pestañas rizadas y más largas</li>
+                        </ul>
+                        <div class="service-price">$4.500</div>
+                        <div class="service-duration">⏱️ 90 minutos aprox.</div>
+                        <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Quiero%20reservar%20un%20Lifting%20de%20Pestañas" 
+                           class="btn btn-rosa" style="margin-top: 15px; width: 100%;" target="_blank">
+                            <i class="fab fa-whatsapp"></i> Reservar Ahora
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CEJAS -->
+            <div class="service-category" id="cejas">
+                <h3><i class="fas fa-eye-brow"></i> Cejas</h3>
+                <div class="services-grid-detailed">
+                    <div class="service-item">
+                        <div class="service-header">
+                            <div class="service-icon">
+                                <i class="fas fa-eye-brow"></i>
+                            </div>
+                            <div class="service-title">
+                                <h4>Diseño y Perfilado</h4>
+                                <small>La forma perfecta para tu rostro</small>
+                            </div>
+                        </div>
+                        <p>Análisis facial personalizado para diseñar la forma ideal de tus cejas según tu rostro, expresión y estilo personal.</p>
+                        <ul class="service-features">
+                            <li><i class="fas fa-check"></i> Análisis facial completo</li>
+                            <li><i class="fas fa-check"></i> Diseño personalizado</li>
+                            <li><i class="fas fa-check"></i> Perfilado con pinza y cera</li>
+                            <li><i class="fas fa-check"></i> Tinte opcional (henna o tinte vegano)</li>
+                        </ul>
+                        <div class="service-price">$3.200</div>
+                        <div class="service-duration">⏱️ 45 minutos aprox.</div>
+                        <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Quiero%20reservar%20Diseño%20y%20Perfilado%20de%20Cejas" 
+                           class="btn btn-rosa" style="margin-top: 15px; width: 100%;" target="_blank">
+                            <i class="fab fa-whatsapp"></i> Reservar Ahora
+                        </a>
+                    </div>
+                    
+                    <div class="service-item">
+                        <div class="service-header">
+                            <div class="service-icon">
+                                <i class="fas fa-paint-brush"></i>
+                            </div>
+                            <div class="service-title">
+                                <h4>Laminado de Cejas</h4>
+                                <small>Cejas perfectamente peinadas</small>
+                            </div>
+                        </div>
+                        <p>Tratamiento que alisa y direcciona cada pelo de la ceja hacia la dirección deseada, creando un efecto de cejas más llenas y definidas.</p>
+                        <ul class="service-features">
+                            <li><i class="fas fa-check"></i> Duración: 4-6 semanas</li>
+                            <li><i class="fas fa-check"></i> Efecto de cejas peinadas</li>
+                            <li><i class="fas fa-check"></i> Mayor definición y volumen</li>
+                            <li><i class="fas fa-check"></i> Ideal para cejas rebeldes</li>
+                        </ul>
+                        <div class="service-price">$4.000</div>
+                        <div class="service-duration">⏱️ 60 minutos aprox.</div>
+                        <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Quiero%20reservar%20Laminado%20de%20Cejas" 
+                           class="btn btn-rosa" style="margin-top: 15px; width: 100%;" target="_blank">
+                            <i class="fab fa-whatsapp"></i> Reservar Ahora
+                        </a>
+                    </div>
+                    
+                    <div class="service-item">
+                        <div class="service-header">
+                            <div class="service-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div class="service-title">
+                                <h4>Henna en Cejas</h4>
+                                <small>Color y definición natural</small>
+                            </div>
+                        </div>
+                        <p>Tinte vegetal que además de dar color, brinda un efecto de ceja más llena y definida. Perfecto para cejas claras o con espacios.</p>
+                        <ul class="service-features">
+                            <li><i class="fas fa-check"></i> Duración: 2-3 semanas en piel</li>
+                            <li><i class="fas fa-check"></i> 4-6 semanas en pelo</li>
+                            <li><i class="fas fa-check"></i> Producto 100% natural</li>
+                            <li><i class="fas fa-check"></i> Efecto de microblading temporal</li>
+                        </ul>
+                        <div class="service-price">$2.800</div>
+                        <div class="service-duration">⏱️ 30 minutos aprox.</div>
+                        <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Quiero%20reservar%20Henna%20en%20Cejas" 
+                           class="btn btn-rosa" style="margin-top: 15px; width: 100%;" target="_blank">
+                            <i class="fab fa-whatsapp"></i> Reservar Ahora
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- DEPILACIÓN LÁSER -->
+            <div class="service-category" id="depilacion">
+                <h3><i class="fas fa-spa"></i> Depilación Láser</h3>
+                <div class="services-grid-detailed">
+                    <div class="service-item">
+                        <div class="service-header">
+                            <div class="service-icon">
+                                <i class="fas fa-spa"></i>
+                            </div>
+                            <div class="service-title">
+                                <h4>Depilación Láser Corporal</h4>
+                                <small>Tecnología de vanguardia</small>
+                            </div>
+                        </div>
+                        <p>Tratamiento definitivo con tecnología láser de última generación. Seguro, efectivo y con mínimas molestias.</p>
+                        <ul class="service-features">
+                            <li><i class="fas fa-check"></i> Axilas: $2.500 por sesión</li>
+                            <li><i class="fas fa-check"></i> Piernas completas: $5.500 por sesión</li>
+                            <li><i class="fas fa-check"></i> Rostro: $3.000 por sesión</li>
+                            <li><i class="fas fa-check"></i> Brazos: $3.800 por sesión</li>
+                            <li><i class="fas fa-check"></i> Paquetes promocionales disponibles</li>
+                        </ul>
+                        <div class="service-duration">⏱️ Tiempo variable según zona</div>
+                        <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Quiero%20consultar%20por%20Depilación%20Láser" 
+                           class="btn btn-rosa" style="margin-top: 15px; width: 100%;" target="_blank">
+                            <i class="fab fa-whatsapp"></i> Consultar Precios
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- APARATOLOGÍA -->
+            <div class="service-category" id="aparato">
+                <h3><i class="fas fa-user-md"></i> Estética Corporal con Aparatología</h3>
+                <p style="text-align: center; color: var(--texto-medio); margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                    Tratamientos reductores, moldeantes y tonificantes con tecnología profesional
+                </p>
+                
+                <div class="aparato-grid">
+                    <div class="aparato-card">
+                        <div class="aparato-icon">
+                            <i class="fas fa-weight"></i>
+                        </div>
+                        <h4>Reducción Localizada</h4>
+                        <p>Tecnología para eliminar grasa localizada en abdomen, cartucheras, espalda y brazos.</p>
+                    </div>
+                    
+                    <div class="aparato-card">
+                        <div class="aparato-icon">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <h4>Radiofrecuencia</h4>
+                        <p>Reafirmación y rejuvenecimiento cutáneo. Estimula producción de colágeno.</p>
+                    </div>
+                    
+                    <div class="aparato-card">
+                        <div class="aparato-icon">
+                            <i class="fas fa-wave-square"></i>
+                        </div>
+                        <h4>Ultracavitación</h4>
+                        <p>Eliminación de adiposidades mediante ultrasonidos de alta frecuencia.</p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Quiero%20consultar%20por%20tratamientos%20de%20aparatología" 
+                       class="btn btn-lila" target="_blank">
+                        <i class="fas fa-info-circle"></i> Consultar Todos los Tratamientos
+                    </a>
+                </div>
+            </div>
+            
+            <!-- PIES -->
+            <div class="service-category" id="pies">
+                <h3><i class="fas fa-shoe-prints"></i> Pies & Pedicuría</h3>
+                <div class="services-grid-detailed">
+                    <div class="service-item">
+                        <div class="service-header">
+                            <div class="service-icon">
+                                <i class="fas fa-shoe-prints"></i>
+                            </div>
+                            <div class="service-title">
+                                <h4>Pedicuría Premium</h4>
+                                <small>Solo en pies | Esmaltado semipermanente</small>
+                            </div>
+                        </div>
+                        <p>Tratamiento completo de pies que incluye limpieza, exfoliación, hidratación y esmaltado semipermanente de alta duración.</p>
+                        <ul class="service-features">
+                            <li><i class="fas fa-check"></i> Limpieza profunda y corte de uñas</li>
+                            <li><i class="fas fa-check"></i> Exfoliación con productos premium</li>
+                            <li><i class="fas fa-check"></i> Hidratación intensiva</li>
+                            <li><i class="fas fa-check"></i> Esmaltado semipermanente (dura 3-4 semanas)</li>
+                            <li><i class="fas fa-check"></i> Masaje relajante incluido</li>
+                        </ul>
+                        <div class="service-price">$3.500</div>
+                        <div class="service-duration">⏱️ 75 minutos aprox.</div>
+                        <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Quiero%20reservar%20Pedicuría%20Premium" 
+                           class="btn btn-rosa" style="margin-top: 15px; width: 100%;" target="_blank">
+                            <i class="fab fa-whatsapp"></i> Reservar Ahora
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CURSOS SECTION ===== -->
+    <section class="courses section-padding" id="cursos">
+        <div class="container">
+            <div class="section-title">
+                <h2>Cursos Profesionales</h2>
+                <p style="color: var(--texto-medio); max-width: 700px; margin: 0 auto;">Formación práctica para emprender en el mundo de la estética</p>
+            </div>
+            
+            <div class="courses-grid">
+                <!-- Curso Laminado de Cejas -->
+                <div class="course-card">
+                    <div class="course-badge">Más Popular</div>
+                    <div class="course-header">
+                        <div class="course-icon">
+                            <i class="fas fa-eye-brow"></i>
+                        </div>
+                        <h3 style="color: white;">Curso Completo de Laminado de Cejas</h3>
+                    </div>
+                    <div class="course-content">
+                        <h3>Master en Laminado de Cejas</h3>
+                        <p>Aprende desde cero la técnica de laminado profesional. Incluye diseño, henna y todos los secretos que he perfeccionado en 5 años de experiencia.</p>
+                        
+                        <div class="course-details">
+                            <div class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span>8 horas intensivas</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-users"></i>
+                                <span>Máximo 4 alumnas</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Fechas flexibles</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Presencial en estudio</span>
+                            </div>
+                        </div>
+                        
+                        <div class="course-includes">
+                            <h4>¿Qué incluye?</h4>
+                            <ul>
+                                <li><i class="fas fa-check"></i> Manual completo en PDF</li>
+                                <li><i class="fas fa-check"></i> Kit profesional de inicio</li>
+                                <li><i class="fas fa-check"></i> Práctica con modelos reales</li>
+                                <li><i class="fas fa-check"></i> Certificado de finalización</li>
+                                <li><i class="fas fa-check"></i> Grupo de apoyo post-curso</li>
+                                <li><i class="fas fa-check"></i> Lista de proveedores premium</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="course-price">$18.000</div>
+                        <div class="course-installment">o 3 cuotas de $6.500</div>
+                        
+                        <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Quiero%20información%20sobre%20el%20Curso%20de%20Laminado%20de%20Cejas" 
+                           class="btn btn-lila" style="width: 100%;" target="_blank">
+                            <i class="fas fa-graduation-cap"></i> Quiero Inscribirme
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Curso Lifting de Pestañas -->
+                <div class="course-card">
+                    <div class="course-badge">Nuevo</div>
+                    <div class="course-header">
+                        <div class="course-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <h3 style="color: white;">Curso de Lifting de Pestañas</h3>
+                    </div>
+                    <div class="course-content">
+                        <h3>Especialización en Lifting</h3>
+                        <p>Domina la técnica de lifting profesional. Aprende a trabajar con diferentes tipos de pestañas y a lograr resultados que duren 6-8 semanas.</p>
+                        
+                        <div class="course-details">
+                            <div class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span>10 horas intensivas</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-users"></i>
+                                <span>Máximo 3 alumnas</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Fines de semana</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Presencial en estudio</span>
+                            </div>
+                        </div>
+                        
+                        <div class="course-includes">
+                            <h4>¿Qué incluye?</h4>
+                            <ul>
+                                <li><i class="fas fa-check"></i> Material didáctico completo</li>
+                                <li><i class="fas fa-check"></i> Kit de productos profesionales</li>
+                                <li><i class="fas fa-check"></i> 2 modelos para práctica</li>
+                                <li><i class="fas fa-check"></i> Certificado oficial</li>
+                                <li><i class="fas fa-check"></i> Asesoramiento post-curso</li>
+                                <li><i class="fas fa-check"></i> Tips para emprender</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="course-price">$22.000</div>
+                        <div class="course-installment">o 3 cuotas de $7.800</div>
+                        
+                        <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Quiero%20información%20sobre%20el%20Curso%20de%20Lifting%20de%20Pestañas" 
+                           class="btn btn-lila" style="width: 100%;" target="_blank">
+                            <i class="fas fa-graduation-cap"></i> Quiero Inscribirme
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 50px;">
+                <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Quiero%20consultar%20por%20todos%20los%20cursos%20disponibles" 
+                   class="btn btn-dorado" target="_blank">
+                    <i class="fas fa-book-open"></i> Consultar por Cursos Personalizados
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FORMACIÓN ACADÉMICA ===== -->
+    <section class="formacion-section section-padding" id="formacion">
+        <div class="container">
+            <div class="section-title">
+                <h2>Mi Formación Profesional</h2>
+                <p style="color: var(--texto-medio); max-width: 700px; margin: 0 auto;">Comprometida con la excelencia y la educación continua</p>
+            </div>
+            
+            <div class="formacion-timeline">
+                <div class="timeline-item">
+                    <div class="timeline-year">2019</div>
+                    <div class="timeline-content">
+                        <h4>Inicio en el Mundo de la Estética</h4>
+                        <p>Comienzo mi formación en técnicas básicas de estética, especializándome en cejas y pestañas. Primeros clientes y desarrollo de mi método personal.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-year">2021</div>
+                    <div class="timeline-content">
+                        <h4>Especialización en Lifting de Pestañas</h4>
+                        <p>Certificación profesional en lifting de pestañas. Implementación de técnicas avanzadas y ampliación de servicios en mi estudio.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-year">2023</div>
+                    <div class="timeline-content">
+                        <h4>Expansión a Tratamientos Corporales</h4>
+                        <p>Formación en aparatología estética. Incorporación de depilación láser y tratamientos reductores a mi portafolio de servicios.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-year">2024</div>
+                    <div class="timeline-content">
+                        <h4>Tecnicatura en Cosmetología</h4>
+                        <p>Inicio de estudios formales en cosmetología. Integración de conocimientos científicos para ofrecer tratamientos más efectivos y seguros.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TESTIMONIOS ===== -->
+    <section class="testimonials section-padding" id="testimonios">
+        <div class="container">
+            <div class="section-title">
+                <h2>Lo que Dicen Mis Clientes</h2>
+                <p style="color: var(--texto-medio); max-width: 700px; margin: 0 auto;">Experiencias reales de quienes confiaron en mi trabajo</p>
+            </div>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="client-rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="client-text">"Cande es una genia total. Mi lifting de pestañas duró más de 2 meses y siempre me sentí en las mejores manos. Su dedicación y atención al detalle son increíbles. ¡Super recomendable!"</p>
+                    <div class="client-info">
+                        <div class="client-avatar">MG</div>
+                        <div>
+                            <div class="client-name">María González</div>
+                            <small>Cliente desde 2021</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="client-rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="client-text">"Hice el curso de laminado con Cande y fue excelente. No solo aprendí la técnica, sino también cómo manejar clientes y armar mi propio emprendimiento. Hoy tengo mi propio estudio gracias a ella."</p>
+                    <div class="client-info">
+                        <div class="client-avatar">LF</div>
+                        <div>
+                            <div class="client-name">Laura Fernández</div>
+                            <small>Ex alumna | Ahora tiene su propio estudio</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="client-rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="client-text">"Las cejas que me hace Cande son perfectas. Siempre analiza mi rostro y me da recomendaciones personalizadas. El laminado con henna me cambió la vida, ¡no salgo sin mis cejas hechas!"</p>
+                    <div class="client-info">
+                        <div class="client-avatar">AP</div>
+                        <div>
+                            <div class="client-name">Ana Paula</div>
+                            <small>Cliente mensual de cejas</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CONTACTO ===== -->
+    <section class="contact-section section-padding" id="contacto">
+        <div class="container">
+            <div class="section-title">
+                <h2 style="color: white;">Contactame</h2>
+                <p style="color: rgba(255,255,255,0.8); max-width: 700px; margin: 0 auto;">¿Lista para realzar tu belleza? ¡Escribime!</p>
+            </div>
+            
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h2 style="color: white;">¡Hablemos!</h2>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 30px;">Agendá tu cita o consultá por mis cursos. Te respondo personalmente en menos de 24 horas.</p>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div>
+                                <h4 style="color: white;">WhatsApp Directo</h4>
+                                <p style="color: rgba(255,255,255,0.8);">11 6281-5014</p>
+                                <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Vi%20tu%20página%20y%20quisiera%20consultarte%20por..." 
+                                   style="color: var(--dorado); text-decoration: none; font-weight: 600;" target="_blank">
+                                    <i class="fab fa-whatsapp"></i> Escribime ahora
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <h4 style="color: white;">Horarios de Atención</h4>
+                                <p style="color: rgba(255,255,255,0.8);">Lunes a Viernes: 9:00 - 20:00<br>Sábados: 10:00 - 16:00<br>Domingos: Cerrado</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <h4 style="color: white;">Ubicación del Estudio</h4>
+                                <p style="color: rgba(255,255,255,0.8);">Zona Norte - Buenos Aires<br>(Dirección exacta se brinda al reservar)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div>
+                                <h4 style="color: white;">Reservas</h4>
+                                <p style="color: rgba(255,255,255,0.8);">Se requiere reserva previa<br>Seña del 50% para confirmar</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="social-links">
+                        <a href="https://instagram.com/tu_usuario" target="_blank" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://facebook.com/tu_pagina" target="_blank" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://tiktok.com/@tu_usuario" target="_blank" aria-label="TikTok">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="contact-form">
+                    <h3 style="color: var(--violeta); margin-bottom: 30px;">Envianos tu Consulta</h3>
+                    
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Nombre Completo *</label>
+                            <input type="text" id="name" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Teléfono *</label>
+                            <input type="tel" id="phone" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="service">Servicio de Interés *</label>
+                            <select id="service" class="form-control" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="lifting">Lifting de Pestañas</option>
+                                <option value="cejas">Cejas (Diseño/Laminado/Henna)</option>
+                                <option value="depilacion">Depilación Láser</option>
+                                <option value="aparato">Estética Corporal</option>
+                                <option value="pedicuria">Pedicuría Premium</option>
+                                <option value="curso_cejas">Curso Laminado de Cejas</option>
+                                <option value="curso_pestanas">Curso Lifting de Pestañas</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Mensaje *</label>
+                            <textarea id="message" class="form-control" required placeholder="Contame qué te gustaría lograr..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-rosa" style="width: 100%; padding: 16px;">
+                            <i class="fas fa-paper-plane"></i> Enviar Consulta
+                        </button>
+                        <p style="text-align: center; margin-top: 15px; color: var(--texto-medio); font-size: 0.9rem;">
+                            También podés escribirme directamente por WhatsApp
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== WHATSAPP FLOTANTE ===== -->
+    <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Vi%20tu%20página%20y%20quisiera%20consultarte%20por..." 
+       class="whatsapp-float" 
+       target="_blank" 
+       aria-label="Contactar a Cande por WhatsApp">
+        <div class="whatsapp-pulse"></div>
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2 class="logo-text" style="color: white;">Luminance<span style="color: var(--dorado);">.</span></h2>
+                    <div class="logo-subtitle" style="color: rgba(255,255,255,0.5);">by Cande | Estética Profesional</div>
+                    <p style="color: rgba(255,255,255,0.7); margin-top: 15px;">5 años de experiencia especializada en pestañas, cejas y tratamientos estéticos. Belleza natural, resultados profesionales.</p>
+                    
+                    <div class="social-links">
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Servicios</h3>
+                    <ul>
+                        <li><a href="#pestanas"><i class="fas fa-chevron-right"></i> Lifting de Pestañas</a></li>
+                        <li><a href="#cejas"><i class="fas fa-chevron-right"></i> Diseño & Perfilado de Cejas</a></li>
+                        <li><a href="#cejas"><i class="fas fa-chevron-right"></i> Laminado de Cejas</a></li>
+                        <li><a href="#cejas"><i class="fas fa-chevron-right"></i> Henna en Cejas</a></li>
+                        <li><a href="#depilacion"><i class="fas fa-chevron-right"></i> Depilación Láser</a></li>
+                        <li><a href="#aparato"><i class="fas fa-chevron-right"></i> Estética Corporal</a></li>
+                        <li><a href="#pies"><i class="fas fa-chevron-right"></i> Pedicuría Premium</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Cursos</h3>
+                    <ul>
+                        <li><a href="#cursos"><i class="fas fa-chevron-right"></i> Laminado de Cejas</a></li>
+                        <li><a href="#cursos"><i class="fas fa-chevron-right"></i> Lifting de Pestañas</a></li>
+                        <li><a href="#cursos"><i class="fas fa-chevron-right"></i> Cursos Personalizados</a></li>
+                    </ul>
+                    
+                    <h3 style="margin-top: 30px;">Contacto Directo</h3>
+                    <ul>
+                        <li><a href="https://wa.me/541162815014" target="_blank"><i class="fab fa-whatsapp"></i> 11 6281-5014</a></li>
+                        <li><i class="fas fa-clock"></i> Lun-Vie: 9:00-20:00</li>
+                        <li><i class="fas fa-clock"></i> Sábados: 10:00-16:00</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Métodos de Pago</h3>
+                    <div class="payment-methods">
+                        <i class="fas fa-money-bill-wave payment-icon" title="Efectivo"></i>
+                        <i class="fas fa-university payment-icon" title="Transferencia"></i>
+                        <i class="fab fa-cc-visa payment-icon" title="Visa"></i>
+                        <i class="fab fa-cc-mastercard payment-icon" title="Mastercard"></i>
+                        <i class="fab fa-cc-amex payment-icon" title="American Express"></i>
+                    </div>
+                    
+                    <h3 style="margin-top: 30px;">Políticas</h3>
+                    <ul>
+                        <li><i class="fas fa-calendar-check"></i> Reserva con seña del 50%</li>
+                        <li><i class="fas fa-clock"></i> Cancelación con 48h de anticipación</li>
+                        <li><i class="fas fa-user-clock"></i> Puntualidad requerida</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Luminance Studio by Cande. Todos los derechos reservados. | Especialista en estética con 5 años de experiencia</p>
+                <p style="margin-top: 10px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">
+                    Sitio web diseñado profesionalmente para mostrar servicios y cursos de estética
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== LOADING SCREEN =====
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+
+        // ===== MENÚ MÓVIL =====
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileClose = document.getElementById('mobileClose');
+        const overlay = document.getElementById('overlay');
+        const mobileDropdownToggle = document.querySelector('.mobile-dropdown-toggle');
+        const mobileDropdown = document.getElementById('mobileDropdown');
+
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        mobileClose.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        overlay.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        mobileDropdownToggle?.addEventListener('click', (e) => {
+            e.preventDefault();
+            mobileDropdown.classList.toggle('active');
+        });
+
+        // ===== HEADER SCROLL EFFECT =====
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // ===== ACTIVE NAV LINK =====
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-links a, .mobile-nav a');
+
+        function updateActiveLink() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveLink);
+        updateActiveLink();
+
+        // ===== FORM SUBMISSION =====
+        const contactForm = document.getElementById('contactForm');
+        contactForm?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Simulación de envío exitoso
+            const service = document.getElementById('service').value;
+            const name = document.getElementById('name').value;
+            
+            let whatsappMessage = `Hola Cande! Soy ${name}. Vi tu página y quisiera consultarte por: ${document.getElementById('service').options[document.getElementById('service').selectedIndex].text}`;
+            
+            // Redirigir a WhatsApp
+            window.open(`https://wa.me/541162815014?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
+            
+            // Resetear formulario
+            contactForm.reset();
+        });
+
+        // ===== ANIMATIONS ON SCROLL =====
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observar elementos para animar
+        document.querySelectorAll('.service-item, .course-card, .benefit-card, .testimonial-card, .aparato-card, .timeline-item').forEach(el => {
+            observer.observe(el);
+        });
+
+        // ===== COUNTER ANIMATION =====
+        const statNumbers = document.querySelectorAll('.stat-number');
+        statNumbers.forEach(stat => {
+            const target = parseInt(stat.textContent.replace('+', '').replace('%', ''));
+            let current = 0;
+            const increment = target / 30;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                stat.textContent = Math.floor(current) + (stat.textContent.includes('%') ? '%' : (stat.textContent.includes('+') ? '+' : ''));
+            }, 50);
+        });
+
+        // ===== SMOOTH SCROLL =====
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                if (this.getAttribute('href').startsWith('#') && this.getAttribute('href') !== '#') {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        // Cerrar menú móvil si está abierto
+                        mobileMenu.classList.remove('active');
+                        overlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                        
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+
+        // ===== NOTIFICATION SYSTEM =====
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 30px;
+                background: ${type === 'success' ? 'linear-gradient(135deg, var(--rosa-medio), var(--lila-oscuro))' : '#ff6b6b'};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Agregar estilos para las animaciones de notificación
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

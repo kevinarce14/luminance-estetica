@@ -1,0 +1,90 @@
+# ========================================
+# LUMINANCE ESTÉTICA - BACKEND DEPENDENCIES
+# ========================================
+
+# ==================
+# CORE FRAMEWORK
+# ==================
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# ==================
+# DATABASE & ORM
+# ==================
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+alembic==1.12.1
+
+# ==================
+# AUTHENTICATION & SECURITY
+# ==================
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.1.1
+
+# ==================
+# DATA VALIDATION
+# ==================
+pydantic==2.5.0
+pydantic-settings==2.1.0
+email-validator==2.1.0
+
+# ==================
+# EMAIL SERVICES
+# ==================
+sendgrid==6.11.0
+resend==0.7.0
+
+# ==================
+# WHATSAPP (Twilio)
+# ==================
+twilio==8.10.0
+
+# ==================
+# PAYMENTS (MercadoPago)
+# ==================
+mercadopago==2.2.1
+
+# ==================
+# ENVIRONMENT & CONFIG
+# ==================
+python-dotenv==1.0.0
+
+# ==================
+# HTTP REQUESTS
+# ==================
+httpx==0.25.1
+requests==2.31.0
+
+# ==================
+# DATE & TIME
+# ==================
+python-dateutil==2.8.2
+pytz==2023.3
+
+# ==================
+# RATE LIMITING
+# ==================
+slowapi==0.1.9
+
+# ==================
+# BACKGROUND TASKS
+# ==================
+celery==5.3.4
+redis==5.0.1
+
+# ==================
+# UTILITIES
+# ==================
+python-slugify==8.0.1
+
+# ==================
+# MONITORING (Opcional)
+# ==================
+# sentry-sdk[fastapi]==1.38.0
+
+# ==================
+# CORS
+# ==================
+# (incluido en FastAPI, no necesita instalación separada)

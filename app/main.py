@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.core.database import init_db, create_initial_data
-from app.api.v1 import auth, appointments, services, payments, users, availability, admin
+from app.routes import auth, appointments, services, payments, users, availability, admin
 
 
 @asynccontextmanager

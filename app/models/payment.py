@@ -67,6 +67,7 @@ class Payment(Base):
         - user: Cliente que realizó el pago
     """
     __tablename__ = "payments"
+    __table_args__ = {"schema": "luminance-estetica"}
     
     # ===== CAMPOS BÁSICOS =====
     id = Column(Integer, primary_key=True, index=True)

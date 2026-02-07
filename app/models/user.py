@@ -25,6 +25,7 @@ class User(Base):
         - payments: Todos los pagos del usuario
     """
     __tablename__ = "users"
+    __table_args__ = {"schema": "luminance-estetica"}
     
     # ===== CAMPOS BÁSICOS =====
     id = Column(Integer, primary_key=True, index=True)

@@ -53,6 +53,7 @@ class Coupon(Base):
         min_purchase_amount=20000, max_uses=50
     """
     __tablename__ = "coupons"
+    __table_args__ = {"schema": "luminance-estetica"}
     
     # ===== CAMPOS BÁSICOS =====
     id = Column(Integer, primary_key=True, index=True)

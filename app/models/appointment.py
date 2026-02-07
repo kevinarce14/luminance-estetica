@@ -48,6 +48,7 @@ class Appointment(Base):
         - payment: Pago asociado (si aplica)
     """
     __tablename__ = "appointments"
+    __table_args__ = {"schema": "luminance-estetica"}
     
     # ===== CAMPOS BÁSICOS =====
     id = Column(Integer, primary_key=True, index=True)

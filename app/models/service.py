@@ -30,6 +30,7 @@ class Service(Base):
         - appointments: Todos los turnos que reservaron este servicio
     """
     __tablename__ = "services"
+    __table_args__ = {"schema": "luminance-estetica"}
     
     # ===== CAMPOS BÁSICOS =====
     id = Column(Integer, primary_key=True, index=True)

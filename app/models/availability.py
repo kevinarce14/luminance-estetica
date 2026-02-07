@@ -41,6 +41,7 @@ class Availability(Base):
         specific_date=2024-12-31, start_time=09:00, end_time=14:00, is_available=True
     """
     __tablename__ = "availability"
+    __table_args__ = {"schema": "luminance-estetica"}
     
     # ===== CAMPOS BÁSICOS =====
     id = Column(Integer, primary_key=True, index=True)

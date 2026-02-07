@@ -49,10 +49,20 @@ def init_db():
     Inicializa la base de datos.
     Crea todas las tablas si no existen.
     
+    IMPORTANTE: Importar las CLASES de los modelos (no los módulos)
+    para que SQLAlchemy las registre correctamente en Base.metadata
+    
     NOTA: En producción usar Alembic para migraciones.
     """
-    from app.models import user, appointment, service, payment, availability, coupon
+    # Importar CLASES directamente (esto las registra en Base.metadata)
+    from app.models.user import User
+    from app.models.service import Service
+    from app.models.availability import Availability
+    from app.models.coupon import Coupon
+    from app.models.appointment import Appointment
+    from app.models.payment import Payment
     
+    # Ahora Base.metadata conoce todos los modelos
     Base.metadata.create_all(bind=engine)
     print("✅ Base de datos inicializada")
 
@@ -91,9 +101,12 @@ async def create_initial_data():
             db.add(admin)
             db.commit()
             print(f"✅ Admin creado: {settings.INITIAL_ADMIN_EMAIL}")
+        else:
+            print(f"ℹ️  Admin ya existe: {settings.INITIAL_ADMIN_EMAIL}")
         
         # ===== CREAR HORARIOS DE DISPONIBILIDAD POR DEFECTO =====
         # Días laborables desde settings
+        availability_count = 0
         for day in settings.business_days_list:
             existing = db.query(Availability).filter(
                 Availability.day_of_week == day
@@ -107,9 +120,13 @@ async def create_initial_data():
                     is_available=True
                 )
                 db.add(availability)
+                availability_count += 1
         
         db.commit()
-        print("✅ Horarios de disponibilidad creados")
+        if availability_count > 0:
+            print(f"✅ {availability_count} horarios de disponibilidad creados")
+        else:
+            print("ℹ️  Horarios de disponibilidad ya existen")
         
         # ===== CREAR SERVICIOS BÁSICOS =====
         default_services = [
@@ -187,6 +204,7 @@ async def create_initial_data():
             },
         ]
         
+        services_count = 0
         for service_data in default_services:
             existing = db.query(Service).filter(
                 Service.name == service_data["name"]
@@ -195,9 +213,13 @@ async def create_initial_data():
             if not existing:
                 service = Service(**service_data)
                 db.add(service)
+                services_count += 1
         
         db.commit()
-        print("✅ Servicios básicos creados")
+        if services_count > 0:
+            print(f"✅ {services_count} servicios básicos creados")
+        else:
+            print("ℹ️  Servicios básicos ya existen")
         
     except Exception as e:
         db.rollback()

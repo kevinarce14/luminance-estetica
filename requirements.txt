@@ -88,3 +88,7 @@ python-slugify==8.0.1
 # CORS
 # ==================
 # (incluido en FastAPI, no necesita instalación separada)
+
+
+
+#pip install python-jose[cryptography]

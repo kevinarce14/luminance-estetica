@@ -1,17 +1,20 @@
 # app/core/database.py
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text, event
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
 
+# Configuración del schema
+SCHEMA_NAME = "luminance-estetica"
+
 # Crear engine de SQLAlchemy
 engine = create_engine(
     settings.DATABASE_URL,
-    pool_pre_ping=True,  # Verifica conexiones antes de usarlas
-    pool_size=10,  # Número de conexiones en el pool
-    max_overflow=20,  # Conexiones adicionales permitidas
-    echo=settings.DEBUG,  # Log SQL queries en modo debug
+    pool_pre_ping=True,
+    pool_size=10,
+    max_overflow=20,
+    #echo=settings.DEBUG,   #print de db
 )
 
 # Session factory
@@ -24,6 +27,27 @@ SessionLocal = sessionmaker(
 # Base class para los modelos
 Base = declarative_base()
 
+# Configurar el schema en metadata
+Base.metadata.schema = SCHEMA_NAME
+
+
+# ===== EVENTOS DE CONEXIÓN =====
+
+@event.listens_for(engine, "connect")
+def set_search_path(dbapi_connection, connection_record):
+    """
+    Establece el search_path después de cada conexión.
+    Esto asegura que todas las queries usen el schema correcto.
+    """
+    try:
+        cursor = dbapi_connection.cursor()
+        cursor.execute(f'SET search_path TO "{SCHEMA_NAME}"')
+        cursor.close()
+    except Exception as e:
+        print(f"⚠️  Advertencia al establecer search_path: {e}")
+
+
+# ===== DEPENDENCIAS =====
 
 def get_db():
     """
@@ -39,22 +63,28 @@ def get_db():
     """
     db = SessionLocal()
     try:
+        # Establecer search_path por seguridad
+        db.execute(text(f'SET search_path TO "{SCHEMA_NAME}"'))
+        db.commit()
         yield db
     finally:
         db.close()
 
+
+# ===== INICIALIZACIÓN =====
 
 def init_db():
     """
     Inicializa la base de datos.
     Crea todas las tablas si no existen.
     
-    IMPORTANTE: Importar las CLASES de los modelos (no los módulos)
-    para que SQLAlchemy las registre correctamente en Base.metadata
-    
-    NOTA: En producción usar Alembic para migraciones.
+    Maneja dos escenarios:
+    1. Conexión con pooler (Neon) - intenta crear tablas normalmente
+    2. Si falla, usa conexión directa temporal
     """
-    # Importar CLASES directamente (esto las registra en Base.metadata)
+    print(f"🛠️  Inicializando base de datos en schema '{SCHEMA_NAME}'...")
+    
+    # Importar TODAS las clases de modelos
     from app.models.user import User
     from app.models.service import Service
     from app.models.availability import Availability
@@ -62,20 +92,94 @@ def init_db():
     from app.models.appointment import Appointment
     from app.models.payment import Payment
     
-    # Ahora Base.metadata conoce todos los modelos
-    Base.metadata.create_all(bind=engine)
-    print("✅ Base de datos inicializada")
+    # Asegurar que todas las tablas usen el schema
+    for table in Base.metadata.tables.values():
+        table.schema = SCHEMA_NAME
+    
+    # Detectar si es conexión pooler
+    is_pooler = "-pooler" in settings.DATABASE_URL or "?pooler=true" in settings.DATABASE_URL
+    
+    try:
+        if is_pooler:
+            #print("⚠️  Detectada conexión con pooler...")
+            _init_with_pooler()
+        else:
+            print("✓  Usando conexión directa...")
+            Base.metadata.create_all(bind=engine)
+            print("✅ Base de datos inicializada")
+            
+    except Exception as e:
+        print(f"❌ Error en inicialización estándar: {e}")
+        print("🔄 Intentando método alternativo...")
+        _init_with_direct_connection()
+
+
+def _init_with_pooler():
+    """
+    Intenta crear tablas con conexión pooler.
+    Neon con pooler puede tener limitaciones con DDL.
+    """
+    try:
+        # Crear schema si no existe (puede fallar con pooler)
+        with engine.begin() as conn:
+            conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{SCHEMA_NAME}"'))
+            conn.execute(text(f'SET search_path TO "{SCHEMA_NAME}"'))
+        
+        # Crear tablas
+        Base.metadata.create_all(bind=engine)
+        #print("✅ Base de datos inicializada con pooler")
+        
+    except Exception as e:
+        print(f"⚠️  Pooler no permite DDL: {e}")
+        raise  # Re-lanzar para que _init_with_direct_connection tome el control
+
+
+def _init_with_direct_connection():
+    """
+    Crea tablas usando conexión directa (sin pooler).
+    Método de fallback cuando pooler falla.
+    """
+    try:
+        # Crear URL de conexión directa
+        direct_url = settings.DATABASE_URL.replace("-pooler", "").replace("?pooler=true", "")
+        
+        #print(f"🔗 Conectando directamente a la base de datos...")
+        temp_engine = create_engine(direct_url, echo=settings.DEBUG)
+        
+        # Crear schema
+        with temp_engine.begin() as conn:
+            conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{SCHEMA_NAME}"'))
+            conn.execute(text(f'SET search_path TO "{SCHEMA_NAME}"'))
+            #print(f"✅ Schema '{SCHEMA_NAME}' verificado")
+        
+        # Asegurar schema en todas las tablas
+        for table in Base.metadata.tables.values():
+            table.schema = SCHEMA_NAME
+        
+        # Crear tablas
+        Base.metadata.create_all(bind=temp_engine)
+        #print("✅ Tablas creadas con conexión directa")
+        
+        # Limpiar
+        temp_engine.dispose()
+        
+    except Exception as e:
+        print(f"❌ Error crítico en inicialización: {e}")
+        print("\n⚠️  POSIBLES CAUSAS:")
+        print("  1. DATABASE_URL incorrecta en .env")
+        print("  2. Base de datos no accesible")
+        print("  3. Permisos insuficientes para crear schema/tablas")
+        print(f"\n📝 URL actual: {settings.DATABASE_URL[:50]}...")
+        raise
 
 
 async def create_initial_data():
     """
     Crea datos iniciales necesarios para la aplicación.
-    - Usuario administrador inicial
-    - Horarios de disponibilidad por defecto
-    - Servicios básicos
-    
-    Debe ejecutarse una sola vez al iniciar la aplicación.
+    Se ejecuta después de init_db() al iniciar la aplicación.
     """
+    #print(f"📦 Creando datos iniciales...")
+    
     from sqlalchemy.orm import Session
     from app.core.security import get_password_hash
     from app.models.user import User
@@ -86,9 +190,12 @@ async def create_initial_data():
     db: Session = SessionLocal()
     
     try:
-        # ===== CREAR ADMIN INICIAL =====
-        admin = db.query(User).filter(User.email == settings.INITIAL_ADMIN_EMAIL).first()
+        # Establecer search_path
+        db.execute(text(f'SET search_path TO "{SCHEMA_NAME}"'))
+        db.commit()
         
+        # ADMIN
+        admin = db.query(User).filter(User.email == settings.INITIAL_ADMIN_EMAIL).first()
         if not admin:
             admin = User(
                 email=settings.INITIAL_ADMIN_EMAIL,
@@ -100,131 +207,63 @@ async def create_initial_data():
             )
             db.add(admin)
             db.commit()
-            print(f"✅ Admin creado: {settings.INITIAL_ADMIN_EMAIL}")
+            #print(f"✅ Admin creado: {settings.INITIAL_ADMIN_EMAIL}")
         else:
-            print(f"ℹ️  Admin ya existe: {settings.INITIAL_ADMIN_EMAIL}")
+            print(f"ℹ️  Admin ya existe")
         
-        # ===== CREAR HORARIOS DE DISPONIBILIDAD POR DEFECTO =====
-        # Días laborables desde settings
+        # HORARIOS
         availability_count = 0
         for day in settings.business_days_list:
-            existing = db.query(Availability).filter(
-                Availability.day_of_week == day
-            ).first()
-            
-            if not existing:
-                availability = Availability(
+            if not db.query(Availability).filter(Availability.day_of_week == day).first():
+                db.add(Availability(
                     day_of_week=day,
                     start_time=time.fromisoformat(settings.BUSINESS_HOURS_START),
                     end_time=time.fromisoformat(settings.BUSINESS_HOURS_END),
                     is_available=True
-                )
-                db.add(availability)
+                ))
                 availability_count += 1
         
-        db.commit()
         if availability_count > 0:
-            print(f"✅ {availability_count} horarios de disponibilidad creados")
+            db.commit()
+            #print(f"✅ {availability_count} horarios creados")
         else:
-            print("ℹ️  Horarios de disponibilidad ya existen")
+            print("ℹ️  Horarios ya existen")
         
-        # ===== CREAR SERVICIOS BÁSICOS =====
-        default_services = [
-            {
-                "name": "Lifting de Pestañas",
-                "description": "Tratamiento profesional que realza, alarga y curva tus pestañas naturales sin necesidad de extensiones.",
-                "duration_minutes": 60,
-                "price": 15000.00,
-                "category": "pestañas",
-                "is_active": True
-            },
-            {
-                "name": "Laminado de Cejas",
-                "description": "Técnica que peina, moldea y fija las cejas dándoles forma perfecta durante semanas.",
-                "duration_minutes": 45,
-                "price": 12000.00,
-                "category": "cejas",
-                "is_active": True
-            },
-            {
-                "name": "Henna de Cejas",
-                "description": "Coloración natural de cejas con henna, rellena espacios y define la forma.",
-                "duration_minutes": 30,
-                "price": 8000.00,
-                "category": "cejas",
-                "is_active": True
-            },
-            {
-                "name": "Depilación Láser - Zona Pequeña",
-                "description": "Eliminación permanente del vello con láser de última generación. Zonas: axilas, bigote, mentón.",
-                "duration_minutes": 30,
-                "price": 10000.00,
-                "category": "laser",
-                "is_active": True
-            },
-            {
-                "name": "Depilación Láser - Zona Mediana",
-                "description": "Eliminación permanente del vello. Zonas: brazos completos, media pierna, cavado completo.",
-                "duration_minutes": 45,
-                "price": 18000.00,
-                "category": "laser",
-                "is_active": True
-            },
-            {
-                "name": "Depilación Láser - Zona Grande",
-                "description": "Eliminación permanente del vello. Zonas: piernas completas, espalda completa.",
-                "duration_minutes": 60,
-                "price": 25000.00,
-                "category": "laser",
-                "is_active": True
-            },
-            {
-                "name": "Radiofrecuencia Facial",
-                "description": "Tratamiento anti-aging con radiofrecuencia, estimula colágeno y reafirma la piel.",
-                "duration_minutes": 60,
-                "price": 20000.00,
-                "category": "facial",
-                "is_active": True
-            },
-            {
-                "name": "VelaShape - Modelado Corporal",
-                "description": "Tratamiento corporal con radiofrecuencia y vacumterapia, reduce celulitis y moldea el cuerpo.",
-                "duration_minutes": 60,
-                "price": 25000.00,
-                "category": "corporal",
-                "is_active": True
-            },
-            {
-                "name": "Pedicuría Spa",
-                "description": "Tratamiento completo de pies: exfoliación, hidratación, esmaltado y masaje relajante.",
-                "duration_minutes": 60,
-                "price": 12000.00,
-                "category": "pies",
-                "is_active": True
-            },
+        # SERVICIOS
+        services = [
+            ("Lifting de Pestañas", "Tratamiento profesional que realza, alarga y curva tus pestañas naturales.", 60, 15000, "pestañas"),
+            ("Laminado de Cejas", "Técnica que peina, moldea y fija las cejas dándoles forma perfecta.", 45, 12000, "cejas"),
+            ("Henna de Cejas", "Coloración natural de cejas con henna, rellena espacios y define la forma.", 30, 8000, "cejas"),
+            ("Depilación Láser - Zona Pequeña", "Eliminación permanente del vello. Zonas: axilas, bigote, mentón.", 30, 10000, "laser"),
+            ("Depilación Láser - Zona Mediana", "Eliminación permanente del vello. Zonas: brazos, media pierna, cavado.", 45, 18000, "laser"),
+            ("Depilación Láser - Zona Grande", "Eliminación permanente del vello. Zonas: piernas completas, espalda.", 60, 25000, "laser"),
+            ("Radiofrecuencia Facial", "Tratamiento anti-aging con radiofrecuencia, estimula colágeno.", 60, 20000, "facial"),
+            ("VelaShape - Modelado Corporal", "Tratamiento corporal con radiofrecuencia y vacumterapia.", 60, 25000, "corporal"),
+            ("Pedicuría Spa", "Tratamiento completo de pies: exfoliación, hidratación, esmaltado y masaje.", 60, 12000, "pies"),
         ]
         
         services_count = 0
-        for service_data in default_services:
-            existing = db.query(Service).filter(
-                Service.name == service_data["name"]
-            ).first()
-            
-            if not existing:
-                service = Service(**service_data)
-                db.add(service)
+        for name, desc, duration, price, category in services:
+            if not db.query(Service).filter(Service.name == name).first():
+                db.add(Service(
+                    name=name,
+                    description=desc,
+                    duration_minutes=duration,
+                    price=price,
+                    category=category,
+                    is_active=True
+                ))
                 services_count += 1
         
-        db.commit()
         if services_count > 0:
-            print(f"✅ {services_count} servicios básicos creados")
+            db.commit()
+            #print(f"✅ {services_count} servicios creados")
         else:
-            print("ℹ️  Servicios básicos ya existen")
+            print("ℹ️  Servicios ya existen")
         
     except Exception as e:
         db.rollback()
-        print(f"❌ Error creando datos iniciales: {str(e)}")
+        print(f"❌ Error: {str(e)}")
         raise
-    
     finally:
         db.close()

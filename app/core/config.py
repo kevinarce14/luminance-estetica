@@ -1,7 +1,11 @@
 # app/core/config.py
+from dataclasses import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
 from functools import lru_cache
+
+#En Pydantic v2, no usas el parámetro env en Field(). 
+# En su lugar, simplemente defines la variable y Pydantic automáticamente busca la variable de entorno con ese nombre
 
 
 class Settings(BaseSettings):
@@ -13,12 +17,13 @@ class Settings(BaseSettings):
     # ========== APP ==========
     APP_NAME: str = "Luminance Estética API"
     APP_VERSION: str = "1.0.0"
-    API_V1_PREFIX: str = "/api/v1"
+    API_V1_PREFIX: str = "/api"
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     
     # ========== DATABASE ==========
     DATABASE_URL: str
+    SCHEMA_NAME: str = "luminance-estetica"
     
     # ========== SECURITY ==========
     SECRET_KEY: str

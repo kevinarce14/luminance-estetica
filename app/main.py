@@ -8,6 +8,7 @@ Sistema de gestión de turnos, pagos y clientes para estudio de estética.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.database import init_db, create_initial_data
@@ -241,22 +242,28 @@ app.include_router(
 @app.exception_handler(404)
 async def not_found_handler(request, exc):
     """Handler para errores 404"""
-    return {
-        "error": "Not Found",
-        "message": "El endpoint solicitado no existe",
-        "path": str(request.url),
-        "suggestion": "Visita /docs para ver todos los endpoints disponibles"
-    }
+    return JSONResponse(
+        status_code=404,
+        content={
+            "error": "Not Found",
+            "message": "El endpoint solicitado no existe",
+            "path": str(request.url),
+            "suggestion": "Visita /docs para ver todos los endpoints disponibles"
+        }
+    )
 
 
 @app.exception_handler(500)
 async def internal_error_handler(request, exc):
     """Handler para errores 500"""
-    return {
-        "error": "Internal Server Error",
-        "message": "Ocurrió un error interno en el servidor",
-        "suggestion": "Por favor contacta al administrador si el problema persiste"
-    }
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal Server Error",
+            "message": "Ocurrió un error interno en el servidor",
+            "suggestion": "Por favor contacta al administrador si el problema persiste"
+        }
+    )
 
 
 # ========== MAIN (para desarrollo local) ==========

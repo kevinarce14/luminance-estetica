@@ -1,0 +1,65 @@
+luminance-estetica/
+├──frontend/
+│         ├──api.js
+│         ├──bienvenida.html
+│         ├──login.html
+│         ├──mis-turnos.html
+│         ├──pago.html
+│         ├──studio.html
+│         └──turnera.html
+├── app/
+│   ├── __init__.py
+│   ├── main.py                      # FastAPI app principal
+│   │
+│   ├── core/                        # Configuración central
+│   │   ├── __init__.py
+│   │   ├── config.py                # Settings y env vars
+│   │   ├── security.py              # JWT, hashing, etc.
+│   │   └── database.py              # Conexión PostgreSQL
+│   │
+│   ├── models/                      # Modelos SQLAlchemy
+│   │   ├── __init__.py
+│   │   ├── user.py                  # Usuarios (clientes + admin)
+│   │   ├── appointment.py           # Citas/Turnos
+│   │   ├── service.py               # Servicios del studio
+│   │   ├── payment.py               # Pagos y transacciones
+│   │   ├── availability.py          # Horarios disponibles
+│   │   └── coupon.py                # Cupones de descuento
+│   │
+│   ├── schemas/                     # Pydantic schemas
+│   │   ├── __init__.py
+│   │   ├── user.py
+│   │   ├── appointment.py
+│   │   ├── service.py
+│   │   ├── payment.py
+│   │   ├──availabity.py
+│   │   ├──coupon.py
+│   │   └── auth.py
+│   │
+│   ├── routes/                         # Endpoints
+│   │   ├── __init__.py
+│   │   ├── deps.py                  # Dependencias (get_db, get_current_user)
+│   │   ├── __init__.py
+│   │   ├── auth.py              # Login, register, password reset
+│   │   ├── appointments.py      # CRUD de turnos
+│   │   ├── services.py          # CRUD de servicios
+│   │   ├── payments.py          # MercadoPago webhooks
+│   │   ├── users.py             # Gestión de clientes
+│   │   ├── availability.py      # Horarios disponibles
+│   │   └── admin.py             # Endpoints de administración
+│   │
+│   └── services/                    # Lógica de negocio
+│       ├── __init__.py
+│       ├── email_service.py         # SendGrid/Resend
+│       ├── whatsapp_service.py      # Twilio WhatsApp
+│       ├── payment_service.py       # MercadoPago
+│       ├── appointment_service.py   # Lógica de reservas
+│       └── notification_service.py  # Recordatorios automáticos
+│   
+├── .env.example                     # Template de variables
+├── .gitignore
+├── requirements.txt
+├── requirements-dev.txt
+├── runtime.txt                      # Python version para Render
+├── alembic.ini
+└── README.md

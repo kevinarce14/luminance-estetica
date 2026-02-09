@@ -1181,10 +1181,19 @@
         // ===== CALENDARIO =====
         function inicializarCalendario() {
             const calendarEl = document.getElementById('calendario');
-            
-            // Generar eventos para el calendario
+
+            if (!calendarEl) {
+                console.error("calendarEl es null");
+                return;
+            }
+
+            // Si ya existe uno previo lo destruimos
+            if (window.calendar) {
+                window.calendar.destroy();
+            }
+
             const eventos = generarEventosCalendario();
-            
+
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'es',
@@ -1193,40 +1202,13 @@
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                events: eventos,
-                eventClick: function(info) {
-                    if (info.event.extendedProps.disponible) {
-                        fechaSeleccionada = info.event.extendedProps.fecha;
-                        servicioSeleccionado = info.event.extendedProps.servicio;
-                        horarioSeleccionado = info.event.extendedProps.hora;
-                        mostrarModalReserva();
-                    } else {
-                        alert('Este horario ya está ocupado. Por favor, selecciona otro horario.');
-                    }
-                },
-                dateClick: function(info) {
-                    fechaSeleccionada = new Date(info.dateStr);
-                    
-                    // Verificar si es domingo
-                    if (fechaSeleccionada.getDay() === 0) {
-                        alert('Los domingos no hay atención. Por favor, selecciona otro día.');
-                        return;
-                    }
-                    
-                    mostrarModalServicio();
-                },
-                eventTimeFormat: {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    meridiem: false
-                }
+                events: eventos
             });
-            
+
             calendar.render();
-            
-            // Guardar referencia al calendario
             window.calendar = calendar;
         }
+
 
         function generarEventosCalendario() {
             const eventos = [];
@@ -1616,15 +1598,14 @@
             document.getElementById('mes').value = hoy.getMonth().toString();
         }
     </script>
-<script src="api.js"></script>
+    <script src="api.js"></script>
 
-<!-- FullCalendar CSS y JS (si no los tienes) -->
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+    <!-- FullCalendar CSS y JS (si no los tienes) -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
 
-<!-- Script de Turnera -->
-<script>
-// Verificar que esté logueado
+    <!-- Script de Turnera -->
+    <script>
 requireAuth();
 
 let selectedServiceId = null;
@@ -1632,158 +1613,95 @@ let selectedDate = null;
 let selectedTime = null;
 let calendar = null;
 
-// ===== INICIALIZAR =====
+// ===== INICIALIZAR TURNERA =====
 document.addEventListener('DOMContentLoaded', async () => {
-    // Cargar servicios en el selector
     await loadServicesSelect();
-    
-    // Verificar si viene de studio.html con servicio pre-seleccionado
+    initCalendar();
+
     const preSelectedService = localStorage.getItem('selected_service_id');
     if (preSelectedService) {
-        document.getElementById('service-select').value = preSelectedService;
         selectedServiceId = parseInt(preSelectedService);
+        document.getElementById('service-select').value = preSelectedService;
         localStorage.removeItem('selected_service_id');
-        
-        // Cargar disponibilidad automáticamente
-        await loadAvailability();
     }
-    
-    // Inicializar calendario
-    initCalendar();
 });
 
 // ===== CARGAR SERVICIOS EN SELECT =====
 async function loadServicesSelect() {
-    try {
-        const services = await getServices();
-        const select = document.getElementById('service-select');
-        
-        select.innerHTML = '<option value="">Selecciona un servicio</option>' +
-            services.map(s => `
-                <option value="${s.id}">
-                    ${s.name} - ${formatPrice(s.price)} - ${s.duration_minutes}min
-                </option>
-            `).join('');
-        
-        // Evento al cambiar servicio
-        select.addEventListener('change', async (e) => {
-            selectedServiceId = e.target.value ? parseInt(e.target.value) : null;
-            if (selectedServiceId && selectedDate) {
-                await loadAvailability();
-            }
-        });
-        
-    } catch (error) {
-        showError('Error cargando servicios');
-    }
+    const services = await getServices();
+    console.log('✅ Servicios cargados:', services.length);
+    const select = document.getElementById('service-select');
+
+    select.innerHTML =
+        `<option value="">Seleccioná un servicio</option>` +
+        services.map(s => `
+            <option value="${s.id}">
+                ${s.name} - ${formatPrice(s.price)}
+            </option>
+        `).join('');
+
+    select.onchange = async e => {
+        selectedServiceId = e.target.value ? parseInt(e.target.value) : null;
+        if (selectedServiceId && selectedDate) {
+            await loadAvailability();
+        }
+    };
 }
 
-// ===== INICIALIZAR CALENDARIO =====
+// ===== CALENDARIO =====
 function initCalendar() {
-    const calendarEl = document.getElementById('calendar');
-    
-    calendar = new FullCalendar.Calendar(calendarEl, {
+    const el = document.getElementById('calendar');
+
+    calendar = new FullCalendar.Calendar(el, {
         initialView: 'dayGridMonth',
         locale: 'es',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth'
-        },
-        dateClick: function(info) {
-            // Evitar fechas pasadas
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            if (info.date < today) {
-                alert('No puedes seleccionar fechas pasadas');
-                return;
-            }
-            
+        dateClick: async info => {
             selectedDate = info.dateStr;
-            
-            if (!selectedServiceId) {
-                alert('Primero selecciona un servicio');
-                return;
+            if (selectedServiceId) {
+                await loadAvailability();
             }
-            
-            loadAvailability();
         }
     });
-    
+
     calendar.render();
 }
 
-// ===== CARGAR HORARIOS DISPONIBLES =====
+// ===== HORARIOS =====
 async function loadAvailability() {
-    if (!selectedServiceId || !selectedDate) return;
-    
-    try {
-        const response = await getAvailableSlots(selectedServiceId, selectedDate);
-        
-        const slotsContainer = document.getElementById('time-slots-container');
-        
-        if (response.available_slots.length === 0) {
-            slotsContainer.innerHTML = '<p>No hay horarios disponibles para esta fecha</p>';
-            return;
-        }
-        
-        // Renderizar slots
-        slotsContainer.innerHTML = response.available_slots
-            .filter(slot => slot.is_available)
-            .map(slot => {
-                const time = formatTime(slot.start_time);
-                return `
-                    <button class="time-slot" onclick="selectTimeSlot('${slot.start_time}')">
-                        ${time}
-                    </button>
-                `;
-            })
-            .join('');
-        
-    } catch (error) {
-        showError('Error cargando disponibilidad');
+    const data = await getAvailableSlots(selectedServiceId, selectedDate);
+    const container = document.getElementById('time-slots-container');
+
+    if (!data.available_slots.length) {
+        container.innerHTML = 'No hay horarios disponibles';
+        return;
     }
+
+    container.innerHTML = data.available_slots
+        .filter(s => s.is_available)
+        .map(s => `
+            <button onclick="selectTime('${s.start_time}')">
+                ${formatTime(s.start_time)}
+            </button>
+        `).join('');
 }
 
-// ===== SELECCIONAR HORARIO =====
-function selectTimeSlot(dateTime) {
+// ===== SELECCIONAR HORA =====
+function selectTime(dateTime) {
     selectedTime = dateTime;
-    
-    // Marcar visualmente el slot seleccionado
-    document.querySelectorAll('.time-slot').forEach(btn => {
-        btn.classList.remove('selected');
-    });
-    event.target.classList.add('selected');
-    
-    // Mostrar confirmación
     document.getElementById('confirm-section').style.display = 'block';
 }
 
-// ===== CONFIRMAR RESERVA =====
+// ===== CONFIRMAR =====
 async function confirmReservation() {
-    if (!selectedServiceId || !selectedTime) {
-        alert('Por favor selecciona un servicio y horario');
-        return;
-    }
-    
     const notes = document.getElementById('appointment-notes').value;
-    
-    try {
-        const appointment = await createAppointment({
-            service_id: selectedServiceId,
-            appointment_date: selectedTime,
-            notes: notes
-        });
-        
-        showSuccess('¡Turno reservado exitosamente!');
-        
-        // Redirigir a página de pago
-        window.location.href = `/pago.html?appointment_id=${appointment.id}`;
-        
-    } catch (error) {
-        showError(error.message || 'Error al crear el turno');
-    }
+
+    const appointment = await createAppointment({
+        service_id: selectedServiceId,
+        appointment_date: selectedTime,
+        notes
+    });
+
+    window.location.href = `/pago.html?appointment_id=${appointment.id}`;
 }
 </script>
 

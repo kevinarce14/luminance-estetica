@@ -103,7 +103,15 @@ async function apiRequest(endpoint, options = {}) {
 
     try {
         const response = await fetch(url, config);
-        const data = await response.json();
+
+        let data = null;
+        const text = await response.text();
+
+        try {
+            data = text ? JSON.parse(text) : null;
+        } catch (e) {
+            data = null;
+        }
 
         // Si la respuesta no es OK, lanzar error
         if (!response.ok) {
@@ -153,29 +161,54 @@ async function register(userData) {
  * Iniciar sesión
  */
 async function login(email, password) {
-    // MercadoPago espera form-urlencoded para OAuth2
     const formData = new URLSearchParams();
     formData.append('username', email);
     formData.append('password', password);
 
-    const data = await apiRequest('/auth/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formData
-    });
-
-    // Guardar token
-    if (data.access_token) {
-        saveAuthToken(data.access_token);
+    try {
+        const url = getApiUrl('/auth/login');
         
-        // Obtener datos del usuario
-        const userData = await getCurrentUser();
-        saveUserData(userData);
-    }
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData.toString()  // ← Importante
+        });
 
-    return data;
+        // Leer como texto primero
+        const text = await response.text();
+        console.log('Respuesta del servidor:', text);
+        
+        // Intentar parsear
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error('❌ El servidor no retornó JSON:', text);
+            throw new Error('Error de conexión con el servidor');
+        }
+
+        if (!response.ok) {
+            throw {
+                status: response.status,
+                message: data.detail || 'Error en el login'
+            };
+        }
+
+        // Guardar token
+        if (data.access_token) {
+            saveAuthToken(data.access_token);
+            const userData = await getCurrentUser();
+            saveUserData(userData);
+        }
+
+        return data;
+
+    } catch (error) {
+        console.error('Error en login:', error);
+        throw error;
+    }
 }
 
 /**

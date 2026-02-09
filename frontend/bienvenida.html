@@ -782,7 +782,7 @@
                         <p>Descubrí testimonios reales de clientas, información detallada sobre mis cursos de formación y mi trayectoria profesional de 5 años en el sector de la estética.</p>
                     </div>
                     
-                    <a href="index.html" class="btn-option btn-rosa">
+                    <a href="studio.html" class="btn-option btn-rosa">
                         <i class="fas fa-home"></i>
                         <span>Ingresar al Sitio Principal</span>
                     </a>
@@ -1007,5 +1007,101 @@
             document.body.classList.add('loaded');
         });
     </script>
+<script>
+    // Botón flotante de login
+    const loginBtn = document.createElement('a');
+    loginBtn.href = 'login.html';
+    loginBtn.innerHTML = '👤 Iniciar Sesión';
+    loginBtn.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 30px;
+        background: linear-gradient(135deg, #e75480, #9c89b8);
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 1rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        z-index: 1000;
+        transition: all 0.3s;
+    `;
+    loginBtn.onmouseenter = () => {
+        loginBtn.style.transform = 'translateY(-3px)';
+        loginBtn.style.boxShadow = '0 12px 30px rgba(0,0,0,0.3)';
+    };
+    loginBtn.onmouseleave = () => {
+        loginBtn.style.transform = 'translateY(0)';
+        loginBtn.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
+    };
+    document.body.appendChild(loginBtn);
+</script>
+
+<script src="api.js"></script>
+<!-- Script de Bienvenida -->
+<script>
+// ===== FORMULARIO DE REGISTRO =====
+const registerForm = document.getElementById('register-form');
+if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+            email: document.getElementById('register-email').value,
+            full_name: document.getElementById('register-name').value,
+            phone: document.getElementById('register-phone').value,
+            password: document.getElementById('register-password').value
+        };
+        
+        try {
+            const response = await register(formData);
+            showSuccess('¡Registro exitoso! Por favor inicia sesión.');
+            
+            // Limpiar formulario
+            registerForm.reset();
+            
+            // Opcional: auto-login después del registro
+            await login(formData.email, formData.password);
+            window.location.href = '/turnera.html';
+            
+        } catch (error) {
+            showError(error.message || 'Error al registrarse');
+        }
+    });
+}
+
+// ===== FORMULARIO DE LOGIN =====
+const loginForm = document.getElementById('login-form');
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        
+        try {
+            await login(email, password);
+            showSuccess('¡Bienvenida!');
+            
+            // Redirigir según el tipo de usuario
+            if (isAdmin()) {
+                window.location.href = '/admin-dashboard.html';
+            } else {
+                window.location.href = '/turnera.html';
+            }
+            
+        } catch (error) {
+            showError('Email o contraseña incorrectos');
+        }
+    });
+}
+
+// ===== VERIFICAR SI YA ESTÁ LOGUEADO =====
+if (isLoggedIn()) {
+    // Ya está logueado, redirigir
+    window.location.href = '/turnera.html';
+}
+</script>
 </body>
 </html>

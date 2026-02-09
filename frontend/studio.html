@@ -2519,5 +2519,90 @@
         `;
         document.head.appendChild(style);
     </script>
+<script src="api.js"></script>
+
+<!-- Script de Studio -->
+<script>
+// ===== CARGAR SERVICIOS DESDE LA API =====
+async function loadServices() {
+    try {
+        const services = await getServices();
+        
+        // Agrupar por categoría
+        const categories = {
+            'pestañas': [],
+            'cejas': [],
+            'laser': [],
+            'facial': [],
+            'corporal': [],
+            'pies': []
+        };
+        
+        services.forEach(service => {
+            if (categories[service.category]) {
+                categories[service.category].push(service);
+            }
+        });
+        
+        // Renderizar cada categoría
+        renderCategory('pestañas', categories.pestañas, '#pestanas-container');
+        renderCategory('cejas', categories.cejas, '#cejas-container');
+        renderCategory('laser', categories.laser, '#laser-container');
+        renderCategory('facial', categories.facial, '#facial-container');
+        renderCategory('corporal', categories.corporal, '#corporal-container');
+        renderCategory('pies', categories.pies, '#pies-container');
+        
+    } catch (error) {
+        console.error('Error cargando servicios:', error);
+        showError('Error al cargar los servicios');
+    }
+}
+
+// ===== RENDERIZAR CATEGORÍA =====
+function renderCategory(categoryName, services, containerSelector) {
+    const container = document.querySelector(containerSelector);
+    if (!container || services.length === 0) return;
+    
+    container.innerHTML = services.map(service => `
+        <div class="service-card" data-service-id="${service.id}">
+            <div class="service-image">
+                ${service.image_url 
+                    ? `<img src="${service.image_url}" alt="${service.name}">` 
+                    : `<div class="service-placeholder">💅</div>`
+                }
+            </div>
+            <div class="service-info">
+                <h3>${service.name}</h3>
+                <p>${service.description}</p>
+                <div class="service-details">
+                    <span class="duration">⏱️ ${service.duration_minutes} min</span>
+                    <span class="price">${formatPrice(service.price)}</span>
+                </div>
+                <button class="btn-reserve" onclick="reserveService(${service.id})">
+                    Reservar Turno
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ===== RESERVAR SERVICIO =====
+function reserveService(serviceId) {
+    if (!isLoggedIn()) {
+        alert('Debes iniciar sesión para reservar un turno');
+        window.location.href = '/bienvenida.html';
+        return;
+    }
+    
+    // Guardar servicio seleccionado y redirigir a turnera
+    localStorage.setItem('selected_service_id', serviceId);
+    window.location.href = '/turnera.html';
+}
+
+// Cargar servicios al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    loadServices();
+});
+</script>
 </body>
 </html>

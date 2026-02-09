@@ -92,3 +92,4 @@ python-slugify==8.0.1
 
 
 #pip install python-jose[cryptography]
+#pip install bcrypt==4.0.1

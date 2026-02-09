@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | Luminance Studio</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8d7e6 0%, #f4f0ff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            max-width: 1000px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 600px;
+        }
+
+        .auth-side {
+            padding: 60px 50px;
+        }
+
+        .brand-side {
+            background: linear-gradient(135deg, #e75480 0%, #9c89b8 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-side::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .brand-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .form-side h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #2d3436;
+            margin-bottom: 10px;
+        }
+
+        .form-side p {
+            color: #636e72;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2d3436;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #9c89b8;
+            box-shadow: 0 0 0 4px rgba(156, 137, 184, 0.1);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #e75480, #9c89b8);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(231, 84, 128, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #636e72;
+        }
+
+        .form-footer a {
+            color: #e75480;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .toggle-form {
+            display: none;
+        }
+
+        .toggle-form.active {
+            display: block;
+        }
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            z-index: 10;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+            }
+
+            .brand-side {
+                padding: 40px 30px;
+                min-height: 200px;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .auth-side {
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <!-- Lado izquierdo - Marca -->
+        <div class="brand-side">
+            <a href="bienvenida.html" class="back-link">← Volver al inicio</a>
+            <div class="brand-content">
+                <div class="logo">Luminance</div>
+                <div class="tagline">STUDIO BY CANDE</div>
+            </div>
+        </div>
+
+        <!-- Lado derecho - Formularios -->
+        <div class="auth-side form-side">
+            <!-- Alertas -->
+            <div id="alert-success" class="alert alert-success"></div>
+            <div id="alert-error" class="alert alert-error"></div>
+
+            <!-- Formulario de LOGIN -->
+            <div id="login-form-container" class="toggle-form active">
+                <h2>Bienvenida</h2>
+                <p>Ingresa a tu cuenta</p>
+
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input 
+                            type="email" 
+                            id="login-email" 
+                            name="email" 
+                            placeholder="tu@email.com"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="login-password">Contraseña</label>
+                        <input 
+                            type="password" 
+                            id="login-password" 
+                            name="password" 
+                            placeholder="••••••••"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="login-btn">
+                        Iniciar Sesión
+                    </button>
+                </form>
+
+                <div class="form-footer">
+                    ¿No tienes cuenta? 
+                    <a href="#" onclick="toggleForms('register'); return false;">Regístrate aquí</a>
+                </div>
+            </div>
+
+            <!-- Formulario de REGISTRO -->
+            <div id="register-form-container" class="toggle-form">
+                <h2>Crear Cuenta</h2>
+                <p>Únete a Luminance Studio</p>
+
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-name">Nombre Completo</label>
+                        <input 
+                            type="text" 
+                            id="register-name" 
+                            name="full_name" 
+                            placeholder="María García"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input 
+                            type="email" 
+                            id="register-email" 
+                            name="email" 
+                            placeholder="tu@email.com"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="register-phone">Teléfono (opcional)</label>
+                        <input 
+                            type="tel" 
+                            id="register-phone" 
+                            name="phone" 
+                            placeholder="+54 11 1234-5678"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="register-password">Contraseña</label>
+                        <input 
+                            type="password" 
+                            id="register-password" 
+                            name="password" 
+                            placeholder="••••••••"
+                            minlength="8"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="register-btn">
+                        Registrarse
+                    </button>
+                </form>
+
+                <div class="form-footer">
+                    ¿Ya tienes cuenta? 
+                    <a href="#" onclick="toggleForms('login'); return false;">Inicia sesión aquí</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Client -->
+    <script src="api.js"></script>
+
+    <script>
+        // ===== ALTERNAR ENTRE LOGIN Y REGISTRO =====
+        function toggleForms(formType) {
+            const loginForm = document.getElementById('login-form-container');
+            const registerForm = document.getElementById('register-form-container');
+            
+            if (formType === 'register') {
+                loginForm.classList.remove('active');
+                registerForm.classList.add('active');
+            } else {
+                registerForm.classList.remove('active');
+                loginForm.classList.add('active');
+            }
+            
+            // Limpiar alertas
+            hideAlerts();
+        }
+
+        // ===== MOSTRAR ALERTAS =====
+        function showAlert(message, type = 'success') {
+            hideAlerts();
+            
+            const alertId = type === 'success' ? 'alert-success' : 'alert-error';
+            const alertEl = document.getElementById(alertId);
+            
+            alertEl.textContent = message;
+            alertEl.classList.add('show');
+            
+            // Auto-ocultar después de 5 segundos
+            setTimeout(hideAlerts, 5000);
+        }
+
+        function hideAlerts() {
+            document.getElementById('alert-success').classList.remove('show');
+            document.getElementById('alert-error').classList.remove('show');
+        }
+
+        // ===== FORMULARIO DE LOGIN =====
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('login-btn');
+            
+            try {
+                // Deshabilitar botón
+                btn.disabled = true;
+                btn.textContent = 'Iniciando sesión...';
+                
+                // Llamar a la API
+                await login(email, password);
+                
+                showAlert('¡Bienvenida! Redirigiendo...', 'success');
+                
+                // Redirigir después de 1 segundo
+                setTimeout(() => {
+                    if (isAdmin()) {
+                        window.location.href = 'turnera.html'; // O admin-dashboard.html si lo tienes
+                    } else {
+                        window.location.href = 'studio.html';
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                showAlert(error.message || 'Email o contraseña incorrectos', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Iniciar Sesión';
+            }
+        });
+
+        // ===== FORMULARIO DE REGISTRO =====
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                email: document.getElementById('register-email').value,
+                full_name: document.getElementById('register-name').value,
+                phone: document.getElementById('register-phone').value || '',
+                password: document.getElementById('register-password').value
+            };
+            
+            const btn = document.getElementById('register-btn');
+            
+            try {
+                // Deshabilitar botón
+                btn.disabled = true;
+                btn.textContent = 'Registrando...';
+                
+                // Llamar a la API
+                await register(formData);
+                
+                showAlert('¡Registro exitoso! Iniciando sesión...', 'success');
+                
+                // Auto-login después del registro
+                await login(formData.email, formData.password);
+                
+                // Redirigir después de 1 segundo
+                setTimeout(() => {
+                    window.location.href = 'studio.html';
+                }, 1000);
+                
+            } catch (error) {
+                showAlert(error.message || 'Error al registrarse. Intenta de nuevo.', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Registrarse';
+            }
+        });
+
+        // ===== VERIFICAR SI YA ESTÁ LOGUEADO =====
+        if (isLoggedIn()) {
+            window.location.href = 'studio.html';
+        }
+
+        console.log('✅ Página de login cargada');
+        console.log('📡 Backend URL:', 'http://localhost:8000');
+    </script>
+</body>
+</html>

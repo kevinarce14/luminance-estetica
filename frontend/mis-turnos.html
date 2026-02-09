@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Turnos - Luminance Estética</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8d7e6 0%, #f4f0ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #2d3436;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .appointment-card {
+            background: linear-gradient(135deg, #fff 0%, #fef9ff 100%);
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+
+        .appointment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .appointment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .service-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #e75480;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .appointment-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-icon {
+            font-size: 1.5rem;
+        }
+
+        .detail-text {
+            font-size: 1rem;
+            color: #636e72;
+        }
+
+        .appointment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #e75480, #9c89b8);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state h2 {
+            color: #636e72;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mis Turnos</h1>
+        
+        <div id="appointments-container">
+            <!-- Los turnos se cargarán aquí -->
+        </div>
+
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <h2>No tienes turnos reservados</h2>
+            <a href="/turnera.html" class="btn btn-primary">Reservar un turno</a>
+        </div>
+    </div>
+
+    <!-- API Client -->
+    <script src="api.js"></script>
+
+    <script>
+        // Verificar que esté logueado
+        requireAuth();
+
+        // ===== CARGAR TURNOS =====
+        async function loadAppointments() {
+            try {
+                const appointments = await getAppointments();
+                
+                const container = document.getElementById('appointments-container');
+                const emptyState = document.getElementById('empty-state');
+                
+                if (appointments.length === 0) {
+                    container.style.display = 'none';
+                    emptyState.style.display = 'block';
+                    return;
+                }
+                
+                container.innerHTML = appointments.map(app => `
+                    <div class="appointment-card">
+                        <div class="appointment-header">
+                            <div class="service-name">${app.service.name}</div>
+                            <div class="status-badge status-${app.status}">
+                                ${getStatusText(app.status)}
+                            </div>
+                        </div>
+                        
+                        <div class="appointment-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">📅</span>
+                                <span class="detail-text">${formatDate(app.appointment_date)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">🕐</span>
+                                <span class="detail-text">${formatTime(app.appointment_date)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">💰</span>
+                                <span class="detail-text">${formatPrice(app.service.price)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">⏱️</span>
+                                <span class="detail-text">${app.service.duration_minutes} min</span>
+                            </div>
+                        </div>
+                        
+                        ${app.notes ? `<p><strong>Notas:</strong> ${app.notes}</p>` : ''}
+                        
+                        <div class="appointment-actions">
+                            ${app.status === 'pending' ? `
+                                <button class="btn btn-primary" onclick="payAppointment(${app.id})">
+                                    Pagar
+                                </button>
+                            ` : ''}
+                            
+                            ${app.status === 'pending' || app.status === 'confirmed' ? `
+                                <button class="btn btn-danger" onclick="cancelAppointment(${app.id})">
+                                    Cancelar
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                showError('Error cargando turnos');
+            }
+        }
+
+        // ===== OBTENER TEXTO DE ESTADO =====
+        function getStatusText(status) {
+            const texts = {
+                'pending': 'Pendiente',
+                'confirmed': 'Confirmado',
+                'completed': 'Completado',
+                'cancelled': 'Cancelado'
+            };
+            return texts[status] || status;
+        }
+
+        // ===== PAGAR TURNO =====
+        function payAppointment(appointmentId) {
+            window.location.href = `/pago.html?appointment_id=${appointmentId}`;
+        }
+
+        // ===== CANCELAR TURNO =====
+        async function cancelAppointmentHandler(appointmentId) {
+            const reason = prompt('¿Por qué deseas cancelar el turno?');
+            
+            if (!reason) return;
+            
+            try {
+                await cancelAppointment(appointmentId, reason);
+                showSuccess('Turno cancelado exitosamente');
+                loadAppointments(); // Recargar lista
+            } catch (error) {
+                showError('Error al cancelar el turno');
+            }
+        }
+
+        // Cargar al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAppointments();
+        });
+    </script>
+</body>
+</html>

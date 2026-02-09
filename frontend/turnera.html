@@ -1616,5 +1616,198 @@
             document.getElementById('mes').value = hoy.getMonth().toString();
         }
     </script>
+<script src="api.js"></script>
+
+<!-- FullCalendar CSS y JS (si no los tienes) -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+
+<!-- Script de Turnera -->
+<script>
+// Verificar que esté logueado
+requireAuth();
+
+let selectedServiceId = null;
+let selectedDate = null;
+let selectedTime = null;
+let calendar = null;
+
+// ===== INICIALIZAR =====
+document.addEventListener('DOMContentLoaded', async () => {
+    // Cargar servicios en el selector
+    await loadServicesSelect();
+    
+    // Verificar si viene de studio.html con servicio pre-seleccionado
+    const preSelectedService = localStorage.getItem('selected_service_id');
+    if (preSelectedService) {
+        document.getElementById('service-select').value = preSelectedService;
+        selectedServiceId = parseInt(preSelectedService);
+        localStorage.removeItem('selected_service_id');
+        
+        // Cargar disponibilidad automáticamente
+        await loadAvailability();
+    }
+    
+    // Inicializar calendario
+    initCalendar();
+});
+
+// ===== CARGAR SERVICIOS EN SELECT =====
+async function loadServicesSelect() {
+    try {
+        const services = await getServices();
+        const select = document.getElementById('service-select');
+        
+        select.innerHTML = '<option value="">Selecciona un servicio</option>' +
+            services.map(s => `
+                <option value="${s.id}">
+                    ${s.name} - ${formatPrice(s.price)} - ${s.duration_minutes}min
+                </option>
+            `).join('');
+        
+        // Evento al cambiar servicio
+        select.addEventListener('change', async (e) => {
+            selectedServiceId = e.target.value ? parseInt(e.target.value) : null;
+            if (selectedServiceId && selectedDate) {
+                await loadAvailability();
+            }
+        });
+        
+    } catch (error) {
+        showError('Error cargando servicios');
+    }
+}
+
+// ===== INICIALIZAR CALENDARIO =====
+function initCalendar() {
+    const calendarEl = document.getElementById('calendar');
+    
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'es',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth'
+        },
+        dateClick: function(info) {
+            // Evitar fechas pasadas
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (info.date < today) {
+                alert('No puedes seleccionar fechas pasadas');
+                return;
+            }
+            
+            selectedDate = info.dateStr;
+            
+            if (!selectedServiceId) {
+                alert('Primero selecciona un servicio');
+                return;
+            }
+            
+            loadAvailability();
+        }
+    });
+    
+    calendar.render();
+}
+
+// ===== CARGAR HORARIOS DISPONIBLES =====
+async function loadAvailability() {
+    if (!selectedServiceId || !selectedDate) return;
+    
+    try {
+        const response = await getAvailableSlots(selectedServiceId, selectedDate);
+        
+        const slotsContainer = document.getElementById('time-slots-container');
+        
+        if (response.available_slots.length === 0) {
+            slotsContainer.innerHTML = '<p>No hay horarios disponibles para esta fecha</p>';
+            return;
+        }
+        
+        // Renderizar slots
+        slotsContainer.innerHTML = response.available_slots
+            .filter(slot => slot.is_available)
+            .map(slot => {
+                const time = formatTime(slot.start_time);
+                return `
+                    <button class="time-slot" onclick="selectTimeSlot('${slot.start_time}')">
+                        ${time}
+                    </button>
+                `;
+            })
+            .join('');
+        
+    } catch (error) {
+        showError('Error cargando disponibilidad');
+    }
+}
+
+// ===== SELECCIONAR HORARIO =====
+function selectTimeSlot(dateTime) {
+    selectedTime = dateTime;
+    
+    // Marcar visualmente el slot seleccionado
+    document.querySelectorAll('.time-slot').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    event.target.classList.add('selected');
+    
+    // Mostrar confirmación
+    document.getElementById('confirm-section').style.display = 'block';
+}
+
+// ===== CONFIRMAR RESERVA =====
+async function confirmReservation() {
+    if (!selectedServiceId || !selectedTime) {
+        alert('Por favor selecciona un servicio y horario');
+        return;
+    }
+    
+    const notes = document.getElementById('appointment-notes').value;
+    
+    try {
+        const appointment = await createAppointment({
+            service_id: selectedServiceId,
+            appointment_date: selectedTime,
+            notes: notes
+        });
+        
+        showSuccess('¡Turno reservado exitosamente!');
+        
+        // Redirigir a página de pago
+        window.location.href = `/pago.html?appointment_id=${appointment.id}`;
+        
+    } catch (error) {
+        showError(error.message || 'Error al crear el turno');
+    }
+}
+</script>
+
+<!-- CSS adicional -->
+<style>
+.time-slot {
+    padding: 10px 20px;
+    margin: 5px;
+    border: 2px solid #e9ecef;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.time-slot:hover {
+    border-color: #9c89b8;
+    background: #f8f0ff;
+}
+
+.time-slot.selected {
+    border-color: #e75480;
+    background: #ffe4ed;
+}
+</style>
 </body>
 </html>

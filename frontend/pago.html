@@ -1532,5 +1532,81 @@
         // ===== FUNCIONES GLOBALES =====
         window.eliminarDelCarrito = eliminarDelCarrito;
     </script>
+<script src="api.js"></script>
+
+<!-- Script de Pago -->
+<script>
+// Verificar que esté logueado
+requireAuth();
+
+let appointmentId = null;
+let appointmentData = null;
+
+// ===== INICIALIZAR =====
+document.addEventListener('DOMContentLoaded', async () => {
+    // Obtener appointment_id de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    appointmentId = urlParams.get('appointment_id');
+    
+    if (!appointmentId) {
+        alert('No se especificó un turno');
+        window.location.href = '/turnera.html';
+        return;
+    }
+    
+    // Cargar datos del turno
+    await loadAppointmentData();
+});
+
+// ===== CARGAR DATOS DEL TURNO =====
+async function loadAppointmentData() {
+    try {
+        appointmentData = await getAppointment(appointmentId);
+        
+        // Mostrar resumen del turno
+        document.getElementById('service-name').textContent = appointmentData.service.name;
+        document.getElementById('appointment-date').textContent = formatDate(appointmentData.appointment_date);
+        document.getElementById('appointment-time').textContent = formatTime(appointmentData.appointment_date);
+        document.getElementById('service-price').textContent = formatPrice(appointmentData.service.price);
+        document.getElementById('total-amount').textContent = formatPrice(appointmentData.service.price);
+        
+    } catch (error) {
+        showError('Error cargando datos del turno');
+    }
+}
+
+// ===== PROCESAR PAGO CON MERCADOPAGO =====
+async function processPayment() {
+    if (!appointmentData) return;
+    
+    try {
+        // Mostrar loading
+        document.getElementById('pay-button').disabled = true;
+        document.getElementById('pay-button').textContent = 'Procesando...';
+        
+        // Crear preferencia de pago
+        const preference = await createPaymentPreference(
+            appointmentId,
+            appointmentData.service.price
+        );
+        
+        // Redirigir a MercadoPago
+        window.location.href = preference.init_point;
+        
+    } catch (error) {
+        showError('Error al procesar el pago');
+        document.getElementById('pay-button').disabled = false;
+        document.getElementById('pay-button').textContent = 'Pagar con MercadoPago';
+    }
+}
+
+// ===== PAGO EN EFECTIVO (MARCAR TURNO COMO PENDIENTE) =====
+function payInCash() {
+    if (confirm('¿Confirmas que pagarás en efectivo en el estudio?')) {
+        showSuccess('Turno confirmado. Recuerda pagar en efectivo al llegar.');
+        window.location.href = '/mis-turnos.html';
+    }
+}
+</script>
 </body>
 </html>

@@ -194,11 +194,13 @@ async def create_initial_data():
         db.execute(text(f'SET search_path TO "{SCHEMA_NAME}"'))
         db.commit()
         
+        # NORMALIZAR EMAIL (minúsculas y trim)
+        admin_email_normalized = settings.INITIAL_ADMIN_EMAIL.strip().lower()
         # ADMIN
-        admin = db.query(User).filter(User.email == settings.INITIAL_ADMIN_EMAIL).first()
+        admin = db.query(User).filter(User.email == admin_email_normalized).first()
         if not admin:
             admin = User(
-                email=settings.INITIAL_ADMIN_EMAIL,
+                email=admin_email_normalized,
                 full_name=settings.INITIAL_ADMIN_NAME,
                 hashed_password=get_password_hash(settings.INITIAL_ADMIN_PASSWORD),
                 phone="",

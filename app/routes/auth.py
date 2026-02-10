@@ -38,8 +38,10 @@ def register(
     
     Retorna el usuario creado (sin la contraseña).
     """
+    # NORMALIZAR EMAIL (minúsculas y trim)
+    admin_email_normalized = user_data.email.strip().lower()
     # Verificar que el email no exista
-    existing_user = db.query(User).filter(User.email == user_data.email).first()
+    existing_user = db.query(User).filter(User.email == admin_email_normalized).first()
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -85,8 +87,10 @@ def login(
     **Nota**: FastAPI espera que uses OAuth2PasswordRequestForm,
     donde `username` es el email y `password` es la contraseña.
     """
+    # NORMALIZAR EMAIL (minúsculas y trim)
+    admin_email_normalized = form_data.username.strip().lower()
     # Buscar usuario por email
-    user = db.query(User).filter(User.email == form_data.username).first()
+    user = db.query(User).filter(User.email == admin_email_normalized).first()
     
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(

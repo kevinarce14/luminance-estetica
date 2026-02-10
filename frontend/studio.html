@@ -1479,7 +1479,7 @@
                     <li><a href="#formacion">Formación</a></li>
                     <li><a href="#testimonios">Testimonios</a></li>
                     <li><a href="#contacto">Contacto</a></li>
-                    <li><a href="/turnera.html" class="btn btn-rosa">📅 Reservar Turno</a></li>
+                    <li><a class="btn btn-rosa" onclick="reserveService()">📅 Reservar Turno</a></li>
                 </ul>
                 
             </nav>
@@ -1585,34 +1585,99 @@
     </section>
 
     <script>
-        // Botón flotante de login
-        const loginBtn = document.createElement('a');
-        loginBtn.href = 'login.html';
-        loginBtn.innerHTML = '👤 Iniciar Sesión';
-        loginBtn.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #e75480, #9c89b8);
-            color: white;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 1rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            z-index: 1000;
-            transition: all 0.3s;
-        `;
-        loginBtn.onmouseenter = () => {
-            loginBtn.style.transform = 'translateY(-3px)';
-            loginBtn.style.boxShadow = '0 12px 30px rgba(0,0,0,0.3)';
-        };
-        loginBtn.onmouseleave = () => {
-            loginBtn.style.transform = 'translateY(0)';
-            loginBtn.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
-        };
-        document.body.appendChild(loginBtn);
+    // ===== BOTÓN FLOTANTE DE LOGOUT/LOGIN =====
+    function createFloatingButton() {
+        const isAuth = isLoggedIn();
+        const userData = getUserData();
+        
+        if (isAuth) {
+            // Usuario logueado: mostrar nombre + botón salir
+            const container = document.createElement('div');
+            container.id = 'auth-buttons';
+            container.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                z-index: 1000;
+            `;
+            
+            const userName = document.createElement('div');
+            userName.textContent = `Hola, ${userData?.full_name || 'Usuario'}`;
+            userName.style.cssText = `
+                padding: 12px 20px;
+                background: white;
+                color: #2d3436;
+                border-radius: 25px;
+                font-weight: 600;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            `;
+            
+            const logoutBtn = document.createElement('button');
+            logoutBtn.innerHTML = '🚪 Salir';
+            logoutBtn.style.cssText = `
+                padding: 12px 25px;
+                background: linear-gradient(135deg, #e75480, #9c89b8);
+                color: white;
+                border: none;
+                border-radius: 25px;
+                font-weight: 600;
+                cursor: pointer;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+                transition: all 0.3s;
+            `;
+            logoutBtn.onmouseover = () => logoutBtn.style.transform = 'scale(1.05)';
+            logoutBtn.onmouseout = () => logoutBtn.style.transform = 'scale(1)';
+            logoutBtn.addEventListener('click', async function() {
+                // Verificar que la función existe
+                if (typeof logoutWithConfirmation !== 'undefined') {
+                    await logoutWithConfirmation();
+                } else {
+                    // Si no existe, usar confirm simple
+                    if (confirm('¿Seguro que quieres salir?')) {
+                        removeAuthToken();
+                        window.location.href = '/bienvenida.html';
+                    }
+                }
+            });
+            
+            container.appendChild(userName);
+            container.appendChild(logoutBtn);
+            document.body.appendChild(container);
+            
+        } else {
+            // Botón flotante de login
+            const loginBtn = document.createElement('a');
+            loginBtn.href = 'login.html';
+            loginBtn.innerHTML = '👤 Iniciar Sesión';
+            loginBtn.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 30px;
+                background: linear-gradient(135deg, #e75480, #9c89b8);
+                color: white;
+                text-decoration: none;
+                border-radius: 30px;
+                font-weight: 600;
+                font-size: 1rem;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+                z-index: 1000;
+                transition: all 0.3s;
+            `;
+            loginBtn.onmouseenter = () => {
+                loginBtn.style.transform = 'translateY(-3px)';
+                loginBtn.style.boxShadow = '0 12px 30px rgba(0,0,0,0.3)';
+            };
+            loginBtn.onmouseleave = () => {
+                loginBtn.style.transform = 'translateY(0)';
+                loginBtn.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
+            };
+            document.body.appendChild(loginBtn);
+        }
+    }
     </script>
     
     <!-- ===== BIO SECTION ===== -->
@@ -2113,8 +2178,6 @@
                                 <option value="lifting">Lifting de Pestañas</option>
                                 <option value="cejas">Diseño de Cejas</option>
                                 <option value="laser">Depilación Láser</option>
-                                <option value="facial">Tratamientos Faciales</option>
-                                <option value="corporal">Tratamientos Corporales</option>
                                 <option value="curso">Cursos</option>
                                 <option value="otro">Otro</option>
                             </select>
@@ -2450,17 +2513,119 @@ function renderCategory(categoryName, services, containerSelector) {
     `).join('');
 }
 
+// ===== MODAL AMIGABLE DE LOGIN =====
+function showLoginModal() {
+    // Crear overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'login-modal';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.3s ease;
+    `;
+    
+    // Crear modal
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        background: white;
+        border-radius: 25px;
+        padding: 50px;
+        max-width: 500px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease;
+    `;
+    
+    modal.innerHTML = `
+        <div style="font-size: 4rem; margin-bottom: 20px;">🔐</div>
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: #2d3436; margin-bottom: 15px;">
+            Inicio de Sesión Requerido
+        </h2>
+        <p style="color: #636e72; font-size: 1.1rem; margin-bottom: 30px; line-height: 1.6;">
+            Para reservar un turno necesitas tener una cuenta. ¡Es gratis y toma solo un minuto!
+        </p>
+        <div style="display: flex; gap: 15px; justify-content: center;">
+            <a href="login.html" style="
+                padding: 15px 35px;
+                background: linear-gradient(135deg, #e75480, #9c89b8);
+                color: white;
+                text-decoration: none;
+                border-radius: 25px;
+                font-weight: 600;
+                font-size: 1.1rem;
+                transition: all 0.3s;
+            ">Iniciar Sesión</a>
+            <button onclick="document.getElementById('login-modal').remove()" style="
+                padding: 15px 35px;
+                background: #e9ecef;
+                color: #636e72;
+                border: none;
+                border-radius: 25px;
+                font-weight: 600;
+                font-size: 1.1rem;
+                cursor: pointer;
+                transition: all 0.3s;
+            ">Cancelar</button>
+        </div>
+    `;
+    
+    // Agregar animaciones
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    
+    // Cerrar al hacer click fuera
+    overlay.onclick = (e) => {
+        if (e.target === overlay) {
+            overlay.remove();
+        }
+    };
+}
+
 // ===== RESERVAR SERVICIO =====
 function reserveService(serviceId) {
     if (!isLoggedIn()) {
-        alert('Debes iniciar sesión');
-        window.location.href = '/login.html';
+        showLoginModal();
         return;
     }
     localStorage.setItem('selected_service_id', serviceId);
     window.location.href = '/turnera.html';
 }
-
+// ===== INICIALIZAR =====
+document.addEventListener('DOMContentLoaded', () => {
+    createFloatingButton();
+});
+// También intentar si el DOM ya está listo
+if (document.readyState !== 'loading') {
+    createFloatingButton();
+}
 // Cargar servicios
 document.addEventListener('DOMContentLoaded', loadServices);
 if (document.readyState !== 'loading') loadServices();

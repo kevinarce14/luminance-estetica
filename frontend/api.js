@@ -530,6 +530,158 @@ function updateAuthUI() {
     }
 }
 
+/**
+ * Mostrar modal de confirmación de logout
+ */
+function showLogoutModal() {
+    return new Promise((resolve) => {
+        // Crear overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'logout-modal';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        `;
+        
+        // Crear modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            background: white;
+            border-radius: 25px;
+            padding: 50px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        `;
+        
+        modal.innerHTML = `
+            <div style="font-size: 4rem; margin-bottom: 20px;">👋</div>
+            <h2 style="
+                font-family: 'Playfair Display', serif;
+                font-size: 2rem;
+                color: #2d3436;
+                margin-bottom: 15px;
+            ">¿Seguro que quieres salir?</h2>
+            <p style="
+                color: #636e72;
+                font-size: 1.1rem;
+                margin-bottom: 30px;
+                line-height: 1.6;
+            ">Puedes volver cuando quieras</p>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button id="confirm-logout-btn" style="
+                    padding: 15px 35px;
+                    background: linear-gradient(135deg, #e75480, #9c89b8);
+                    color: white;
+                    border: none;
+                    border-radius: 25px;
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                ">Sí, cerrar sesión</button>
+                <button id="cancel-logout-btn" style="
+                    padding: 15px 35px;
+                    background: #e9ecef;
+                    color: #636e72;
+                    border: none;
+                    border-radius: 25px;
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                ">Cancelar</button>
+            </div>
+        `;
+        
+        // Agregar animaciones si no existen
+        if (!document.getElementById('modal-animations')) {
+            const style = document.createElement('style');
+            style.id = 'modal-animations';
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes slideUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(50px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+        
+        // Event listeners
+        document.getElementById('confirm-logout-btn').onclick = () => {
+            overlay.remove();
+            resolve(true);
+        };
+        
+        document.getElementById('cancel-logout-btn').onclick = () => {
+            overlay.remove();
+            resolve(false);
+        };
+        
+        // Cerrar al hacer click fuera
+        overlay.onclick = (e) => {
+            if (e.target === overlay) {
+                overlay.remove();
+                resolve(false);
+            }
+        };
+        
+        // Efectos hover
+        document.getElementById('confirm-logout-btn').onmouseover = function() {
+            this.style.transform = 'scale(1.05)';
+        };
+        document.getElementById('confirm-logout-btn').onmouseout = function() {
+            this.style.transform = 'scale(1)';
+        };
+        
+        document.getElementById('cancel-logout-btn').onmouseover = function() {
+            this.style.background = '#dee2e6';
+        };
+        document.getElementById('cancel-logout-btn').onmouseout = function() {
+            this.style.background = '#e9ecef';
+        };
+    });
+}
+
+/**
+ * Logout mejorado con modal bonito
+ */
+async function logoutWithConfirmation() {
+    const confirmed = await showLogoutModal();
+    if (confirmed) {
+        removeAuthToken();
+        window.location.href = '/bienvenida.html';
+    }
+}
+
+// Hacer la función global
+window.showLogoutModal = showLogoutModal;
+window.logoutWithConfirmation = logoutWithConfirmation;
+
 // Ejecutar al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
     updateAuthUI();

@@ -244,199 +244,221 @@
             border: 2px solid var(--gris-medio);
             border-radius: 10px;
             font-family: 'Poppins', sans-serif;
-            background-color: var(--blanco);
+            font-size: 1rem;
             transition: var(--transicion);
         }
         
         .select-filtro:focus {
             outline: none;
-            border-color: var(--lila-medio);
-            box-shadow: 0 0 0 3px rgba(123, 75, 189, 0.1);
+            border-color: var(--rosa-medio);
         }
         
         .checkbox-grupo {
             display: flex;
-            align-items: center;
-            margin-bottom: 10px;
+            flex-direction: column;
+            gap: 10px;
         }
         
-        .checkbox-grupo input {
-            margin-right: 10px;
-            width: 18px;
-            height: 18px;
-            accent-color: var(--lila-medio);
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .btn-aplicar {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--rosa-medio), var(--rosa-fuerte));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transicion);
+        }
+        
+        .btn-aplicar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(231, 84, 128, 0.3);
         }
         
         /* ===== CALENDARIO ===== */
-        .calendario-container {
+        .calendario-section {
             background-color: var(--blanco);
             border-radius: var(--border-radius);
-            padding: 25px;
+            padding: 30px;
             box-shadow: var(--sombra);
         }
         
-        .calendario-header {
+        .controles-calendario {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--gris-claro);
         }
         
-        .calendario-header h2 {
+        .controles-calendario h2 {
             color: var(--violeta);
-            margin-bottom: 0;
+            margin: 0;
         }
         
-        .vista-selector {
+        .vistas-calendario {
             display: flex;
             gap: 10px;
-            background-color: var(--gris-claro);
-            padding: 8px;
-            border-radius: 10px;
         }
         
         .btn-vista {
-            padding: 8px 15px;
-            border: none;
-            background: transparent;
+            padding: 8px 16px;
+            background: var(--gris-claro);
+            border: 2px solid transparent;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 500;
             transition: var(--transicion);
         }
         
         .btn-vista.active {
-            background-color: var(--blanco);
-            color: var(--rosa-fuerte);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* FullCalendar Personalizado */
-        .fc {
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        .fc .fc-toolbar-title {
-            font-family: 'Playfair Display', serif;
-            color: var(--violeta);
-            font-size: 1.5rem;
-        }
-        
-        .fc .fc-button {
-            background-color: var(--gris-claro);
-            border: none;
-            color: var(--texto-oscuro);
-            font-weight: 600;
-            transition: var(--transicion);
-        }
-        
-        .fc .fc-button:hover {
-            background-color: var(--gris-medio);
-        }
-        
-        .fc .fc-button-primary:not(:disabled).fc-button-active {
-            background-color: var(--rosa-fuerte);
+            background: linear-gradient(135deg, var(--rosa-medio), var(--rosa-fuerte));
             color: white;
+            border-color: transparent;
         }
         
-        .fc .fc-daygrid-day-number {
-            color: var(--texto-oscuro);
-            font-weight: 600;
+        .btn-vista:hover:not(.active) {
+            background: var(--gris-medio);
         }
         
-        .fc .fc-day-today {
+        /* ===== FULLCALENDAR CUSTOMIZATION ===== */
+        #calendario {
+            margin-bottom: 30px;
+        }
+        
+        .fc {
+            font-family: 'Poppins', sans-serif !important;
+        }
+        
+        .fc-button {
+            background: linear-gradient(135deg, var(--rosa-medio), var(--rosa-fuerte)) !important;
+            border: none !important;
+            text-transform: capitalize !important;
+        }
+        
+        .fc-button:hover {
+            background: linear-gradient(135deg, var(--rosa-fuerte), var(--lila-oscuro)) !important;
+        }
+        
+        .fc-day-today {
             background-color: rgba(231, 84, 128, 0.1) !important;
         }
         
         .fc-event {
+            background: linear-gradient(135deg, var(--lila-medio), var(--lila-oscuro));
             border: none;
-            border-radius: 8px;
-            padding: 5px 8px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: var(--transicion);
+            border-radius: 6px;
+            padding: 2px 6px;
         }
         
-        .fc-event:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .event-pestanas {
-            background-color: rgba(216, 27, 96, 0.1);
-            border-left: 4px solid var(--rosa-fuerte);
-            color: var(--rosa-fuerte);
-        }
-        
-        .event-cejas {
-            background-color: rgba(156, 137, 184, 0.1);
-            border-left: 4px solid var(--lila-medio);
-            color: var(--lila-medio);
-        }
-        
-        .event-depilacion {
-            background-color: rgba(41, 167, 69, 0.1);
-            border-left: 4px solid var(--verde);
-            color: var(--verde);
-        }
-        
-        .event-corporal {
-            background-color: rgba(253, 126, 20, 0.1);
-            border-left: 4px solid var(--naranja);
-            color: var(--naranja);
-        }
-        
-        .event-pies {
-            background-color: rgba(108, 117, 125, 0.1);
-            border-left: 4px solid var(--gris-oscuro);
-            color: var(--gris-oscuro);
-        }
-        
-        .event-curso {
-            background-color: rgba(212, 175, 55, 0.1);
-            border-left: 4px solid var(--dorado);
-            color: var(--dorado);
-        }
-        
-        /* ===== MODALES ===== */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transicion);
-        }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal {
+        /* ===== LISTA DE TURNOS ===== */
+        .lista-turnos {
             background-color: var(--blanco);
             border-radius: var(--border-radius);
             padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: var(--sombra-hover);
-            transform: translateY(-20px);
-            transition: var(--transicion);
-            max-height: 90vh;
-            overflow-y: auto;
+            box-shadow: var(--sombra);
+            margin-top: 30px;
         }
         
-        .modal-overlay.active .modal {
-            transform: translateY(0);
+        .lista-turnos h3 {
+            color: var(--violeta);
+            margin-bottom: 20px;
+        }
+        
+        .turno-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--gris-claro) 0%, white 100%);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: var(--transicion);
+        }
+        
+        .turno-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--sombra);
+        }
+        
+        .turno-info {
+            flex: 1;
+        }
+        
+        .turno-info h4 {
+            color: var(--rosa-medio);
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .turno-info p {
+            color: var(--texto-medio);
+            font-size: 0.9rem;
+        }
+        
+        .turno-estado {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .estado-disponible {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .estado-ocupado {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .estado-pendiente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        /* ===== MODALES ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-contenido {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
         
         .modal-header {
@@ -450,132 +472,21 @@
         
         .modal-header h3 {
             color: var(--violeta);
-            margin-bottom: 0;
+            margin: 0;
         }
         
-        .modal-close {
+        .btn-cerrar {
             background: none;
             border: none;
             font-size: 24px;
-            color: var(--rosa-fuerte);
+            color: var(--texto-medio);
             cursor: pointer;
             transition: var(--transicion);
         }
         
-        .modal-close:hover {
+        .btn-cerrar:hover {
+            color: var(--rosa-medio);
             transform: rotate(90deg);
-        }
-        
-        .modal-body {
-            margin-bottom: 25px;
-        }
-        
-        .info-turno {
-            background-color: var(--gris-claro);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
-        }
-        
-        .info-item {
-            display: flex;
-            margin-bottom: 10px;
-        }
-        
-        .info-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .info-label {
-            font-weight: 600;
-            min-width: 100px;
-            color: var(--texto-oscuro);
-        }
-        
-        .info-value {
-            color: var(--texto-medio);
-        }
-        
-        .disponibilidad {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .disponibilidad.disponible {
-            color: var(--verde);
-        }
-        
-        .disponibilidad.ocupado {
-            color: var(--rojo);
-        }
-        
-        .horarios-disponibles {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .btn-horario {
-            padding: 10px;
-            border: 2px solid var(--gris-medio);
-            background-color: var(--blanco);
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transicion);
-            text-align: center;
-        }
-        
-        .btn-horario:hover {
-            border-color: var(--lila-medio);
-            background-color: rgba(123, 75, 189, 0.05);
-        }
-        
-        .btn-horario.selected {
-            background-color: var(--rosa-fuerte);
-            color: white;
-            border-color: var(--rosa-fuerte);
-        }
-        
-        .btn-horario.ocupado {
-            background-color: var(--gris-claro);
-            color: var(--gris-oscuro);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        
-        /* Estilos para el modal de selección de servicio */
-        .servicio-item {
-            padding: 15px;
-            border: 2px solid var(--gris-medio);
-            border-radius: 10px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: var(--transicion);
-        }
-        
-        .servicio-item:hover {
-            border-color: var(--lila-medio);
-            background-color: rgba(123, 75, 189, 0.05);
-        }
-        
-        .servicio-item.selected {
-            border-color: var(--rosa-fuerte);
-            background-color: rgba(216, 27, 96, 0.1);
-        }
-        
-        .servicio-nombre {
-            font-weight: 700;
-            color: var(--texto-oscuro);
-            margin-bottom: 5px;
-        }
-        
-        .servicio-detalles {
-            font-size: 0.9em;
-            color: var(--texto-medio);
         }
         
         .form-grupo {
@@ -589,22 +500,31 @@
             color: var(--texto-oscuro);
         }
         
-        .form-control {
+        .form-grupo input,
+        .form-grupo select,
+        .form-grupo textarea {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid var(--gris-medio);
             border-radius: 10px;
             font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
             transition: var(--transicion);
         }
         
-        .form-control:focus {
+        .form-grupo input:focus,
+        .form-grupo select:focus,
+        .form-grupo textarea:focus {
             outline: none;
-            border-color: var(--lila-medio);
-            box-shadow: 0 0 0 3px rgba(123, 75, 189, 0.1);
+            border-color: var(--rosa-medio);
         }
         
-        .btn-submit {
+        .form-grupo textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .btn-primario {
             width: 100%;
             padding: 15px;
             background: linear-gradient(135deg, var(--rosa-medio), var(--rosa-fuerte));
@@ -612,114 +532,34 @@
             border: none;
             border-radius: 10px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.1rem;
             cursor: pointer;
             transition: var(--transicion);
-            margin-top: 20px;
         }
         
-        .btn-submit:hover {
+        .btn-primario:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(231, 84, 128, 0.3);
+            box-shadow: 0 10px 25px rgba(231, 84, 128, 0.3);
         }
         
-        .btn-continuar {
+        .btn-secundario {
             width: 100%;
             padding: 15px;
-            background: linear-gradient(135deg, var(--lila-medio), var(--lila-oscuro));
-            color: white;
+            background: var(--gris-claro);
+            color: var(--texto-oscuro);
             border: none;
             border-radius: 10px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.1rem;
             cursor: pointer;
             transition: var(--transicion);
-            margin-top: 20px;
+            margin-top: 10px;
         }
         
-        .btn-continuar:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(123, 75, 189, 0.3);
+        .btn-secundario:hover {
+            background: var(--gris-medio);
         }
-        
-        /* ===== LISTA DE TURNOS ===== */
-        .lista-turnos {
-            background-color: var(--blanco);
-            border-radius: var(--border-radius);
-            padding: 25px;
-            box-shadow: var(--sombra);
-            margin-top: 30px;
-        }
-        
-        .lista-turnos h3 {
-            color: var(--violeta);
-            margin-bottom: 20px;
-        }
-        
-        .turno-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid var(--gris-claro);
-            transition: var(--transicion);
-        }
-        
-        .turno-item:hover {
-            background-color: var(--gris-claro);
-            border-radius: 8px;
-        }
-        
-        .turno-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .turno-fecha {
-            background-color: var(--gris-claro);
-            padding: 10px 15px;
-            border-radius: 8px;
-            text-align: center;
-            min-width: 100px;
-        }
-        
-        .turno-dia {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--rosa-fuerte);
-        }
-        
-        .turno-mes {
-            font-size: 0.9rem;
-            color: var(--texto-medio);
-            text-transform: uppercase;
-        }
-        
-        .turno-detalles h4 {
-            color: var(--violeta);
-            margin-bottom: 5px;
-        }
-        
-        .turno-detalles p {
-            color: var(--texto-medio);
-            font-size: 0.9rem;
-        }
-        
-        .turno-cliente {
-            text-align: right;
-        }
-        
-        .turno-cliente strong {
-            color: var(--texto-oscuro);
-            display: block;
-        }
-        
-        .turno-cliente span {
-            color: var(--texto-medio);
-            font-size: 0.9rem;
-        }
-        
+
         /* ===== FOOTER ===== */
         .footer-turnera {
             background: linear-gradient(135deg, var(--texto-oscuro), #1a1a1a);
@@ -751,68 +591,48 @@
         }
         
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 1200px) {
+        @media (max-width: 968px) {
             .turnera-layout {
                 grid-template-columns: 1fr;
             }
             
             .sidebar {
+                order: 1;
+            }
+            
+            .calendario-section {
                 order: 2;
             }
             
-            .calendario-container {
-                order: 1;
+            .lista-turnos {
+                order: 3;
+            }
+            
+            .vistas-calendario {
+                flex-wrap: wrap;
+            }
+            
+            .controles-calendario {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
             }
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
             .turnera-title h1 {
                 font-size: 2rem;
             }
             
-            .logo-turnera {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-            
-            .calendario-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .vista-selector {
-                justify-content: center;
+            .modal-contenido {
+                padding: 25px;
             }
             
             .turno-item {
                 flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
+                align-items: flex-start;
+                gap: 10px;
             }
-            
-            .turno-info {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .turno-fecha {
-                align-self: flex-start;
-            }
-            
-            .turno-cliente {
-                text-align: left;
-            }
-        }
-        
-        /* ===== ANIMACIONES ===== */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease forwards;
         }
     </style>
 </head>
@@ -821,64 +641,53 @@
     <header class="header-turnera">
         <div class="container">
             <div class="logo-turnera">
-                <a href="index.html">
-                    <div>
-                        <div class="logo-text">Luminance<span class="logo-dot">.</span></div>
-                        <div class="logo-subtitle">by Cande | Turnera Online</div>
-                    </div>
+                <a href="/studio.html">
+                    <div class="logo-text">Luminance<span class="logo-dot">.</span></div>
+                    <div class="logo-subtitle">Sistema de Turnos</div>
                 </a>
-                <a href="index.html" class="btn-volver">
-                    <i class="fas fa-arrow-left"></i> Volver al Sitio Principal
+                <a href="/studio.html" class="btn-volver">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver al Inicio
                 </a>
             </div>
         </div>
     </header>
-
+    
     <!-- ===== MAIN CONTENT ===== -->
     <main class="main-turnera">
         <div class="container">
-            <div class="turnera-title fade-in">
-                <h1>Sistema de Reserva de Turnos</h1>
-                <p>Seleccioná la fecha y horario para tu tratamiento. Los turnos disponibles se muestran en verde.</p>
+            <div class="turnera-title">
+                <h1>📅 Reserva tu Turno Online</h1>
+                <p>Selecciona el servicio, fecha y horario que prefieras</p>
             </div>
             
             <div class="turnera-layout">
                 <!-- ===== SIDEBAR ===== -->
-                <aside class="sidebar fade-in" style="animation-delay: 0.1s;">
+                <aside class="sidebar">
                     <div class="info-cande">
-                        <div class="avatar">
-                            <i class="fas fa-spa"></i>
-                        </div>
+                        <div class="avatar">💅</div>
                         <h3>Cande</h3>
-                        <p>Especialista en estética | 5 años de experiencia</p>
+                        <p>Especialista en Estética</p>
                     </div>
                     
-                    <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Tengo%20una%20consulta%20sobre%20los%20turnos..." 
-                       class="whatsapp-sidebar" target="_blank">
+                    <a href="https://wa.me/541162815014" class="whatsapp-sidebar" target="_blank">
                         <i class="fab fa-whatsapp"></i>
-                        <span>Consultar por WhatsApp</span>
+                        Contactar por WhatsApp
                     </a>
                     
                     <div class="filtros">
-                        <h4>Filtrar Turnos</h4>
+                        <h4>Filtros</h4>
                         
                         <div class="filtro-grupo">
                             <label for="servicio">Servicio</label>
                             <select id="servicio" class="select-filtro">
-                                <option value="todos">Todos los servicios</option>
-                                <option value="pestanas">Lifting de Pestañas</option>
-                                <option value="cejas">Cejas (Diseño/Laminado/Henna)</option>
-                                <option value="depilacion">Depilación Láser</option>
-                                <option value="corporal">Estética Corporal</option>
-                                <option value="pies">Pedicuría Premium</option>
-                                <option value="curso">Cursos</option>
+                                <option value="">Todos los servicios</option>
                             </select>
                         </div>
                         
                         <div class="filtro-grupo">
                             <label for="mes">Mes</label>
                             <select id="mes" class="select-filtro">
-                                <option value="todos">Todos los meses</option>
                                 <option value="0">Enero</option>
                                 <option value="1">Febrero</option>
                                 <option value="2">Marzo</option>
@@ -897,143 +706,123 @@
                         <div class="filtro-grupo">
                             <label>Estado</label>
                             <div class="checkbox-grupo">
-                                <input type="checkbox" id="disponible" checked>
-                                <label for="disponible">Disponibles</label>
-                            </div>
-                            <div class="checkbox-grupo">
-                                <input type="checkbox" id="ocupado">
-                                <label for="ocupado">Ocupados</label>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="disponible" checked>
+                                    <label for="disponible">Disponibles</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="ocupado" checked>
+                                    <label for="ocupado">Ocupados</label>
+                                </div>
                             </div>
                         </div>
                         
-                        <button id="aplicarFiltros" class="btn-submit" style="margin-top: 10px;">
-                            <i class="fas fa-filter"></i> Aplicar Filtros
+                        <button id="aplicarFiltros" class="btn-aplicar">
+                            <i class="fas fa-filter"></i>
+                            Aplicar Filtros
                         </button>
                     </div>
                 </aside>
                 
                 <!-- ===== CALENDARIO ===== -->
-                <div class="calendario-container fade-in" style="animation-delay: 0.2s;">
-                    <div class="calendario-header">
-                        <h2>Calendario de Turnos</h2>
-                        <div class="vista-selector">
-                            <button class="btn-vista active" data-vista="month">
-                                <i class="fas fa-calendar-alt"></i> Mes
-                            </button>
-                            <button class="btn-vista" data-vista="week">
-                                <i class="fas fa-calendar-week"></i> Semana
-                            </button>
-                            <button class="btn-vista" data-vista="day">
-                                <i class="fas fa-calendar-day"></i> Día
-                            </button>
+                <div>
+                    <div class="calendario-section">
+                        <div class="controles-calendario">
+                            <h2>Calendario de Turnos</h2>
+                            <div class="vistas-calendario">
+                                <button class="btn-vista active" data-vista="month">Mes</button>
+                                <button class="btn-vista" data-vista="week">Semana</button>
+                                <button class="btn-vista" data-vista="day">Día</button>
+                            </div>
                         </div>
+                        
+                        <div id="calendario"></div>
                     </div>
                     
-                    <div id="calendario"></div>
-                </div>
-            </div>
-            
-            <!-- ===== LISTA DE TURNOS ===== -->
-            <div class="lista-turnos fade-in" style="animation-delay: 0.3s;">
-                <h3>Próximos Turnos Disponibles</h3>
-                <div id="lista-turnos-container">
-                    <!-- Los turnos se cargarán dinámicamente -->
+                    <!-- ===== LISTA DE TURNOS ===== -->
+                    <div class="lista-turnos">
+                        <h3>Próximos Turnos Disponibles</h3>
+                        <div id="listaTurnos">
+                            <!-- Se llena dinámicamente -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
-
-    <!-- ===== MODAL DE SELECCIÓN DE SERVICIO ===== -->
-    <div class="modal-overlay" id="modalServicio">
-        <div class="modal">
+    
+    <!-- ===== MODAL SELECCIÓN DE SERVICIO ===== -->
+    <div id="modalServicio" class="modal">
+        <div class="modal-contenido">
             <div class="modal-header">
-                <h3>Seleccionar Servicio</h3>
-                <button class="modal-close" id="cerrarModalServicio">
+                <h3>Selecciona un Servicio</h3>
+                <button class="btn-cerrar" id="cerrarModalServicio">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             
-            <div class="modal-body">
-                <p style="margin-bottom: 20px; color: var(--texto-medio); text-align: center;">
-                    Seleccioná el servicio para el <strong id="fechaSeleccionada"></strong>
-                </p>
-                
-                <div id="lista-servicios">
-                    <!-- Los servicios se cargarán dinámicamente -->
-                </div>
-                
-                <button type="button" class="btn-continuar" id="continuarServicio">
-                    <i class="fas fa-arrow-right"></i> Continuar con el Horario
-                </button>
+            <div class="form-grupo">
+                <label for="servicioModal">Servicio</label>
+                <select id="servicioModal" class="select-filtro">
+                    <option value="">Selecciona un servicio</option>
+                </select>
             </div>
+            
+            <div id="detalleServicio" style="display: none; margin-top: 20px; padding: 20px; background: var(--gris-claro); border-radius: 10px;">
+                <!-- Se llena dinámicamente -->
+            </div>
+            
+            <button id="continuarServicio" class="btn-primario">
+                <i class="fas fa-arrow-right"></i>
+                Continuar
+            </button>
         </div>
     </div>
-
-    <!-- ===== MODAL DE RESERVA ===== -->
-    <div class="modal-overlay" id="modalReserva">
-        <div class="modal">
+    
+    <!-- ===== MODAL RESERVA ===== -->
+    <div id="modalReserva" class="modal">
+        <div class="modal-contenido">
             <div class="modal-header">
-                <h3>Reservar Turno</h3>
-                <button class="modal-close" id="cerrarModalReserva">
+                <h3>Completar Reserva</h3>
+                <button class="btn-cerrar" id="cerrarModalReserva">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             
-            <div class="modal-body">
-                <div class="info-turno">
-                    <div class="info-item">
-                        <span class="info-label">Fecha:</span>
-                        <span class="info-value" id="modalFecha">15 de Marzo, 2024</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Servicio:</span>
-                        <span class="info-value" id="modalServicio">Lifting de Pestañas</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Duración:</span>
-                        <span class="info-value" id="modalDuracion">90 minutos</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Precio:</span>
-                        <span class="info-value" id="modalPrecio">$4.500</span>
-                    </div>
+            <form id="formReserva">
+                <div class="form-grupo">
+                    <label for="nombre">Nombre Completo *</label>
+                    <input type="text" id="nombre" required>
                 </div>
                 
-                <div class="disponibilidad disponible" id="disponibilidadInfo">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Horarios disponibles para esta fecha</span>
+                <div class="form-grupo">
+                    <label for="telefono">Teléfono *</label>
+                    <input type="tel" id="telefono" required>
                 </div>
                 
-                <div class="horarios-disponibles" id="horariosContainer">
-                    <!-- Los horarios se cargarán dinámicamente -->
+                <div class="form-grupo">
+                    <label for="email">Email</label>
+                    <input type="email" id="email">
                 </div>
                 
-                <form id="formReserva">
-                    <div class="form-grupo">
-                        <label for="nombreCliente">Nombre Completo *</label>
-                        <input type="text" id="nombreCliente" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-grupo">
-                        <label for="telefonoCliente">Teléfono *</label>
-                        <input type="tel" id="telefonoCliente" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-grupo">
-                        <label for="emailCliente">Email</label>
-                        <input type="email" id="emailCliente" class="form-control">
-                    </div>
-                    
-                    <div class="form-grupo">
-                        <label for="notasCliente">Notas adicionales</label>
-                        <textarea id="notasCliente" class="form-control" rows="3" placeholder="Ej: Es mi primera vez, tengo alergias, etc."></textarea>
-                    </div>
-                    
-                    <button type="submit" class="btn-submit">
-                        <i class="fas fa-calendar-check"></i> Confirmar Reserva
-                    </button>
-                </form>
-            </div>
+                <div class="form-grupo">
+                    <label for="notas">Notas adicionales</label>
+                    <textarea id="notas" placeholder="¿Alguna consulta o comentario especial?"></textarea>
+                </div>
+                
+                <div id="resumenReserva" style="background: var(--lila-claro); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <!-- Se llena dinámicamente -->
+                </div>
+                
+                <button type="submit" class="btn-primario">
+                    <i class="fab fa-whatsapp"></i>
+                    Confirmar y Enviar por WhatsApp
+                </button>
+                
+                <button type="button" class="btn-secundario" id="cerrarModalReserva2">
+                    Cancelar
+                </button>
+            </form>
         </div>
     </div>
 
@@ -1042,447 +831,297 @@
         <div class="container">
             <p>&copy; 2024 Luminance Studio by Cande. Sistema de reserva de turnos.</p>
             <p>Para consultas urgentes: WhatsApp 11 6281-5014</p>
-            <div class="footer-links">
-                <a href="index.html">Inicio</a>
-                <a href="index.html#servicios">Servicios</a>
-                <a href="index.html#contacto">Contacto</a>
-            </div>
         </div>
     </footer>
-
+    
     <!-- ===== SCRIPTS ===== -->
-    <!-- FullCalendar -->
+    <!-- FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js"></script>
     
     <script>
-        // ===== DATOS DE TURNOS (Simulación) =====
+        // ===== DATOS DE SERVICIOS =====
         const servicios = [
             {
                 id: 1,
-                nombre: "Lifting de Pestañas",
-                tipo: "pestanas",
-                duracion: 90,
-                precio: 4500,
-                color: "event-pestanas"
+                nombre: 'Lifting de Pestañas',
+                duracion: 60,
+                precio: 15000,
+                descripcion: 'Lifting profesional que dura 6-8 semanas'
             },
             {
                 id: 2,
-                nombre: "Diseño y Perfilado de Cejas",
-                tipo: "cejas",
+                nombre: 'Diseño de Cejas',
                 duracion: 45,
-                precio: 3200,
-                color: "event-cejas"
+                precio: 8000,
+                descripcion: 'Diseño personalizado con depilación y perfilado'
             },
             {
                 id: 3,
-                nombre: "Laminado de Cejas",
-                tipo: "cejas",
-                duracion: 60,
-                precio: 4000,
-                color: "event-cejas"
+                nombre: 'Depilación Láser - Bozo',
+                duracion: 15,
+                precio: 5000,
+                descripcion: 'Sesión de depilación láser en zona de bozo'
             },
             {
                 id: 4,
-                nombre: "Henna en Cejas",
-                tipo: "cejas",
-                duracion: 30,
-                precio: 2800,
-                color: "event-cejas"
+                nombre: 'Radiofrecuencia Facial',
+                duracion: 60,
+                precio: 18000,
+                descripcion: 'Tratamiento antiedad con tecnología de punta'
             },
             {
                 id: 5,
-                nombre: "Depilación Láser - Axilas",
-                tipo: "depilacion",
-                duracion: 30,
-                precio: 2500,
-                color: "event-depilacion"
+                nombre: 'VelaShape Corporal',
+                duracion: 45,
+                precio: 20000,
+                descripcion: 'Reducción de celulitis y contorneo corporal'
             },
             {
                 id: 6,
-                nombre: "Pedicuría Premium",
-                tipo: "pies",
-                duracion: 75,
-                precio: 3500,
-                color: "event-pies"
-            },
-            {
-                id: 7,
-                nombre: "Curso de Laminado de Cejas",
-                tipo: "curso",
-                duracion: 480,
-                precio: 18000,
-                color: "event-curso"
-            },
-            {
-                id: 8,
-                nombre: "Curso de Lifting de Pestañas",
-                tipo: "curso",
-                duracion: 600,
-                precio: 22000,
-                color: "event-curso"
+                nombre: 'Pedicuría Spa',
+                duracion: 60,
+                precio: 12000,
+                descripcion: 'Tratamiento completo de pies con spa'
             }
         ];
-
-        // ===== HORARIOS LABORALES =====
-        const horariosLaborales = {
-            lunes: ["09:00", "11:00", "13:00", "15:00", "17:00", "19:00"],
-            martes: ["09:00", "11:00", "13:00", "15:00", "17:00", "19:00"],
-            miercoles: ["09:00", "11:00", "13:00", "15:00", "17:00", "19:00"],
-            jueves: ["09:00", "11:00", "13:00", "15:00", "17:00", "19:00"],
-            viernes: ["09:00", "11:00", "13:00", "15:00", "17:00", "19:00"],
-            sabado: ["10:00", "12:00", "14:00"],
-            domingo: []
-        };
-
-        // ===== TURNOS EXISTENTES (Simulación) =====
+        
+        // ===== DATOS DE TURNOS EXISTENTES =====
         let turnosExistentes = [
             {
-                id: 101,
+                id: 1,
                 servicioId: 1,
-                cliente: "María González",
-                telefono: "11 1234-5678",
-                fecha: new Date(new Date().setDate(new Date().getDate() + 2)),
-                hora: "15:00",
-                estado: "confirmado"
+                cliente: 'María González',
+                fecha: new Date(2024, 11, 15, 10, 0),
+                hora: '10:00',
+                estado: 'ocupado'
             },
             {
-                id: 102,
-                servicioId: 3,
-                cliente: "Ana Paula",
-                telefono: "11 2345-6789",
-                fecha: new Date(new Date().setDate(new Date().getDate() + 3)),
-                hora: "11:00",
-                estado: "confirmado"
+                id: 2,
+                servicioId: 2,
+                cliente: 'Lucía Fernández',
+                fecha: new Date(2024, 11, 15, 15, 30),
+                hora: '15:30',
+                estado: 'ocupado'
             },
             {
-                id: 103,
-                servicioId: 5,
-                cliente: "Laura Fernández",
-                telefono: "11 3456-7890",
-                fecha: new Date(new Date().setDate(new Date().getDate() + 5)),
-                hora: "14:00",
-                estado: "confirmado"
+                id: 3,
+                servicioId: 4,
+                cliente: 'Sofía Martínez',
+                fecha: new Date(2024, 11, 18, 11, 0),
+                hora: '11:00',
+                estado: 'ocupado'
             }
         ];
-
+        
         // ===== VARIABLES GLOBALES =====
-        let fechaSeleccionada = null;
+        let calendarioInstance = null;
         let servicioSeleccionado = null;
+        let fechaSeleccionada = null;
         let horarioSeleccionado = null;
-
-        // ===== INICIALIZACIÓN =====
-        document.addEventListener('DOMContentLoaded', function() {
+        
+        // ===== INICIALIZAR =====
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarServicios();
             inicializarCalendario();
             cargarListaTurnos();
             configurarEventos();
         });
-
-        // ===== CALENDARIO =====
+        
+        // ===== CARGAR SERVICIOS EN SELECTS =====
+        function cargarServicios() {
+            const selectFiltro = document.getElementById('servicio');
+            const selectModal = document.getElementById('servicioModal');
+            
+            servicios.forEach(servicio => {
+                const option1 = document.createElement('option');
+                option1.value = servicio.id;
+                option1.textContent = servicio.nombre;
+                selectFiltro.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = servicio.id;
+                option2.textContent = `${servicio.nombre} - $${servicio.precio.toLocaleString()}`;
+                selectModal.appendChild(option2);
+            });
+            
+            // Evento de cambio en el select del modal
+            selectModal.addEventListener('change', function() {
+                const servicioId = parseInt(this.value);
+                if (servicioId) {
+                    const servicio = servicios.find(s => s.id === servicioId);
+                    if (servicio) {
+                        servicioSeleccionado = servicio;
+                        mostrarDetalleServicio(servicio);
+                    }
+                } else {
+                    servicioSeleccionado = null;
+                    document.getElementById('detalleServicio').style.display = 'none';
+                }
+            });
+        }
+        
+        // ===== MOSTRAR DETALLE DEL SERVICIO =====
+        function mostrarDetalleServicio(servicio) {
+            const detalle = document.getElementById('detalleServicio');
+            detalle.innerHTML = `
+                <h4 style="color: var(--rosa-medio); margin-bottom: 10px;">${servicio.nombre}</h4>
+                <p style="color: var(--texto-medio); margin-bottom: 10px;">${servicio.descripcion}</p>
+                <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+                    <span><strong>Duración:</strong> ${servicio.duracion} min</span>
+                    <span><strong>Precio:</strong> $${servicio.precio.toLocaleString()}</span>
+                </div>
+            `;
+            detalle.style.display = 'block';
+        }
+        
+        // ===== INICIALIZAR CALENDARIO =====
         function inicializarCalendario() {
-            const calendarEl = document.getElementById('calendario');
-
-            if (!calendarEl) {
-                console.error("calendarEl es null");
-                return;
-            }
-
-            // Si ya existe uno previo lo destruimos
-            if (window.calendar) {
-                window.calendar.destroy();
-            }
-
-            const eventos = generarEventosCalendario();
-
-            const calendar = new FullCalendar.Calendar(calendarEl, {
+            const calendarioEl = document.getElementById('calendario');
+            
+            calendarioInstance = new FullCalendar.Calendar(calendarioEl, {
                 initialView: 'dayGridMonth',
                 locale: 'es',
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    right: ''
                 },
-                events: eventos
+                events: generarEventos(),
+                dateClick: function(info) {
+                    // Al hacer clic en una fecha
+                    fechaSeleccionada = info.date;
+                    abrirModal('modalServicio');
+                },
+                eventClick: function(info) {
+                    alert(`Turno: ${info.event.title}\nHorario: ${info.event.start.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}`);
+                }
             });
-
-            calendar.render();
-            window.calendar = calendar;
+            
+            calendarioInstance.render();
         }
-
-
-        function generarEventosCalendario() {
-            const eventos = [];
+        
+        // ===== GENERAR EVENTOS PARA EL CALENDARIO =====
+        function generarEventos() {
+            return turnosExistentes.map(turno => {
+                const servicio = servicios.find(s => s.id === turno.servicioId);
+                return {
+                    title: servicio ? servicio.nombre : 'Turno',
+                    start: turno.fecha,
+                    backgroundColor: turno.estado === 'ocupado' ? '#dc3545' : '#28a745',
+                    borderColor: turno.estado === 'ocupado' ? '#dc3545' : '#28a745'
+                };
+            });
+        }
+        
+        // ===== CARGAR LISTA DE TURNOS =====
+        function cargarListaTurnos() {
+            const listaTurnos = document.getElementById('listaTurnos');
+            
+            // Generar turnos disponibles para los próximos 7 días
+            const turnosDisponibles = [];
             const hoy = new Date();
             
-            // Generar eventos para los próximos 60 días
-            for (let i = 1; i <= 60; i++) {
-                const fecha = new Date();
+            for (let i = 0; i < 7; i++) {
+                const fecha = new Date(hoy);
                 fecha.setDate(hoy.getDate() + i);
                 
-                // No incluir domingos
-                if (fecha.getDay() === 0) continue;
+                // Horarios disponibles
+                const horarios = ['09:00', '10:30', '12:00', '14:00', '15:30', '17:00'];
                 
-                // Convertir día de la semana a texto
-                const diasSemana = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-                const diaSemana = diasSemana[fecha.getDay()];
-                
-                // Obtener horarios disponibles para este día
-                const horariosDisponibles = horariosLaborales[diaSemana] || [];
-                
-                // Verificar turnos ocupados para esta fecha
-                const turnosOcupados = turnosExistentes.filter(t => 
-                    t.fecha.toDateString() === fecha.toDateString()
-                );
-                
-                // Crear eventos para horarios disponibles
-                horariosDisponibles.forEach(hora => {
-                    const estaOcupado = turnosOcupados.some(t => t.hora === hora);
+                horarios.forEach(hora => {
+                    const [h, m] = hora.split(':');
+                    const fechaHora = new Date(fecha);
+                    fechaHora.setHours(parseInt(h), parseInt(m), 0, 0);
                     
-                    // Seleccionar un servicio aleatorio para mostrar
-                    const servicio = servicios[Math.floor(Math.random() * servicios.length)];
+                    // Verificar si no está ocupado
+                    const ocupado = turnosExistentes.some(t => {
+                        return t.fecha.getTime() === fechaHora.getTime();
+                    });
                     
-                    eventos.push({
-                        title: estaOcupado ? 'OCUPADO' : `${servicio.nombre} - ${hora}`,
-                        start: `${fecha.toISOString().split('T')[0]}T${hora}:00`,
-                        end: `${fecha.toISOString().split('T')[0]}T${hora}:00`,
-                        color: estaOcupado ? '#dc3545' : null,
-                        className: estaOcupado ? '' : servicio.color,
-                        extendedProps: {
-                            disponible: !estaOcupado,
-                            servicio: servicio,
+                    if (!ocupado && fechaHora > hoy) {
+                        turnosDisponibles.push({
+                            fecha: fechaHora,
                             hora: hora,
-                            fecha: new Date(fecha)
-                        }
-                    });
+                            estado: 'disponible'
+                        });
+                    }
                 });
             }
             
-            return eventos;
-        }
-
-        // ===== LISTA DE TURNOS =====
-        function cargarListaTurnos() {
-            const container = document.getElementById('lista-turnos-container');
-            container.innerHTML = '';
-            
-            // Filtrar turnos futuros
-            const hoy = new Date();
-            const turnosFuturos = turnosExistentes
-                .filter(t => t.fecha >= hoy)
-                .sort((a, b) => a.fecha - b.fecha)
-                .slice(0, 5);
-            
-            if (turnosFuturos.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: var(--texto-medio);">
-                        <i class="fas fa-calendar-times" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                        <p>No hay turnos próximos programados</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            turnosFuturos.forEach(turno => {
-                const servicio = servicios.find(s => s.id === turno.servicioId);
-                const fecha = new Date(turno.fecha);
-                const dia = fecha.getDate();
-                const mes = fecha.toLocaleDateString('es-ES', { month: 'short' });
-                
-                const turnoElement = document.createElement('div');
-                turnoElement.className = 'turno-item';
-                turnoElement.innerHTML = `
+            // Mostrar solo los primeros 10
+            listaTurnos.innerHTML = turnosDisponibles.slice(0, 10).map(turno => `
+                <div class="turno-item">
                     <div class="turno-info">
-                        <div class="turno-fecha">
-                            <div class="turno-dia">${dia}</div>
-                            <div class="turno-mes">${mes}</div>
-                        </div>
-                        <div class="turno-detalles">
-                            <h4>${servicio.nombre}</h4>
-                            <p><i class="far fa-clock"></i> ${turno.hora} - ${servicio.duracion} min</p>
-                        </div>
+                        <h4>${turno.fecha.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}</h4>
+                        <p><i class="far fa-clock"></i> ${turno.hora}</p>
                     </div>
-                    <div class="turno-cliente">
-                        <strong>${turno.cliente}</strong>
-                        <span>${turno.estado === 'confirmado' ? '✅ Confirmado' : '⏳ Pendiente'}</span>
-                    </div>
-                `;
-                
-                container.appendChild(turnoElement);
-            });
+                    <span class="turno-estado estado-${turno.estado}">
+                        ${turno.estado === 'disponible' ? '✓ Disponible' : '✗ Ocupado'}
+                    </span>
+                </div>
+            `).join('');
         }
-
-        // ===== MODAL DE SELECCIÓN DE SERVICIO =====
-        function mostrarModalServicio() {
-            if (!fechaSeleccionada) return;
-            
-            // Actualizar la fecha mostrada
-            const fechaTexto = fechaSeleccionada.toLocaleDateString('es-ES', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-            document.getElementById('fechaSeleccionada').textContent = fechaTexto;
-            
-            // Limpiar selección previa
-            servicioSeleccionado = null;
-            horarioSeleccionado = null;
-            
-            // Cargar servicios disponibles
-            const listaServicios = document.getElementById('lista-servicios');
-            listaServicios.innerHTML = '';
-            
-            servicios.forEach(servicio => {
-                const servicioElement = document.createElement('div');
-                servicioElement.className = 'servicio-item';
-                servicioElement.dataset.id = servicio.id;
-                servicioElement.innerHTML = `
-                    <div class="servicio-nombre">${servicio.nombre}</div>
-                    <div class="servicio-detalles">
-                        <i class="far fa-clock"></i> ${servicio.duracion} min | 
-                        <i class="fas fa-dollar-sign"></i> $${servicio.precio}
-                    </div>
-                `;
-                
-                servicioElement.addEventListener('click', function() {
-                    // Remover selección anterior
-                    document.querySelectorAll('.servicio-item').forEach(item => {
-                        item.classList.remove('selected');
-                    });
-                    
-                    // Seleccionar este servicio
-                    this.classList.add('selected');
-                    servicioSeleccionado = servicio;
-                    
-                    // Habilitar botón de continuar
-                    document.getElementById('continuarServicio').disabled = false;
-                });
-                
-                listaServicios.appendChild(servicioElement);
-            });
-            
-            // Deshabilitar botón de continuar inicialmente
-            document.getElementById('continuarServicio').disabled = true;
-            
-            // Mostrar modal
-            abrirModal('modalServicio');
+        
+        // ===== ABRIR MODAL =====
+        function abrirModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('active');
         }
-
-        // ===== MODAL DE RESERVA =====
+        
+        // ===== CERRAR MODAL =====
+        function cerrarModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('active');
+        }
+        
+        // ===== MOSTRAR MODAL DE RESERVA =====
         function mostrarModalReserva() {
-            if (!fechaSeleccionada || !servicioSeleccionado) {
-                // Si no hay servicio seleccionado, mostrar primero el modal de servicio
-                mostrarModalServicio();
+            if (!servicioSeleccionado || !fechaSeleccionada) {
+                alert('Por favor, selecciona un servicio y una fecha');
                 return;
             }
             
-            actualizarInfoModalReserva();
-            mostrarHorariosDisponibles();
+            // Generar horarios disponibles para la fecha seleccionada
+            const horariosDisponibles = ['09:00', '10:30', '12:00', '14:00', '15:30', '17:00'];
+            
+            const resumen = document.getElementById('resumenReserva');
+            resumen.innerHTML = `
+                <h4 style="color: var(--violeta); margin-bottom: 15px;">Resumen de la Reserva</h4>
+                <p><strong>Servicio:</strong> ${servicioSeleccionado.nombre}</p>
+                <p><strong>Fecha:</strong> ${fechaSeleccionada.toLocaleDateString('es-ES')}</p>
+                <p><strong>Precio:</strong> $${servicioSeleccionado.precio.toLocaleString()}</p>
+                <p><strong>Duración:</strong> ${servicioSeleccionado.duracion} minutos</p>
+                <div style="margin-top: 15px;">
+                    <label><strong>Horario:</strong></label>
+                    <select id="horarioSelect" class="select-filtro">
+                        <option value="">Selecciona un horario</option>
+                        ${horariosDisponibles.map(h => `<option value="${h}">${h}</option>`).join('')}
+                    </select>
+                </div>
+            `;
+            
+            // Evento de cambio de horario
+            document.getElementById('horarioSelect').addEventListener('change', function() {
+                horarioSeleccionado = this.value;
+            });
+            
             abrirModal('modalReserva');
         }
-
-        function actualizarInfoModalReserva() {
-            if (!fechaSeleccionada || !servicioSeleccionado) return;
-            
-            document.getElementById('modalFecha').textContent = 
-                fechaSeleccionada.toLocaleDateString('es-ES', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                });
-            
-            document.getElementById('modalServicio').textContent = servicioSeleccionado.nombre;
-            document.getElementById('modalDuracion').textContent = `${servicioSeleccionado.duracion} minutos`;
-            document.getElementById('modalPrecio').textContent = `$${servicioSeleccionado.precio}`;
-        }
-
-        function mostrarHorariosDisponibles() {
-            if (!fechaSeleccionada) return;
-            
-            const container = document.getElementById('horariosContainer');
-            const diaSemana = fechaSeleccionada.getDay();
-            const diasSemana = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-            const diaSemanaTexto = diasSemana[diaSemana];
-            
-            const horariosDelDia = horariosLaborales[diaSemanaTexto] || [];
-            
-            // Obtener turnos ocupados para esta fecha
-            const turnosOcupados = turnosExistentes.filter(t => 
-                t.fecha.toDateString() === fechaSeleccionada.toDateString()
-            ).map(t => t.hora);
-            
-            // Actualizar información de disponibilidad
-            const disponibilidadInfo = document.getElementById('disponibilidadInfo');
-            if (horariosDelDia.length === 0) {
-                disponibilidadInfo.className = 'disponibilidad ocupado';
-                disponibilidadInfo.innerHTML = '<i class="fas fa-times-circle"></i> No hay horarios disponibles este día';
-                container.innerHTML = '';
-                return;
-            } else {
-                const horariosLibres = horariosDelDia.filter(h => !turnosOcupados.includes(h));
-                if (horariosLibres.length === 0) {
-                    disponibilidadInfo.className = 'disponibilidad ocupado';
-                    disponibilidadInfo.innerHTML = '<i class="fas fa-times-circle"></i> Todos los horarios están ocupados';
-                } else {
-                    disponibilidadInfo.className = 'disponibilidad disponible';
-                    disponibilidadInfo.innerHTML = `<i class="fas fa-check-circle"></i> ${horariosLibres.length} horarios disponibles`;
-                }
-            }
-            
-            // Mostrar horarios
-            container.innerHTML = horariosDelDia.map(hora => {
-                const estaOcupado = turnosOcupados.includes(hora);
-                const estaSeleccionado = horarioSeleccionado === hora;
-                
-                return `
-                    <button type="button" 
-                            class="btn-horario ${estaOcupado ? 'ocupado' : ''} ${estaSeleccionado ? 'selected' : ''}"
-                            ${estaOcupado ? 'disabled' : ''}
-                            ${estaOcupado ? '' : `onclick="seleccionarHorario('${hora}')"`}>
-                        ${hora}
-                        ${estaOcupado ? '<br><small>Ocupado</small>' : ''}
-                    </button>
-                `;
-            }).join('');
-        }
-
-        // ===== MANEJO DE MODALES =====
-        function abrirModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function cerrarModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // ===== FUNCIONES GLOBALES =====
-        window.seleccionarHorario = function(hora) {
-            horarioSeleccionado = hora;
-            mostrarHorariosDisponibles();
-        };
-
-        // ===== FORMULARIO DE RESERVA =====
+        
+        // ===== ENVIAR FORMULARIO DE RESERVA =====
         document.getElementById('formReserva').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            if (!fechaSeleccionada || !servicioSeleccionado || !horarioSeleccionado) {
-                alert('Por favor, completa todos los pasos de la reserva.');
+            if (!horarioSeleccionado) {
+                alert('Por favor, selecciona un horario');
                 return;
             }
             
-            const nombre = document.getElementById('nombreCliente').value;
-            const telefono = document.getElementById('telefonoCliente').value;
-            const email = document.getElementById('emailCliente').value;
-            const notas = document.getElementById('notasCliente').value;
-            
-            // Validar datos
-            if (!nombre || !telefono) {
-                alert('Por favor, completa al menos tu nombre y teléfono.');
-                return;
-            }
+            const nombre = document.getElementById('nombre').value;
+            const telefono = document.getElementById('telefono').value;
+            const email = document.getElementById('email').value;
+            const notas = document.getElementById('notas').value;
             
             // Crear nuevo turno
             const nuevoTurno = {
@@ -1615,42 +1254,51 @@ let calendar = null;
 
 // ===== INICIALIZAR TURNERA =====
 document.addEventListener('DOMContentLoaded', async () => {
-    await loadServicesSelect();
+    await loadServicesIntoSelect();
     initCalendar();
 
     const preSelectedService = localStorage.getItem('selected_service_id');
     if (preSelectedService) {
         selectedServiceId = parseInt(preSelectedService);
-        document.getElementById('service-select').value = preSelectedService;
+        document.getElementById('servicio').value = preSelectedService;
         localStorage.removeItem('selected_service_id');
     }
 });
 
 // ===== CARGAR SERVICIOS EN SELECT =====
-async function loadServicesSelect() {
-    const services = await getServices();
-    console.log('✅ Servicios cargados:', services.length);
-    const select = document.getElementById('service-select');
-
-    select.innerHTML =
-        `<option value="">Seleccioná un servicio</option>` +
-        services.map(s => `
-            <option value="${s.id}">
-                ${s.name} - ${formatPrice(s.price)}
-            </option>
-        `).join('');
-
-    select.onchange = async e => {
-        selectedServiceId = e.target.value ? parseInt(e.target.value) : null;
-        if (selectedServiceId && selectedDate) {
-            await loadAvailability();
+async function loadServicesIntoSelect() {
+    try {
+        const services = await getServices();
+        console.log('✅ Servicios cargados para select:', services.length);
+        
+        const select = document.getElementById('servicio');
+        if (!select) {
+            console.error('❌ No se encontró el select de servicios');
+            return;
         }
-    };
+        
+        // Limpiar opciones actuales (excepto la primera)
+        select.innerHTML = '<option value="">Seleccioná un servicio</option>';
+        
+        // Agregar servicios reales
+        services.forEach(service => {
+            const option = document.createElement('option');
+            option.value = service.id;
+            option.textContent = `${service.name} - ${formatPrice(service.price)}`;
+            option.dataset.price = service.price;
+            option.dataset.duration = service.duration_minutes;
+            option.dataset.name = service.name;
+            select.appendChild(option);
+        });
+        
+    } catch (error) {
+        console.error('❌ Error cargando servicios:', error);
+    }
 }
 
 // ===== CALENDARIO =====
 function initCalendar() {
-    const el = document.getElementById('calendar');
+    const el = document.getElementById('calendario');
 
     calendar = new FullCalendar.Calendar(el, {
         initialView: 'dayGridMonth',

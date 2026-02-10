@@ -230,7 +230,7 @@
                             ` : ''}
                             
                             ${app.status === 'pending' || app.status === 'confirmed' ? `
-                                <button class="btn btn-danger" onclick="cancelAppointment(${app.id})">
+                                <button class="btn btn-danger" onclick="handleCancelAppointment(${app.id})">
                                     Cancelar
                                 </button>
                             ` : ''}
@@ -259,13 +259,14 @@
             window.location.href = `/pago.html?appointment_id=${appointmentId}`;
         }
 
-        // ===== CANCELAR TURNO =====
-        async function cancelAppointmentHandler(appointmentId) {
+        // ===== CANCELAR TURNO (RENOMBRADO PARA EVITAR CONFLICTO) =====
+        async function handleCancelAppointment(appointmentId) {
             const reason = prompt('¿Por qué deseas cancelar el turno?');
             
             if (!reason) return;
             
             try {
+                // Usa la función de api.js
                 await cancelAppointment(appointmentId, reason);
                 showSuccess('Turno cancelado exitosamente');
                 loadAppointments(); // Recargar lista

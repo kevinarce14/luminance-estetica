@@ -1063,7 +1063,7 @@ if (registerForm) {
             
             // Opcional: auto-login después del registro
             await login(formData.email, formData.password);
-            window.location.href = '/turnera.html';
+            window.location.href = '/studio.html';
             
         } catch (error) {
             showError(error.message || 'Error al registrarse');
@@ -1100,7 +1100,7 @@ if (loginForm) {
 // ===== VERIFICAR SI YA ESTÁ LOGUEADO =====
 if (isLoggedIn()) {
     // Ya está logueado, redirigir
-    window.location.href = '/turnera.html';
+    window.location.href = '/studio.html';
 }
 </script>
 </body>

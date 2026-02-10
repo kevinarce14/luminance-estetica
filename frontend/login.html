@@ -459,6 +459,13 @@
                 // Deshabilitar botón
                 btn.disabled = true;
                 btn.textContent = 'Registrando...';
+
+                // Validación en el frontend también (opcional pero recomendado)
+                const passwordErrors = validatePassword(formData.password);
+                if (passwordErrors.length > 0) {
+                    const errorMessage = `La contraseña debe tener: ${passwordErrors.join(', ')}`;
+                    throw new Error(errorMessage);
+                }
                 
                 // Llamar a la API
                 await register(formData);
@@ -474,11 +481,57 @@
                 }, 1000);
                 
             } catch (error) {
-                showAlert(error.message || 'Error al registrarse. Intenta de nuevo.', 'error');
+                // Mejor manejo del error
+                let errorMessage = 'Error al registrarse. Intenta de nuevo.';
+                
+                if (error.message) {
+                    // Si el error ya es un string legible
+                    errorMessage = error.message;
+                } else if (error.data && error.data.message) {
+                    // Si es el objeto de error de la API
+                    errorMessage = Array.isArray(error.data.message) 
+                        ? error.data.message.join(', ') 
+                        : error.data.message;
+                } else if (error.status === 422) {
+                    errorMessage = 'Datos inválidos. Verifica que:';
+                    if (error.data && error.data.detail) {
+                        // Parsear errores de validación de Pydantic
+                        const errors = error.data.detail;
+                        if (Array.isArray(errors)) {
+                            errors.forEach(err => {
+                                errorMessage += `\n• ${err.msg} (${err.loc.join('.')})`;
+                            });
+                        }
+                    } else {
+                        errorMessage += '\n• La contraseña debe tener: mayúscula, minúscula y número\n• Email debe ser válido\n• Nombre mínimo 2 caracteres';
+                    }
+                }
+                
+                showAlert(errorMessage, 'error');
                 btn.disabled = false;
                 btn.textContent = 'Registrarse';
             }
         });
+
+        // Función auxiliar para validar contraseña en el frontend
+        function validatePassword(password) {
+            const errors = [];
+            
+            if (password.length < 8) {
+                errors.push('Mínimo 8 caracteres');
+            }
+            if (!/[A-Z]/.test(password)) {
+                errors.push('Al menos una MAYÚSCULA');
+            }
+            if (!/[a-z]/.test(password)) {
+                errors.push('Al menos una minúscula');
+            }
+            if (!/[0-9]/.test(password)) {
+                errors.push('Al menos un número');
+            }
+            
+            return errors;
+        }
 
         // ===== VERIFICAR SI YA ESTÁ LOGUEADO =====
         if (isLoggedIn()) {

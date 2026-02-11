@@ -569,16 +569,12 @@
                 </div>
                 <div class="message-box info">
                     <i class="fas fa-info-circle"></i>
-                    <span>Hacé click en el día que prefieras para tu turno</span>
+                    <span>Hacé click en el día que prefieras para tu turno. Los días con turnos confirmados se muestran en rojo.</span>
                 </div>
                 <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <div style="width: 12px; height: 12px; background: #dc3545; border-radius: 50%;"></div>
-                        <span style="font-size: 0.9rem; color: var(--texto-medio);">Confirmado</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 12px; height: 12px; background: #ffc107; border-radius: 50%;"></div>
-                        <span style="font-size: 0.9rem; color: var(--texto-medio);">Pendiente</span>
+                        <span style="font-size: 0.9rem; color: var(--texto-medio);">Turno Confirmado</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <div style="width: 12px; height: 12px; background: rgba(231, 84, 128, 0.3); border: 2px solid var(--rosa-medio); border-radius: 50%;"></div>
@@ -789,35 +785,34 @@
                 // Convertir a formato de FullCalendar
                 return appointments
                     .filter(apt => {
-                        // Solo mostrar turnos confirmados y pendientes (no cancelados ni completados)
-                        return apt.status === 'confirmed' || apt.status === 'pending';
+                        // SOLO mostrar turnos CONFIRMADOS (no pendientes, cancelados ni completados)
+                        return apt.status === 'confirmed';
                     })
                     .map(apt => {
                         const appointmentDate = new Date(apt.appointment_date);
                         
-                        // Determinar color según estado
-                        let bgColor = '#6c757d'; // Gris por defecto
-                        let borderColor = '#5a6268';
+                        // Formatear hora
+                        const hours = appointmentDate.getHours().toString().padStart(2, '0');
+                        const minutes = appointmentDate.getMinutes().toString().padStart(2, '0');
+                        const timeStr = `${hours}:${minutes}`;
                         
-                        if (apt.status === 'confirmed') {
-                            bgColor = '#dc3545'; // Rojo para confirmados
-                            borderColor = '#bd2130';
-                        } else if (apt.status === 'pending') {
-                            bgColor = '#ffc107'; // Amarillo para pendientes
-                            borderColor = '#e0a800';
-                        }
+                        // Nombre del servicio (acortado si es muy largo)
+                        const serviceName = apt.service.name.length > 20 
+                            ? apt.service.name.substring(0, 20) + '...'
+                            : apt.service.name;
                         
                         return {
                             id: apt.id,
-                            title: apt.service.name.substring(0, 15) + '...', // Nombre corto
+                            title: `${timeStr} ${serviceName}`, // Formato: "14:30 Lifting de Pestañas"
                             start: appointmentDate.toISOString(),
-                            backgroundColor: bgColor,
-                            borderColor: borderColor,
+                            backgroundColor: '#dc3545', // Rojo para confirmados
+                            borderColor: '#bd2130',
                             textColor: '#ffffff',
                             extendedProps: {
                                 serviceId: apt.service_id,
                                 status: apt.status,
-                                fullServiceName: apt.service.name
+                                fullServiceName: apt.service.name,
+                                time: timeStr
                             }
                         };
                     });
@@ -945,13 +940,36 @@
                 }
 
                 // Filtrar solo horarios disponibles
-                const availableSlots = data.available_slots.filter(slot => slot.is_available);
+                let availableSlots = data.available_slots.filter(slot => slot.is_available);
+
+                // Si es el día actual, filtrar horarios que ya pasaron
+                const today = new Date();
+                const selectedDateObj = new Date(selectedDate + 'T00:00:00');
+                
+                // Normalizar fechas para comparar solo día/mes/año
+                today.setHours(0, 0, 0, 0);
+                selectedDateObj.setHours(0, 0, 0, 0);
+                
+                if (selectedDateObj.getTime() === today.getTime()) {
+                    // Es el día actual - filtrar horarios pasados
+                    const now = new Date(); // Hora actual real
+                    
+                    availableSlots = availableSlots.filter(slot => {
+                        const slotTime = new Date(slot.start_time);
+                        return slotTime > now; // Solo horarios futuros
+                    });
+                    
+                    console.log('📅 Día actual - filtrados horarios pasados. Disponibles:', availableSlots.length);
+                }
 
                 if (availableSlots.length === 0) {
+                    const isToday = selectedDateObj.getTime() === today.getTime();
                     container.innerHTML = `
                         <div class="message-box warning" style="grid-column: 1/-1;">
                             <i class="fas fa-exclamation-triangle"></i>
-                            <span>Todos los horarios están ocupados para esta fecha. Intenta con otro día.</span>
+                            <span>${isToday 
+                                ? 'No hay más horarios disponibles para hoy. Por favor, selecciona otro día.' 
+                                : 'Todos los horarios están ocupados para esta fecha. Intenta con otro día.'}</span>
                         </div>
                     `;
                     return;

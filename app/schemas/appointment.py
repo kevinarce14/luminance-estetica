@@ -1,6 +1,6 @@
 # app/schemas/appointment.py
-from pydantic import BaseModel, Field, validator
-from datetime import datetime
+from pydantic import BaseModel, Field, field_validator, validator
+from datetime import datetime, timezone
 from typing import Optional
 
 from app.schemas.user import UserPublic
@@ -16,8 +16,15 @@ class AppointmentBase(BaseModel):
     
     @validator('appointment_date')
     def validate_future_date(cls, v):
-        """Valida que la fecha del turno sea en el futuro"""
-        if v < datetime.now():
+        # Obtener ahora con timezone UTC
+        now = datetime.now(timezone.utc)
+        
+        # Si v no tiene timezone, agregar UTC
+        if v.tzinfo is None:
+            v = v.replace(tzinfo=timezone.utc)
+        
+        # Ahora podemos comparar
+        if v < now:
             raise ValueError('La fecha del turno debe ser en el futuro')
         return v
 
@@ -46,11 +53,22 @@ class AppointmentUpdate(BaseModel):
     status: Optional[str] = None  # "pending", "confirmed", "completed", "cancelled"
     cancellation_reason: Optional[str] = Field(None, max_length=500)
     
-    @validator('appointment_date')
+    @field_validator('appointment_date')
+    @classmethod
     def validate_future_date(cls, v):
-        """Valida que la fecha del turno sea en el futuro"""
-        if v and v < datetime.now():
-            raise ValueError('La fecha del turno debe ser en el futuro')
+        """Valida que la fecha sea futura, manejando timezones"""
+        
+        # Obtener ahora con timezone UTC
+        now = datetime.now(timezone.utc)
+        
+        # Si v no tiene timezone, agregar UTC
+        if v.tzinfo is None:
+            v = v.replace(tzinfo=timezone.utc)
+        
+        # Ahora podemos comparar
+        if v < now:
+            raise ValueError('La fecha del turno debe ser futura')
+        
         return v
     
     @validator('status')

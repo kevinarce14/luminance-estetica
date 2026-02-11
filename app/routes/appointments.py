@@ -50,8 +50,17 @@ def check_slot_availability(
     if not service:
         return False
     
-    # Calcular hora de fin
-    end_time = appointment_date + timedelta(minutes=service.duration_minutes)
+    # ==== CORRECCIÓN AQUÍ ====
+    # Convertir appointment_date a naive si es necesario
+    # La base de datos generalmente almacena fechas sin timezone
+    from datetime import timezone
+    
+    appointment_date_local = appointment_date
+    if appointment_date_local.tzinfo is not None:
+        appointment_date_local = appointment_date_local.astimezone(timezone.utc).replace(tzinfo=None)
+    
+    # Calcular hora de fin (sin timezone)
+    end_time = appointment_date_local + timedelta(minutes=service.duration_minutes)
     
     # Buscar turnos conflictivos (que se solapen)
     query = db.query(Appointment).filter(
@@ -60,8 +69,8 @@ def check_slot_availability(
         or_(
             # Caso 1: El nuevo turno empieza durante un turno existente
             and_(
-                Appointment.appointment_date <= appointment_date,
-                Appointment.appointment_date + timedelta(minutes=service.duration_minutes) > appointment_date
+                Appointment.appointment_date <= appointment_date_local,
+                Appointment.appointment_date + timedelta(minutes=service.duration_minutes) > appointment_date_local
             ),
             # Caso 2: El nuevo turno termina durante un turno existente
             and_(
@@ -70,7 +79,7 @@ def check_slot_availability(
             ),
             # Caso 3: El nuevo turno contiene completamente a un turno existente
             and_(
-                Appointment.appointment_date >= appointment_date,
+                Appointment.appointment_date >= appointment_date_local,
                 Appointment.appointment_date + timedelta(minutes=service.duration_minutes) <= end_time
             )
         )
@@ -116,17 +125,29 @@ def create_appointment(
             detail="Este servicio no está disponible actualmente"
         )
     
-    # Verificar que la fecha sea en el futuro (con anticipación mínima)
-    min_advance = datetime.now() + timedelta(hours=settings.MIN_BOOKING_ADVANCE_HOURS)
-    if appointment_data.appointment_date < min_advance:
+    # ==== CORRECCIÓN AQUÍ ====
+    # Obtener la fecha actual con timezone para comparar
+    from datetime import timezone
+    
+    # appointment_data.appointment_date ya es aware (por el validator)
+    # Necesitamos hacer que min_advance también sea aware
+    min_advance = datetime.now(timezone.utc) + timedelta(hours=settings.MIN_BOOKING_ADVANCE_HOURS)
+    
+    # Asegurarnos de que appointment_date también tiene timezone UTC
+    appointment_date_utc = appointment_data.appointment_date
+    if appointment_date_utc.tzinfo is None:
+        appointment_date_utc = appointment_date_utc.replace(tzinfo=timezone.utc)
+    
+    # Ahora podemos comparar
+    if appointment_date_utc < min_advance:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Debes reservar con al menos {settings.MIN_BOOKING_ADVANCE_HOURS} horas de anticipación"
         )
     
     # Verificar anticipación máxima
-    max_advance = datetime.now() + timedelta(days=settings.MAX_BOOKING_ADVANCE_DAYS)
-    if appointment_data.appointment_date > max_advance:
+    max_advance = datetime.now(timezone.utc) + timedelta(days=settings.MAX_BOOKING_ADVANCE_DAYS)
+    if appointment_date_utc > max_advance:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"No puedes reservar con más de {settings.MAX_BOOKING_ADVANCE_DAYS} días de anticipación"

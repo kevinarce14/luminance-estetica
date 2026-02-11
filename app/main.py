@@ -22,6 +22,9 @@ from app.routes import payments
 from app.routes import availability
 from app.routes import admin
 
+#servicio para actualizar los estados de los turnos automaticamente
+from app.services.scheduler_service import init_scheduler
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -91,6 +94,9 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
     lifespan=lifespan,
 )
+
+# Inicializar scheduler al arrancar la app
+scheduler = init_scheduler()
 
 
 # ========== CORS MIDDLEWARE ==========

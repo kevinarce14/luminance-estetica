@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 from typing import List
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from app.core.database import get_db
 from app.core.config import settings
@@ -205,7 +205,7 @@ def list_my_appointments(
     
     Requiere autenticación.
     """
-    query = db.query(Appointment).filter(Appointment.user_id == current_user.id)
+    query = db.query(Appointment).filter(Appointment.user_id == current_user.id, Appointment.appointment_date >= datetime.now(timezone.utc))
     
     if status_filter:
         query = query.filter(Appointment.status == status_filter)

@@ -629,6 +629,13 @@
     <script>
         // ===== VERIFICAR AUTENTICACIÓN =====
         requireAuth();
+
+        // ===== FORMATO LOCAL (no depender de versión de api.js) =====
+        function formatPrice(p) { return '$' + Number(p).toLocaleString('es-AR'); }
+        function formatTime(s)  {
+            const d = new Date(s);
+            return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ' hs';
+        }
         
         // ===== VARIABLES GLOBALES =====
         let appointmentId = null;
@@ -658,25 +665,40 @@
         
         // ===== CARGAR DATOS DEL TURNO =====
         async function loadAppointmentData() {
+            const container = document.getElementById('appointment-summary');
             try {
-                // Obtener información del appointment
+                console.log('📡 Cargando turno ID:', appointmentId);
                 appointmentData = await getAppointmentById(appointmentId);
-                console.log('✅ Datos del turno cargados:', appointmentData);
+                console.log('✅ Datos del turno:', appointmentData);
                 
-                // Verificar que esté en estado pending
                 if (appointmentData.status !== 'pending') {
-                    alert('Este turno ya fue procesado');
-                    window.location.href = '/mis-turnos.html';
+                    container.innerHTML = `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-info-circle"></i>
+                            <div>Este turno ya fue procesado (estado: <strong>${appointmentData.status}</strong>).
+                            <br><a href="/mis-turnos.html" style="color:inherit;font-weight:700;">Ver mis turnos →</a></div>
+                        </div>`;
+                    document.getElementById('btn-confirm-payment').disabled = true;
                     return;
                 }
-                
-                // Renderizar resumen
                 renderAppointmentSummary();
                 
             } catch (error) {
                 console.error('❌ Error cargando datos del turno:', error);
-                alert('Error al cargar la información del turno');
-                window.location.href = '/turnera.html';
+                const msg = error?.message || error?.detail || JSON.stringify(error);
+                container.innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Error al cargar turno #${appointmentId}</strong><br>
+                            <code>${msg}</code><br><br>
+                            <button onclick="loadAppointmentData()" 
+                                style="background:var(--rosa-medio);color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;margin-right:10px;">
+                                🔄 Reintentar
+                            </button>
+                            <a href="/turnera.html" style="color:var(--rosa-medio);font-weight:600;">← Volver</a>
+                        </div>
+                    </div>`;
             }
         }
         
@@ -842,8 +864,19 @@
                 
             } catch (error) {
                 console.error('❌ Error procesando pago:', error);
-                alert('Error al procesar el pago. Por favor, intenta nuevamente.');
                 document.getElementById('loadingOverlay').classList.remove('active');
+                
+                // Extraer mensaje detallado — el 422 de Pydantic viene como Array
+                let msg = '';
+                if (Array.isArray(error?.message)) {
+                    // Pydantic validation error: [{loc, msg, type}, ...]
+                    msg = error.message.map(e => `Campo '${e.loc?.join('.')}': ${e.msg}`).join('\n');
+                    console.error('❌ Validación Pydantic:', error.message);
+                } else {
+                    msg = error?.message || error?.detail || JSON.stringify(error);
+                }
+                
+                alert(`Error (${error?.status || '?'}):\n${msg}`);
             }
         }
         
@@ -941,50 +974,60 @@
         }
         
         // ===== FUNCIONES AUXILIARES DE API =====
-        
+        // Todas usan apiRequest (función pública de api.js, igual que en turnera.html)
+
         async function getAppointmentById(id) {
-            const response = await authenticatedFetch(`${API_URL}/appointments/${id}/`);
-            return response;
+            console.log('🔍 GET /appointments/' + id + '/');
+            return await apiRequest(`/appointments/${id}/`);
         }
         
-        async function createMercadoPagoPreference(appointmentId) {
-            const response = await authenticatedFetch(
-                `${API_URL}/payments/create-preference/`,
-                {
-                    method: 'POST',
-                    body: JSON.stringify({ appointment_id: appointmentId })
-                }
-            );
-            return response;
-        }
-        
-        async function uploadPaymentProof(appointmentId, formData) {
-            const token = localStorage.getItem('access_token');
-            
-            const response = await fetch(`${API_URL}/payments/upload-proof/${appointmentId}/`, {
+        async function createMercadoPagoPreference(id) {
+            console.log('🔍 POST /payments/create-preference/');
+            return await apiRequest('/payments/create-preference/', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
+                body: { appointment_id: parseInt(id) }
+            });
+        }
+        
+        async function uploadPaymentProof(id, formData) {
+            // FormData no puede ir por apiRequest (que agrega Content-Type: application/json)
+            // así que usamos fetch directo con el token
+            const token = localStorage.getItem('access_token') 
+                       || localStorage.getItem('token')
+                       || localStorage.getItem('authToken');
+            console.log('🔍 POST /payments/upload-proof/' + id + '/');
+            const response = await fetch(`${API_URL}/payments/upload-proof/${id}/`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
             });
-            
             if (!response.ok) {
-                throw new Error('Error subiendo comprobante');
+                const errData = await response.json().catch(() => ({}));
+                throw { status: response.status, message: errData.detail || 'Error subiendo comprobante' };
             }
-            
             return await response.json();
         }
         
-        async function confirmAppointmentCash(appointmentId) {
-            const response = await authenticatedFetch(
-                `${API_URL}/payments/confirm-cash/${appointmentId}/`,
-                {
+        async function confirmAppointmentCash(id) {
+            // Intentamos el endpoint específico de cash; si no existe en el backend,
+            // usamos el PATCH de appointments para cambiar status a confirmed
+            console.log('🔍 POST /payments/confirm-cash/' + id + '/');
+            try {
+                return await apiRequest(`/payments/confirm-cash/${id}/`, {
                     method: 'POST',
-                    body: JSON.stringify({})
+                    body: {}
+                });
+            } catch (err) {
+                // Si el endpoint no existe (404), usamos PATCH directo sobre el appointment
+                if (err.status === 404 || err.status === 405) {
+                    console.warn('⚠️ /payments/confirm-cash/ no existe, usando PATCH /appointments/');
+                    return await apiRequest(`/appointments/${id}/`, {
+                        method: 'PATCH',
+                        body: { status: 'confirmed' }
+                    });
                 }
-            );
-            return response;
+                throw err;
+            }
         }
     </script>
 </body>

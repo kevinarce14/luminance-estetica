@@ -782,10 +782,13 @@
                 
                 console.log('📋 Turnos existentes cargados:', appointments.length);
                 
+                // Guardar confirmados globalmente para doble chequeo de disponibilidad
+                window._confirmedAppointments = appointments.filter(a => a.status === 'confirmed');
+                console.log('🔒 Turnos confirmados en memoria:', window._confirmedAppointments.length);
+
                 // Convertir a formato de FullCalendar
-                return appointments
+                return window._confirmedAppointments
                     .filter(apt => {
-                        // SOLO mostrar turnos CONFIRMADOS (no pendientes, cancelados ni completados)
                         return apt.status === 'confirmed';
                     })
                     .map(apt => {
@@ -944,8 +947,31 @@
                     return;
                 }
 
-                // Filtrar solo horarios disponibles
+                // Filtrar horarios que el backend marcó como disponibles
                 let availableSlots = data.available_slots.filter(slot => slot.is_available);
+
+                // ── DOBLE CHEQUEO FRONTEND ──────────────────────────────────────────
+                // El backend a veces no actualiza is_available en tiempo real.
+                // Cruzamos con los turnos confirmados que ya tenemos en memoria.
+                if (window._confirmedAppointments && window._confirmedAppointments.length > 0) {
+                    const durationMs = (selectedService?.duration_minutes || 60) * 60 * 1000;
+
+                    availableSlots = availableSlots.filter(slot => {
+                        const slotStart = new Date(slot.start_time).getTime();
+                        const slotEnd   = slotStart + durationMs;
+
+                        const ocupado = window._confirmedAppointments.some(apt => {
+                            const aptStart = new Date(apt.appointment_date).getTime();
+                            const aptEnd   = aptStart + durationMs;
+                            // Hay solapamiento si los rangos se tocan
+                            return aptStart < slotEnd && aptEnd > slotStart;
+                        });
+
+                        if (ocupado) console.log(`🔴 Bloqueado por turno confirmado: ${slot.start_time}`);
+                        return !ocupado;
+                    });
+                }
+                // ────────────────────────────────────────────────────────────────────
 
                 // Si es el día actual, filtrar horarios que ya pasaron
                 const today = new Date();
@@ -1211,15 +1237,12 @@
             }
         }
 
-        if (typeof formatTime === 'undefined') {
-            function formatTime(dateTimeString) {
-                const date = new Date(dateTimeString);
-                return date.toLocaleTimeString('es-ES', { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    hour12: false 
-                });
-            }
+        // Sobreescribimos siempre para garantizar "HH:MM hs" con 2 dígitos (no depender de api.js)
+        function formatTime(dateTimeString) {
+            const date = new Date(dateTimeString);
+            const h = String(date.getHours()).padStart(2, '0');
+            const m = String(date.getMinutes()).padStart(2, '0');
+            return `${h}:${m} hs`;
         }
 
         if (typeof formatDate === 'undefined') {

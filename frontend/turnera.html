@@ -852,16 +852,21 @@
 
             // Verificar si hay servicio pre-seleccionado de studio.html
             const preSelectedServiceId = localStorage.getItem('selected_service_id');
-            if (preSelectedServiceId) {
+            const isValidPreSelection = preSelectedServiceId 
+                && preSelectedServiceId !== 'undefined' 
+                && preSelectedServiceId !== 'null'
+                && !isNaN(parseInt(preSelectedServiceId));
+
+            if (isValidPreSelection) {
                 console.log('🎯 Auto-seleccionando servicio pre-seleccionado:', preSelectedServiceId);
-                
-                // Esperar un momento para que el DOM se actualice
+                localStorage.removeItem('selected_service_id');
                 setTimeout(() => {
                     selectService(parseInt(preSelectedServiceId));
-                    localStorage.removeItem('selected_service_id');
                 }, 100);
             } else {
-                // Scroll suave a la sección de servicios solo si no hay pre-selección
+                // Limpiar cualquier valor inválido en localStorage
+                localStorage.removeItem('selected_service_id');
+                // Scroll suave a la sección de servicios
                 document.getElementById('section-service').scrollIntoView({ 
                     behavior: 'smooth', 
                     block: 'start' 
@@ -979,7 +984,7 @@
                 container.innerHTML = availableSlots.map(slot => {
                     const time = formatTime(slot.start_time);
                     return `
-                        <div class="time-slot" onclick="selectTime('${slot.start_time}')">
+                        <div class="time-slot" onclick="selectTime('${slot.start_time}', this)">
                             ${time}
                         </div>
                     `;
@@ -997,14 +1002,14 @@
         }
 
         // ===== SELECCIONAR HORARIO =====
-        function selectTime(dateTime) {
+        function selectTime(dateTime, element) {
             // Remover selección anterior
             document.querySelectorAll('.time-slot').forEach(slot => {
                 slot.classList.remove('selected');
             });
 
-            // Marcar nuevo horario
-            event.target.classList.add('selected');
+            // Marcar nuevo horario (usando el elemento pasado como parámetro)
+            if (element) element.classList.add('selected');
 
             selectedTime = dateTime;
             console.log('🕐 Horario seleccionado:', selectedTime);
@@ -1072,30 +1077,46 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
 
+            let appointmentCreatedId = null; // Para el fallback del catch
+
             try {
                 console.log('📤 Creando appointment...');
-                console.log('Datos:', {
-                    service_id: selectedServiceId,
-                    appointment_date: selectedTime,
+                console.log('📌 selectedServiceId:', selectedServiceId, typeof selectedServiceId);
+                console.log('📌 selectedTime:', selectedTime, typeof selectedTime);
+                console.log('📌 selectedDate:', selectedDate, typeof selectedDate);
+                
+                // Asegurar que service_id sea número
+                const serviceIdNum = parseInt(selectedServiceId);
+                
+                // ✅ IMPORTANTE: El backend espera la fecha con timezone explícito.
+                // Convertimos el string "2026-02-12T11:00:00" a un objeto Date
+                // y luego lo formateamos con el offset local (ej: -03:00 para Argentina)
+                // para que el backend sepa exactamente qué hora es.
+                const appointmentDateTime = toLocalISOString(new Date(selectedTime));
+                console.log('🕐 Fecha con timezone:', appointmentDateTime);
+                
+                const appointmentData = {
+                    service_id: serviceIdNum,
+                    appointment_date: appointmentDateTime,
                     notes: ''
-                });
+                };
+                
+                console.log('📦 Datos a enviar:', JSON.stringify(appointmentData, null, 2));
 
-                const appointment = await createAppointment({
-                    service_id: selectedServiceId,
-                    appointment_date: selectedTime,
-                    notes: ''
-                });
-
+                const appointment = await createAppointment(appointmentData);
+                appointmentCreatedId = appointment.id; // Guardar por si falla algo después
                 console.log('✅ Appointment creado:', appointment);
 
                 // Actualizar el calendario con el nuevo turno
-                if (calendar) {
+                // Usamos selectedService (ya cargado en memoria) porque el backend
+                // devuelve AppointmentResponse que solo tiene service_id, no el objeto completo
+                if (calendar && selectedService) {
                     const appointmentDate = new Date(appointment.appointment_date);
                     calendar.addEvent({
                         id: appointment.id,
-                        title: appointment.service.name.substring(0, 15) + '...',
+                        title: selectedService.name.substring(0, 15) + '...',
                         start: appointmentDate.toISOString(),
-                        backgroundColor: '#ffc107', // Amarillo para pendiente
+                        backgroundColor: '#ffc107',
                         borderColor: '#e0a800',
                         textColor: '#ffffff'
                     });
@@ -1105,9 +1126,23 @@
                 window.location.href = `/pago.html?appointment_id=${appointment.id}`;
 
             } catch (error) {
-                console.error('❌ Error creando appointment:', error);
-                alert('Error al crear la reserva. Por favor, intenta nuevamente.');
+                console.error('❌ Error:', error);
+
+                // Si el error es de JS (TypeError) y el appointment ya fue creado,
+                // igual redirigimos al pago — el turno existe en el backend
+                if (error instanceof TypeError && appointmentCreatedId) {
+                    console.warn('⚠️ Error de JS pero appointment creado, redirigiendo...');
+                    window.location.href = `/pago.html?appointment_id=${appointmentCreatedId}`;
+                    return;
+                }
+
+                // Error real del backend
+                let errorMessage = 'Error al crear la reserva.';
+                if (error && error.message) {
+                    errorMessage += `\n${error.message}`;
+                }
                 
+                alert(errorMessage);
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-calendar-check"></i> Confirmar Reserva';
             }
@@ -1143,6 +1178,30 @@
                 document.getElementById('section-summary').classList.add('disabled');
                 document.getElementById('btn-confirm').disabled = true;
             }
+        }
+
+        // ===== FUNCIÓN: fecha local con timezone offset =====
+        // Convierte un Date a ISO string con el offset local del navegador
+        // Ej (UTC-3): "2026-02-12T11:00:00-03:00"
+        // El backend Pydantic lo parsea correctamente con timezone.utc
+        function toLocalISOString(date) {
+            const pad = n => String(n).padStart(2, '0');
+            
+            const year   = date.getFullYear();
+            const month  = pad(date.getMonth() + 1);
+            const day    = pad(date.getDate());
+            const hours  = pad(date.getHours());
+            const mins   = pad(date.getMinutes());
+            const secs   = pad(date.getSeconds());
+            
+            // Calcular offset (ej: -180 min → "-03:00")
+            const offsetMin = date.getTimezoneOffset(); // positivo = atrás de UTC
+            const sign      = offsetMin <= 0 ? '+' : '-';
+            const absOffset = Math.abs(offsetMin);
+            const offH      = pad(Math.floor(absOffset / 60));
+            const offM      = pad(absOffset % 60);
+            
+            return `${year}-${month}-${day}T${hours}:${mins}:${secs}${sign}${offH}:${offM}`;
         }
 
         // ===== FUNCIONES DE FORMATO (si no están en api.js) =====

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagos | Luminance Studio by Cande</title>
+    <title>Confirmar Pago | Luminance Studio by Cande</title>
+    <meta name="description" content="Completa el pago para confirmar tu turno">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,7 +12,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         /* ===== VARIABLES Y ESTILOS GLOBALES ===== */
@@ -26,17 +27,14 @@
             --dorado: #d4af37;
             --dorado-claro: #f1c40f;
             --blanco: #ffffff;
-            --blanco-transparente: rgba(255, 255, 255, 0.98);
             --gris-claro: #f8f9fa;
             --gris-medio: #e9ecef;
-            --gris-oscuro: #6c757d;
             --texto-oscuro: #2d3436;
             --texto-medio: #636e72;
             --verde: #28a745;
-            --azul-mp: #009ee3;
             --sombra: 0 10px 30px rgba(0, 0, 0, 0.08);
             --sombra-hover: 0 20px 40px rgba(0, 0, 0, 0.12);
-            --transicion: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            --transicion: all 0.3s ease;
             --border-radius: 15px;
         }
         
@@ -46,472 +44,301 @@
             box-sizing: border-box;
         }
         
-        html {
-            scroll-behavior: smooth;
-        }
-        
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f9f7fe 0%, #fef5f9 100%);
+            background: linear-gradient(135deg, var(--rosa-claro) 0%, var(--lila-claro) 100%);
             color: var(--texto-oscuro);
-            line-height: 1.7;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
         
         h1, h2, h3, h4 {
             font-family: 'Playfair Display', serif;
             font-weight: 700;
             line-height: 1.2;
-            margin-bottom: 1rem;
         }
         
-        .container {
-            width: 90%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
+        /* ===== CONTAINER ===== */
+        .payment-container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--sombra-hover);
+            overflow: hidden;
         }
         
         /* ===== HEADER ===== */
-        .header-pagos {
-            background: linear-gradient(135deg, var(--rosa-claro) 0%, var(--lila-claro) 100%);
-            padding: 25px 0;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .nav-pagos {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo-pagos {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-        }
-        
-        .logo-text {
-            font-family: 'Playfair Display', serif;
-            font-size: 28px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--rosa-fuerte), var(--lila-oscuro));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .logo-dot {
-            color: var(--dorado);
-        }
-        
-        .nav-links-pagos {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-        
-        .nav-links-pagos a {
-            text-decoration: none;
-            color: var(--texto-oscuro);
-            font-weight: 600;
-            transition: var(--transicion);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .nav-links-pagos a:hover {
-            color: var(--rosa-fuerte);
-        }
-        
-        .btn-volver {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 25px;
-            background: var(--blanco);
-            color: var(--rosa-fuerte);
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: var(--transicion);
-            box-shadow: var(--sombra);
-        }
-        
-        .btn-volver:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--sombra-hover);
-        }
-        
-        /* ===== HERO SECTION ===== */
-        .hero-pagos {
-            padding: 80px 0 60px;
-            text-align: center;
-        }
-        
-        .hero-pagos h1 {
-            font-size: 3.2rem;
-            color: var(--violeta);
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, var(--violeta), var(--rosa-fuerte));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .hero-pagos p {
-            font-size: 1.2rem;
-            color: var(--texto-medio);
-            max-width: 700px;
-            margin: 0 auto 30px;
-        }
-        
-        .steps {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 50px;
-            flex-wrap: wrap;
-        }
-        
-        .step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            max-width: 200px;
-        }
-        
-        .step-number {
-            width: 50px;
-            height: 50px;
+        .payment-header {
             background: linear-gradient(135deg, var(--rosa-medio), var(--lila-oscuro));
             color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-        }
-        
-        .step p {
-            color: var(--texto-medio);
-            font-size: 1rem;
-            margin: 0;
-        }
-        
-        /* ===== LAYOUT PRINCIPAL ===== */
-        .pagos-layout {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 40px;
-            padding: 40px 0 80px;
-        }
-        
-        /* ===== SECCIÓN DE PRODUCTOS ===== */
-        .productos-section {
-            margin-bottom: 60px;
-        }
-        
-        .section-title {
-            font-size: 2.2rem;
-            color: var(--violeta);
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid var(--rosa-claro);
-        }
-        
-        .filtros-pagos {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .btn-filtro {
-            padding: 10px 20px;
-            background: var(--gris-claro);
-            border: 2px solid var(--gris-medio);
-            border-radius: 30px;
-            font-weight: 600;
-            color: var(--texto-oscuro);
-            cursor: pointer;
-            transition: var(--transicion);
-        }
-        
-        .btn-filtro.active {
-            background: linear-gradient(135deg, var(--rosa-medio), var(--lila-oscuro));
-            color: white;
-            border-color: transparent;
-        }
-        
-        .productos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        
-        .producto-card {
-            background: var(--blanco);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--sombra);
-            transition: var(--transicion);
-            border: 1px solid var(--gris-medio);
-        }
-        
-        .producto-card:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--sombra-hover);
-        }
-        
-        .producto-imagen {
-            height: 200px;
-            background: linear-gradient(135deg, var(--rosa-claro), var(--lila-claro));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--rosa-fuerte);
-            font-size: 4rem;
-        }
-        
-        .producto-contenido {
-            padding: 25px;
-        }
-        
-        .producto-categoria {
-            display: inline-block;
-            background: var(--rosa-claro);
-            color: var(--rosa-fuerte);
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-        
-        .producto-categoria.curso {
-            background: var(--lila-claro);
-            color: var(--lila-oscuro);
-        }
-        
-        .producto-titulo {
-            font-size: 1.4rem;
-            color: var(--violeta);
-            margin-bottom: 15px;
-        }
-        
-        .producto-descripcion {
-            color: var(--texto-medio);
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-        }
-        
-        .producto-detalles {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-top: 15px;
-            border-top: 1px solid var(--gris-claro);
-        }
-        
-        .producto-precio {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--lila-oscuro);
-        }
-        
-        .producto-duracion {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--texto-medio);
-            font-size: 0.9rem;
-        }
-        
-        .btn-agregar {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, var(--rosa-medio), var(--rosa-fuerte));
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transicion);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .btn-agregar:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(231, 84, 128, 0.3);
-        }
-        
-        /* ===== CARRITO DE COMPRAS ===== */
-        .carrito-sidebar {
-            background: var(--blanco);
-            border-radius: var(--border-radius);
-            box-shadow: var(--sombra);
             padding: 30px;
-            position: sticky;
-            top: 100px;
-            height: fit-content;
+            text-align: center;
         }
         
-        .carrito-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--gris-claro);
-        }
-        
-        .carrito-header h3 {
-            color: var(--violeta);
-            margin-bottom: 0;
-        }
-        
-        .carrito-cantidad {
-            background: var(--rosa-fuerte);
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-        
-        .carrito-items {
-            max-height: 400px;
-            overflow-y: auto;
-            margin-bottom: 25px;
-        }
-        
-        .carrito-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--gris-claro);
-        }
-        
-        .carrito-item:last-child {
-            border-bottom: none;
-        }
-        
-        .item-info h4 {
-            font-size: 1rem;
-            color: var(--texto-oscuro);
-            margin-bottom: 5px;
-        }
-        
-        .item-precio {
-            color: var(--lila-oscuro);
-            font-weight: 600;
-        }
-        
-        .item-eliminar {
-            background: none;
-            border: none;
-            color: var(--gris-oscuro);
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: var(--transicion);
-        }
-        
-        .item-eliminar:hover {
-            color: var(--rojo);
-        }
-        
-        .carrito-resumen {
-            background: var(--gris-claro);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
-        }
-        
-        .resumen-linea {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-        
-        .resumen-linea.total {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--violeta);
-            border-top: 2px solid var(--gris-medio);
-            padding-top: 15px;
-            margin-top: 15px;
-        }
-        
-        .metodos-pago {
-            margin-bottom: 25px;
-        }
-        
-        .metodos-pago h4 {
-            color: var(--violeta);
-            margin-bottom: 15px;
-        }
-        
-        .metodos-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-        
-        .metodo-pago {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 15px;
-            background: var(--gris-claro);
-            border: 2px solid var(--gris-medio);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: var(--transicion);
-        }
-        
-        .metodo-pago:hover {
-            border-color: var(--lila-medio);
-        }
-        
-        .metodo-pago.active {
-            border-color: var(--rosa-fuerte);
-            background: rgba(216, 27, 96, 0.05);
-        }
-        
-        .metodo-icono {
+        .payment-header h1 {
             font-size: 2rem;
             margin-bottom: 10px;
         }
         
-        .metodo-texto {
-            font-size: 0.8rem;
-            text-align: center;
+        .payment-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
         }
         
-        .btn-pagar {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--lila-medio), var(--lila-oscuro));
+        /* ===== CONTENT ===== */
+        .payment-content {
+            padding: 40px;
+        }
+        
+        .payment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        /* ===== RESUMEN DEL TURNO ===== */
+        .appointment-summary {
+            background: linear-gradient(135deg, var(--lila-claro), var(--rosa-claro));
+            border-radius: var(--border-radius);
+            padding: 30px;
+        }
+        
+        .appointment-summary h2 {
+            color: var(--violeta);
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .summary-label {
+            font-weight: 600;
+            color: var(--texto-oscuro);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .summary-value {
+            color: var(--texto-medio);
+            text-align: right;
+            font-weight: 500;
+        }
+        
+        .summary-value.highlight {
+            color: var(--rosa-medio);
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        /* ===== MÉTODOS DE PAGO ===== */
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .payment-methods h2 {
+            color: var(--violeta);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .payment-option {
+            border: 2px solid var(--gris-medio);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transicion);
+            position: relative;
+        }
+        
+        .payment-option:hover {
+            border-color: var(--rosa-medio);
+            background: var(--lila-claro);
+            transform: translateY(-3px);
+            box-shadow: var(--sombra);
+        }
+        
+        .payment-option.selected {
+            border-color: var(--rosa-medio);
+            background: linear-gradient(135deg, var(--rosa-claro), var(--lila-claro));
+        }
+        
+        .payment-option-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .payment-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--rosa-medio), var(--lila-oscuro));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .payment-option-title {
+            flex: 1;
+        }
+        
+        .payment-option-title h3 {
+            color: var(--violeta);
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .payment-option-title p {
+            color: var(--texto-medio);
+            font-size: 0.9rem;
+        }
+        
+        .payment-option-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--verde);
+            color: white;
+        }
+        
+        .payment-details {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .payment-option.selected .payment-details {
+            display: block;
+        }
+        
+        .transfer-info {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .transfer-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--gris-medio);
+        }
+        
+        .transfer-info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .copy-button {
+            background: var(--lila-medio);
             color: white;
             border: none;
-            border-radius: 10px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transicion);
+        }
+        
+        .copy-button:hover {
+            background: var(--lila-oscuro);
+        }
+        
+        .file-upload {
+            margin-top: 15px;
+        }
+        
+        .file-upload label {
+            display: block;
+            margin-bottom: 8px;
             font-weight: 600;
-            font-size: 1.1rem;
+            color: var(--texto-oscuro);
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            border: 2px dashed var(--gris-medio);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transicion);
+        }
+        
+        .file-input-wrapper:hover {
+            border-color: var(--rosa-medio);
+            background: var(--lila-claro);
+        }
+        
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+        
+        .file-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--verde);
+            color: white;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        /* ===== BOTONES DE ACCIÓN ===== */
+        .payment-actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px 30px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
             cursor: pointer;
             transition: var(--transicion);
             display: flex;
@@ -520,1093 +347,645 @@
             gap: 10px;
         }
         
-        .btn-pagar:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(123, 75, 189, 0.3);
+        .btn-primary {
+            background: linear-gradient(135deg, var(--rosa-medio), var(--rosa-fuerte));
+            color: white;
+            box-shadow: 0 6px 20px rgba(231, 84, 128, 0.3);
         }
         
-        .btn-pagar:disabled {
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(231, 84, 128, 0.4);
+        }
+        
+        .btn-primary:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
         
-        /* ===== MODAL DE PAGO ===== */
-        .modal-overlay {
+        .btn-secondary {
+            background: var(--gris-medio);
+            color: var(--texto-oscuro);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gris-oscuro);
+            color: white;
+        }
+        
+        /* ===== ALERTAS ===== */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .alert-info {
+            background: #cfe2ff;
+            color: #084298;
+            border-left: 4px solid #0d6efd;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #664d03;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .alert-success {
+            background: #d1e7dd;
+            color: #0f5132;
+            border-left: 4px solid #198754;
+        }
+        
+        /* ===== LOADING ===== */
+        .loading-overlay {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            align-items: center;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
             justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transicion);
+            align-items: center;
         }
         
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
+        .loading-overlay.active {
+            display: flex;
         }
         
-        .modal-pago {
-            background: var(--blanco);
-            border-radius: var(--border-radius);
-            width: 90%;
-            max-width: 500px;
+        .loading-content {
+            background: white;
             padding: 40px;
-            box-shadow: var(--sombra-hover);
-            transform: translateY(-30px);
-            transition: var(--transicion);
-        }
-        
-        .modal-overlay.active .modal-pago {
-            transform: translateY(0);
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        
-        .modal-header h3 {
-            color: var(--violeta);
-            margin-bottom: 0;
-        }
-        
-        .modal-cerrar {
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--rosa-fuerte);
-            cursor: pointer;
-        }
-        
-        .resumen-compra {
-            background: var(--gris-claro);
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 30px;
-        }
-        
-        .info-pago {
-            font-size: 0.9rem;
-            color: var(--texto-medio);
-            margin-bottom: 25px;
+            border-radius: 20px;
             text-align: center;
         }
         
-        .qr-code {
-            text-align: center;
-            margin: 25px 0;
-        }
-        
-        .qr-placeholder {
-            width: 200px;
-            height: 200px;
-            background: var(--gris-claro);
-            border: 2px dashed var(--gris-medio);
-            border-radius: 10px;
+        .spinner {
+            border: 4px solid var(--gris-claro);
+            border-top: 4px solid var(--rosa-medio);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
             margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--gris-oscuro);
         }
         
-        /* ===== FOOTER ===== */
-        .footer-pagos {
-            background: linear-gradient(135deg, var(--texto-oscuro), #1a1a1a);
-            color: white;
-            padding: 60px 0 30px;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 50px;
-            margin-bottom: 40px;
-        }
-        
-        .footer-col h4 {
-            color: var(--dorado);
-            margin-bottom: 25px;
-            font-size: 1.3rem;
-        }
-        
-        .footer-col p {
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 20px;
-        }
-        
-        .contacto-info {
-            list-style: none;
-        }
-        
-        .contacto-info li {
-            margin-bottom: 15px;
-            color: rgba(255, 255, 255, 0.7);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .footer-bottom {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 1200px) {
-            .pagos-layout {
-                grid-template-columns: 1fr;
-            }
-            
-            .carrito-sidebar {
-                position: static;
-                max-width: 600px;
-                margin: 0 auto;
-            }
-        }
-        
         @media (max-width: 768px) {
-            .nav-pagos {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-            
-            .nav-links-pagos {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
-            .hero-pagos h1 {
-                font-size: 2.5rem;
-            }
-            
-            .steps {
-                gap: 20px;
-            }
-            
-            .productos-grid {
+            .payment-grid {
                 grid-template-columns: 1fr;
             }
             
-            .metodos-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .hero-pagos h1 {
-                font-size: 2rem;
+            .payment-content {
+                padding: 20px;
             }
             
-            .section-title {
-                font-size: 1.8rem;
+            .payment-header h1 {
+                font-size: 1.5rem;
             }
             
-            .filtros-pagos {
-                justify-content: center;
+            .payment-actions {
+                flex-direction: column;
             }
-            
-            .modal-pago {
-                padding: 30px 20px;
-            }
-        }
-        
-        /* ===== ANIMACIONES ===== */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease forwards;
-        }
-        
-        /* ===== ESTILOS PARA ENLACES DE PAGO ===== */
-        .link-pago {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 25px;
-            background: linear-gradient(135deg, var(--azul-mp), #009ee3);
-            color: white;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: 600;
-            transition: var(--transicion);
-        }
-        
-        .link-pago:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 158, 227, 0.3);
-        }
-        
-        /* ===== BADGE DE OFERTA ===== */
-        .badge-oferta {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: linear-gradient(135deg, var(--dorado), var(--dorado-claro));
-            color: var(--texto-oscuro);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            z-index: 1;
-        }
-        
-        .producto-card {
-            position: relative;
         }
     </style>
 </head>
 <body>
-    <!-- ===== HEADER ===== -->
-    <header class="header-pagos">
-        <div class="container">
-            <nav class="nav-pagos">
-                <a href="bienvenida.html" class="logo-pagos">
-                    <span class="logo-text">Luminance<span class="logo-dot">.</span></span>
-                </a>
-                
-                <div class="nav-links-pagos">
-                    <a href="index.html">
-                        <i class="fas fa-home"></i>
-                        <span>Sitio Principal</span>
-                    </a>
-                    <a href="turnera.html">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span>Reservar Turno</span>
-                    </a>
-                    <a href="bienvenida.html" class="btn-volver">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Volver a Inicio</span>
-                    </a>
-                </div>
-            </nav>
-        </div>
-    </header>
-
-    <!-- ===== HERO SECTION ===== -->
-    <section class="hero-pagos">
-        <div class="container">
-            <h1 class="fade-in">Pagos Seguros Online</h1>
-            <p class="fade-in" style="animation-delay: 0.1s;">Seleccioná tus servicios o cursos y pagalos de forma rápida y segura. Aceptamos todos los medios de pago.</p>
-            
-            <div class="steps fade-in" style="animation-delay: 0.2s;">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <p>Seleccioná tu servicio o curso</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <p>Agregalo al carrito</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <p>Elegí tu método de pago</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <p>¡Listo! Confirmá tu compra</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== LAYOUT PRINCIPAL ===== -->
-    <div class="container">
-        <div class="pagos-layout">
-            <!-- ===== SECCIÓN DE PRODUCTOS ===== -->
-            <main class="productos-section">
-                <!-- SERVICIOS -->
-                <section class="fade-in">
-                    <h2 class="section-title">Servicios Disponibles</h2>
-                    
-                    <div class="filtros-pagos">
-                        <button class="btn-filtro active" data-categoria="todos">Todos</button>
-                        <button class="btn-filtro" data-categoria="pestanas">Pestañas</button>
-                        <button class="btn-filtro" data-categoria="cejas">Cejas</button>
-                        <button class="btn-filtro" data-categoria="depilacion">Depilación</button>
-                        <button class="btn-filtro" data-categoria="corporal">Corporal</button>
-                        <button class="btn-filtro" data-categoria="pies">Pies</button>
-                    </div>
-                    
-                    <div class="productos-grid">
-                        <!-- Servicio 1 -->
-                        <div class="producto-card" data-categoria="pestanas">
-                            <div class="producto-imagen">
-                                <i class="fas fa-eye"></i>
-                            </div>
-                            <div class="producto-contenido">
-                                <span class="producto-categoria">Pestañas</span>
-                                <h3 class="producto-titulo">Lifting de Pestañas</h3>
-                                <p class="producto-descripcion">Realza la curvatura natural de tus pestañas. Resultados que duran 6-8 semanas sin extensiones.</p>
-                                
-                                <div class="producto-detalles">
-                                    <div class="producto-precio">$4.500</div>
-                                    <div class="producto-duracion">
-                                        <i class="far fa-clock"></i>
-                                        <span>90 min</span>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn-agregar" data-id="1" data-nombre="Lifting de Pestañas" data-precio="4500">
-                                    <i class="fas fa-cart-plus"></i>
-                                    Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Servicio 2 -->
-                        <div class="producto-card" data-categoria="cejas">
-                            <div class="producto-imagen">
-                                <i class="fas fa-eye-brow"></i>
-                            </div>
-                            <div class="producto-contenido">
-                                <span class="producto-categoria">Cejas</span>
-                                <h3 class="producto-titulo">Diseño y Perfilado</h3>
-                                <p class="producto-descripcion">Análisis facial personalizado para diseñar la forma ideal de tus cejas según tu rostro.</p>
-                                
-                                <div class="producto-detalles">
-                                    <div class="producto-precio">$3.200</div>
-                                    <div class="producto-duracion">
-                                        <i class="far fa-clock"></i>
-                                        <span>45 min</span>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn-agregar" data-id="2" data-nombre="Diseño y Perfilado de Cejas" data-precio="3200">
-                                    <i class="fas fa-cart-plus"></i>
-                                    Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Servicio 3 -->
-                        <div class="producto-card" data-categoria="cejas">
-                            <span class="badge-oferta">MÁS PEDIDO</span>
-                            <div class="producto-imagen">
-                                <i class="fas fa-paint-brush"></i>
-                            </div>
-                            <div class="producto-contenido">
-                                <span class="producto-categoria">Cejas</span>
-                                <h3 class="producto-titulo">Laminado de Cejas</h3>
-                                <p class="producto-descripcion">Tratamiento que alisa y direcciona cada pelo creando efecto de cejas más llenas y definidas.</p>
-                                
-                                <div class="producto-detalles">
-                                    <div class="producto-precio">$4.000</div>
-                                    <div class="producto-duracion">
-                                        <i class="far fa-clock"></i>
-                                        <span>60 min</span>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn-agregar" data-id="3" data-nombre="Laminado de Cejas" data-precio="4000">
-                                    <i class="fas fa-cart-plus"></i>
-                                    Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Servicio 4 -->
-                        <div class="producto-card" data-categoria="depilacion">
-                            <div class="producto-imagen">
-                                <i class="fas fa-spa"></i>
-                            </div>
-                            <div class="producto-contenido">
-                                <span class="producto-categoria">Depilación</span>
-                                <h3 class="producto-titulo">Depilación Láser Axilas</h3>
-                                <p class="producto-descripcion">Sesión de depilación láser definitiva en zona de axilas. Tecnología de última generación.</p>
-                                
-                                <div class="producto-detalles">
-                                    <div class="producto-precio">$2.500</div>
-                                    <div class="producto-duracion">
-                                        <i class="far fa-clock"></i>
-                                        <span>30 min</span>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn-agregar" data-id="4" data-nombre="Depilación Láser Axilas" data-precio="2500">
-                                    <i class="fas fa-cart-plus"></i>
-                                    Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Servicio 5 -->
-                        <div class="producto-card" data-categoria="pies">
-                            <div class="producto-imagen">
-                                <i class="fas fa-shoe-prints"></i>
-                            </div>
-                            <div class="producto-contenido">
-                                <span class="producto-categoria">Pies</span>
-                                <h3 class="producto-titulo">Pedicuría Premium</h3>
-                                <p class="producto-descripcion">Tratamiento completo de pies con esmaltado semipermanente. Limpieza, exfoliación e hidratación.</p>
-                                
-                                <div class="producto-detalles">
-                                    <div class="producto-precio">$3.500</div>
-                                    <div class="producto-duracion">
-                                        <i class="far fa-clock"></i>
-                                        <span>75 min</span>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn-agregar" data-id="5" data-nombre="Pedicuría Premium" data-precio="3500">
-                                    <i class="fas fa-cart-plus"></i>
-                                    Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Servicio 6 -->
-                        <div class="producto-card" data-categoria="corporal">
-                            <div class="producto-imagen">
-                                <i class="fas fa-user-md"></i>
-                            </div>
-                            <div class="producto-contenido">
-                                <span class="producto-categoria">Corporal</span>
-                                <h3 class="producto-titulo">Radiofrecuencia Corporal</h3>
-                                <p class="producto-descripcion">Sesión de radiofrecuencia para reafirmación y rejuvenecimiento cutáneo. Estimula colágeno.</p>
-                                
-                                <div class="producto-detalles">
-                                    <div class="producto-precio">$5.000</div>
-                                    <div class="producto-duracion">
-                                        <i class="far fa-clock"></i>
-                                        <span>60 min</span>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn-agregar" data-id="6" data-nombre="Radiofrecuencia Corporal" data-precio="5000">
-                                    <i class="fas fa-cart-plus"></i>
-                                    Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                
-                <!-- CURSOS -->
-                <section class="fade-in" style="animation-delay: 0.3s; margin-top: 80px;">
-                    <h2 class="section-title">Cursos Profesionales</h2>
-                    
-                    <div class="productos-grid">
-                        <!-- Curso 1 -->
-                        <div class="producto-card">
-                            <span class="badge-oferta">¡OFERTA!</span>
-                            <div class="producto-imagen">
-                                <i class="fas fa-graduation-cap"></i>
-                            </div>
-                            <div class="producto-contenido">
-                                <span class="producto-categoria curso">Curso</span>
-                                <h3 class="producto-titulo">Curso Completo de Laminado de Cejas</h3>
-                                <p class="producto-descripcion">Aprende desde cero la técnica de laminado profesional. Incluye kit, manual y certificación.</p>
-                                
-                                <div class="producto-detalles">
-                                    <div class="producto-precio">$18.000</div>
-                                    <div class="producto-duracion">
-                                        <i class="far fa-clock"></i>
-                                        <span>8 horas</span>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn-agregar" data-id="7" data-nombre="Curso de Laminado de Cejas" data-precio="18000">
-                                    <i class="fas fa-cart-plus"></i>
-                                    Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Curso 2 -->
-                        <div class="producto-card">
-                            <div class="producto-imagen">
-                                <i class="fas fa-eye"></i>
-                            </div>
-                            <div class="producto-contenido">
-                                <span class="producto-categoria curso">Curso</span>
-                                <h3 class="producto-titulo">Curso de Lifting de Pestañas</h3>
-                                <p class="producto-descripcion">Domina la técnica de lifting profesional. Práctica con modelos reales y kit incluido.</p>
-                                
-                                <div class="producto-detalles">
-                                    <div class="producto-precio">$22.000</div>
-                                    <div class="producto-duracion">
-                                        <i class="far fa-clock"></i>
-                                        <span>10 horas</span>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn-agregar" data-id="8" data-nombre="Curso de Lifting de Pestañas" data-precio="22000">
-                                    <i class="fas fa-cart-plus"></i>
-                                    Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </main>
-            
-            <!-- ===== CARRITO DE COMPRAS ===== -->
-            <aside class="carrito-sidebar fade-in" style="animation-delay: 0.4s;">
-                <div class="carrito-header">
-                    <h3>Tu Carrito</h3>
-                    <div class="carrito-cantidad" id="carritoCantidad">0</div>
-                </div>
-                
-                <div class="carrito-items" id="carritoItems">
-                    <!-- Los items se agregarán dinámicamente -->
-                    <div style="text-align: center; padding: 40px 20px; color: var(--texto-medio);">
-                        <i class="fas fa-shopping-cart" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
-                        <p>Tu carrito está vacío</p>
-                        <p style="font-size: 0.9rem;">Agregá servicios o cursos desde la lista</p>
-                    </div>
-                </div>
-                
-                <div class="carrito-resumen">
-                    <div class="resumen-linea">
-                        <span>Subtotal:</span>
-                        <span id="subtotal">$0</span>
-                    </div>
-                    <div class="resumen-linea">
-                        <span>Descuento:</span>
-                        <span id="descuento">$0</span>
-                    </div>
-                    <div class="resumen-linea total">
-                        <span>Total:</span>
-                        <span id="total">$0</span>
-                    </div>
-                </div>
-                
-                <div class="metodos-pago">
-                    <h4>Método de Pago</h4>
-                    <div class="metodos-grid">
-                        <div class="metodo-pago" data-metodo="mp">
-                            <div class="metodo-icono">
-                                <i class="fab fa-cc-visa" style="color: #1a1f71;"></i>
-                            </div>
-                            <span class="metodo-texto">Tarjeta</span>
-                        </div>
-                        <div class="metodo-pago" data-metodo="mp">
-                            <div class="metodo-icono">
-                                <i class="fas fa-qrcode" style="color: var(--azul-mp);"></i>
-                            </div>
-                            <span class="metodo-texto">QR</span>
-                        </div>
-                        <div class="metodo-pago" data-metodo="transferencia">
-                            <div class="metodo-icono">
-                                <i class="fas fa-university" style="color: var(--verde);"></i>
-                            </div>
-                            <span class="metodo-texto">Transferencia</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <button class="btn-pagar" id="btnPagar" disabled>
-                    <i class="fas fa-lock"></i>
-                    Proceder al Pago
-                </button>
-                
-                <div style="margin-top: 20px; text-align: center;">
-                    <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Tengo%20una%20consulta%20sobre%20pagos..." 
-                       target="_blank" 
-                       style="color: var(--texto-medio); text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <i class="fab fa-whatsapp" style="color: #25D366;"></i>
-                        ¿Tenés dudas? Escribime por WhatsApp
-                    </a>
-                </div>
-            </aside>
+    <!-- ===== LOADING OVERLAY ===== -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Procesando pago...</h3>
+            <p>Por favor espera un momento</p>
         </div>
     </div>
 
-    <!-- ===== MODAL DE PAGO ===== -->
-    <div class="modal-overlay" id="modalPago">
-        <div class="modal-pago">
-            <div class="modal-header">
-                <h3>Confirmar Pago</h3>
-                <button class="modal-cerrar" id="cerrarModal">
+    <!-- ===== MAIN CONTAINER ===== -->
+    <div class="payment-container">
+        <!-- ===== HEADER ===== -->
+        <div class="payment-header">
+            <h1>💳 Confirmar tu Turno</h1>
+            <p>Completa el pago para confirmar tu reserva</p>
+        </div>
+        
+        <!-- ===== CONTENT ===== -->
+        <div class="payment-content">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Importante:</strong> Tu turno está <strong>reservado temporalmente</strong> con estado "Pendiente". 
+                    Una vez acreditado el pago, recibirás un email de confirmación.
+                </div>
+            </div>
+            
+            <div class="payment-grid">
+                <!-- ===== RESUMEN DEL TURNO ===== -->
+                <div class="appointment-summary">
+                    <h2>
+                        <i class="fas fa-calendar-check"></i>
+                        Resumen del Turno
+                    </h2>
+                    
+                    <div id="appointment-summary">
+                        <!-- Se llena dinámicamente -->
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Cargando información...
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ===== MÉTODOS DE PAGO ===== -->
+                <div class="payment-methods">
+                    <h2>Método de Pago</h2>
+                    
+                    <!-- MERCADO PAGO -->
+                    <div class="payment-option" id="option-mercadopago" onclick="selectPaymentMethod('mercadopago')">
+                        <div class="payment-option-header">
+                            <div class="payment-icon">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div class="payment-option-title">
+                                <h3>Mercado Pago</h3>
+                                <p>Pago online con tarjeta o transferencia</p>
+                            </div>
+                            <span class="payment-option-badge">Recomendado</span>
+                        </div>
+                        <div class="payment-details">
+                            <p style="margin-bottom: 15px; color: var(--texto-medio);">
+                                Serás redirigido a Mercado Pago para completar el pago de forma segura.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- TRANSFERENCIA BANCARIA -->
+                    <div class="payment-option" id="option-transfer" onclick="selectPaymentMethod('transfer')">
+                        <div class="payment-option-header">
+                            <div class="payment-icon">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <div class="payment-option-title">
+                                <h3>Transferencia Bancaria</h3>
+                                <p>Transferencia o depósito directo</p>
+                            </div>
+                        </div>
+                        <div class="payment-details">
+                            <div class="transfer-info">
+                                <div class="transfer-info-item">
+                                    <span><strong>Banco:</strong></span>
+                                    <span>Banco Galicia</span>
+                                </div>
+                                <div class="transfer-info-item">
+                                    <span><strong>Titular:</strong></span>
+                                    <span>Candelaria López</span>
+                                </div>
+                                <div class="transfer-info-item">
+                                    <span><strong>CBU:</strong></span>
+                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                        <span id="cbu-text">0070156030004017654321</span>
+                                        <button class="copy-button" onclick="copyToClipboard('cbu-text', event)">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="transfer-info-item">
+                                    <span><strong>Alias:</strong></span>
+                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                        <span id="alias-text">LUMINANCE.CANDE</span>
+                                        <button class="copy-button" onclick="copyToClipboard('alias-text', event)">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="file-upload">
+                                <label>Subir comprobante de pago:</label>
+                                <div class="file-input-wrapper">
+                                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--rosa-medio);"></i>
+                                    <p style="margin-top: 10px;">Hacé click o arrastrá tu comprobante aquí</p>
+                                    <input type="file" id="file-input" accept="image/*,.pdf" onchange="handleFileUpload(event)">
+                                </div>
+                                <div class="file-preview" id="file-preview">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span id="file-name"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- EFECTIVO EN PERSONA -->
+                    <div class="payment-option" id="option-cash" onclick="selectPaymentMethod('cash')">
+                        <div class="payment-option-header">
+                            <div class="payment-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="payment-option-title">
+                                <h3>Efectivo en Persona</h3>
+                                <p>Paga directamente en el estudio</p>
+                            </div>
+                        </div>
+                        <div class="payment-details">
+                            <div class="alert alert-info" style="margin: 0;">
+                                <i class="fas fa-info-circle"></i>
+                                <div>
+                                    Podrás abonar en efectivo cuando llegues al turno. 
+                                    Tu turno quedará confirmado igualmente.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ===== ACCIONES ===== -->
+            <div class="payment-actions">
+                <button class="btn btn-secondary" onclick="cancelReservation()">
                     <i class="fas fa-times"></i>
+                    Cancelar Reserva
                 </button>
-            </div>
-            
-            <div class="resumen-compra">
-                <h4 style="color: var(--violeta); margin-bottom: 20px;">Resumen de tu Compra</h4>
-                <div id="resumenModal">
-                    <!-- El resumen se cargará aquí -->
-                </div>
-                <div class="resumen-linea total" style="margin-top: 20px;">
-                    <span>Total a Pagar:</span>
-                    <span id="totalModal">$0</span>
-                </div>
-            </div>
-            
-            <p class="info-pago">Seleccioná cómo querés realizar el pago:</p>
-            
-            <div style="text-align: center; margin: 30px 0;">
-                <a href="#" id="linkMercadoPago" class="link-pago" target="_blank" style="display: inline-block;">
-                    <i class="fab fa-cc-visa"></i> Pagar con Mercado Pago
-                </a>
-            </div>
-            
-            <div style="text-align: center; margin-top: 30px;">
-                <div class="qr-code">
-                    <h4 style="color: var(--violeta); margin-bottom: 15px;">O pagá con QR</h4>
-                    <div class="qr-placeholder">
-                        <i class="fas fa-qrcode" style="font-size: 4rem;"></i>
-                    </div>
-                    <p style="color: var(--texto-medio); font-size: 0.9rem;">Escaneá este código con tu app de Mercado Pago</p>
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--gris-medio);">
-                <p style="color: var(--texto-medio); font-size: 0.9rem;">
-                    <i class="fas fa-shield-alt" style="color: var(--verde);"></i>
-                    Pago 100% seguro · Datos protegidos
-                </p>
+                <button class="btn btn-primary" id="btn-confirm-payment" onclick="confirmPayment()" disabled>
+                    <i class="fas fa-check-circle"></i>
+                    Confirmar Pago
+                </button>
             </div>
         </div>
     </div>
-
-    <!-- ===== FOOTER ===== -->
-    <footer class="footer-pagos">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-col">
-                    <h4>Luminance Studio</h4>
-                    <p>Especialistas en belleza natural con resultados profesionales. 5 años de experiencia en el sector de la estética.</p>
-                </div>
-                
-                <div class="footer-col">
-                    <h4>Contacto</h4>
-                    <ul class="contacto-info">
-                        <li>
-                            <i class="fab fa-whatsapp"></i>
-                            <span>11 6281-5014</span>
-                        </li>
-                        <li>
-                            <i class="far fa-envelope"></i>
-                            <span>info@luminancestudio.com</span>
-                        </li>
-                        <li>
-                            <i class="far fa-clock"></i>
-                            <span>Lun-Vie: 9:00-20:00 | Sáb: 10:00-16:00</span>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="footer-col">
-                    <h4>Enlaces Rápidos</h4>
-                    <ul class="contacto-info">
-                        <li><a href="index.html" style="color: rgba(255,255,255,0.7); text-decoration: none;">Sitio Principal</a></li>
-                        <li><a href="turnera.html" style="color: rgba(255,255,255,0.7); text-decoration: none;">Reservar Turno</a></li>
-                        <li><a href="bienvenida.html" style="color: rgba(255,255,255,0.7); text-decoration: none;">Página de Inicio</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2024 Luminance Studio by Cande. Todos los derechos reservados.</p>
-                <p style="margin-top: 10px;">Sistema de pagos seguro · Todos los medios de pago aceptados</p>
-            </div>
-        </div>
-    </footer>
-
+    
+    <!-- ===== SCRIPTS ===== -->
+    <script src="api.js"></script>
+    
     <script>
-        // ===== SISTEMA DE CARRITO =====
-        let carrito = JSON.parse(localStorage.getItem('carritoLuminance')) || [];
-        let metodoPagoSeleccionado = null;
-
-        // ===== PRODUCTOS DISPONIBLES =====
-        const productos = [
-            { id: 1, nombre: "Lifting de Pestañas", precio: 4500, categoria: "pestanas" },
-            { id: 2, nombre: "Diseño y Perfilado de Cejas", precio: 3200, categoria: "cejas" },
-            { id: 3, nombre: "Laminado de Cejas", precio: 4000, categoria: "cejas" },
-            { id: 4, nombre: "Depilación Láser Axilas", precio: 2500, categoria: "depilacion" },
-            { id: 5, nombre: "Pedicuría Premium", precio: 3500, categoria: "pies" },
-            { id: 6, nombre: "Radiofrecuencia Corporal", precio: 5000, categoria: "corporal" },
-            { id: 7, nombre: "Curso de Laminado de Cejas", precio: 18000, categoria: "curso" },
-            { id: 8, nombre: "Curso de Lifting de Pestañas", precio: 22000, categoria: "curso" }
-        ];
-
-        // ===== INICIALIZACIÓN =====
-        document.addEventListener('DOMContentLoaded', function() {
-            actualizarCarrito();
-            configurarEventos();
+        // ===== VERIFICAR AUTENTICACIÓN =====
+        requireAuth();
+        
+        // ===== VARIABLES GLOBALES =====
+        let appointmentId = null;
+        let appointmentData = null;
+        let selectedPaymentMethod = null;
+        let uploadedFile = null;
+        
+        // ===== INICIALIZAR =====
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('💳 Inicializando página de pago...');
+            
+            // Obtener ID del appointment desde URL
+            const urlParams = new URLSearchParams(window.location.search);
+            appointmentId = urlParams.get('appointment_id');
+            
+            if (!appointmentId) {
+                alert('No se encontró información del turno');
+                window.location.href = '/turnera.html';
+                return;
+            }
+            
+            console.log('📌 Appointment ID:', appointmentId);
+            
+            // Cargar datos del turno
+            await loadAppointmentData();
         });
-
-        // ===== FUNCIONES DEL CARRITO =====
-        function agregarAlCarrito(id, nombre, precio) {
-            const productoExistente = carrito.find(item => item.id === id);
-            
-            if (productoExistente) {
-                productoExistente.cantidad += 1;
-            } else {
-                carrito.push({
-                    id: id,
-                    nombre: nombre,
-                    precio: precio,
-                    cantidad: 1
-                });
-            }
-            
-            guardarCarrito();
-            actualizarCarrito();
-            
-            // Mostrar notificación
-            mostrarNotificacion(`${nombre} agregado al carrito`, 'success');
-        }
-
-        function eliminarDelCarrito(id) {
-            carrito = carrito.filter(item => item.id !== id);
-            guardarCarrito();
-            actualizarCarrito();
-            
-            mostrarNotificacion('Producto eliminado del carrito', 'info');
-        }
-
-        function actualizarCarrito() {
-            // Actualizar cantidad
-            const cantidadTotal = carrito.reduce((total, item) => total + item.cantidad, 0);
-            document.getElementById('carritoCantidad').textContent = cantidadTotal;
-            
-            // Actualizar items
-            const carritoItems = document.getElementById('carritoItems');
-            const btnPagar = document.getElementById('btnPagar');
-            
-            if (carrito.length === 0) {
-                carritoItems.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: var(--texto-medio);">
-                        <i class="fas fa-shopping-cart" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
-                        <p>Tu carrito está vacío</p>
-                        <p style="font-size: 0.9rem;">Agregá servicios o cursos desde la lista</p>
-                    </div>
-                `;
-                btnPagar.disabled = true;
-            } else {
-                carritoItems.innerHTML = '';
-                carrito.forEach(item => {
-                    const itemElement = document.createElement('div');
-                    itemElement.className = 'carrito-item';
-                    itemElement.innerHTML = `
-                        <div class="item-info">
-                            <h4>${item.nombre}</h4>
-                            <div class="item-precio">$${item.precio} x ${item.cantidad}</div>
-                        </div>
-                        <button class="item-eliminar" onclick="eliminarDelCarrito(${item.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    `;
-                    carritoItems.appendChild(itemElement);
-                });
-                btnPagar.disabled = false;
-            }
-            
-            // Actualizar totales
-            const subtotal = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
-            const descuento = subtotal >= 10000 ? subtotal * 0.1 : 0; // 10% de descuento por compras mayores a $10.000
-            const total = subtotal - descuento;
-            
-            document.getElementById('subtotal').textContent = `$${subtotal.toLocaleString('es-AR')}`;
-            document.getElementById('descuento').textContent = `$${descuento.toLocaleString('es-AR')}`;
-            document.getElementById('total').textContent = `$${total.toLocaleString('es-AR')}`;
-            
-            // Actualizar botón de pago
-            if (metodoPagoSeleccionado) {
-                btnPagar.innerHTML = `<i class="fas fa-lock"></i> Pagar con ${metodoPagoSeleccionado === 'mp' ? 'Mercado Pago' : 'Transferencia'}`;
+        
+        // ===== CARGAR DATOS DEL TURNO =====
+        async function loadAppointmentData() {
+            try {
+                // Obtener información del appointment
+                appointmentData = await getAppointmentById(appointmentId);
+                console.log('✅ Datos del turno cargados:', appointmentData);
+                
+                // Verificar que esté en estado pending
+                if (appointmentData.status !== 'pending') {
+                    alert('Este turno ya fue procesado');
+                    window.location.href = '/mis-turnos.html';
+                    return;
+                }
+                
+                // Renderizar resumen
+                renderAppointmentSummary();
+                
+            } catch (error) {
+                console.error('❌ Error cargando datos del turno:', error);
+                alert('Error al cargar la información del turno');
+                window.location.href = '/turnera.html';
             }
         }
-
-        function guardarCarrito() {
-            localStorage.setItem('carritoLuminance', JSON.stringify(carrito));
-        }
-
-        // ===== FILTROS =====
-        function configurarFiltros() {
-            const filtros = document.querySelectorAll('.btn-filtro');
-            const productosCards = document.querySelectorAll('.producto-card');
+        
+        // ===== RENDERIZAR RESUMEN =====
+        function renderAppointmentSummary() {
+            const container = document.getElementById('appointment-summary');
             
-            filtros.forEach(filtro => {
-                filtro.addEventListener('click', function() {
-                    // Remover clase active de todos los filtros
-                    filtros.forEach(f => f.classList.remove('active'));
-                    // Agregar clase active al filtro clickeado
-                    this.classList.add('active');
-                    
-                    const categoria = this.dataset.categoria;
-                    
-                    productosCards.forEach(card => {
-                        if (categoria === 'todos' || card.dataset.categoria === categoria) {
-                            card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
-                });
+            const appointmentDate = new Date(appointmentData.appointment_date);
+            const formattedDate = appointmentDate.toLocaleDateString('es-ES', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
             });
-        }
-
-        // ===== MÉTODOS DE PAGO =====
-        function configurarMetodosPago() {
-            const metodos = document.querySelectorAll('.metodo-pago');
-            
-            metodos.forEach(metodo => {
-                metodo.addEventListener('click', function() {
-                    // Remover clase active de todos los métodos
-                    metodos.forEach(m => m.classList.remove('active'));
-                    // Agregar clase active al método clickeado
-                    this.classList.add('active');
-                    
-                    metodoPagoSeleccionado = this.dataset.metodo;
-                    
-                    // Actualizar botón de pago
-                    const btnPagar = document.getElementById('btnPagar');
-                    if (carrito.length > 0) {
-                        btnPagar.disabled = false;
-                        btnPagar.innerHTML = `<i class="fas fa-lock"></i> Pagar con ${metodoPagoSeleccionado === 'mp' ? 'Mercado Pago' : 'Transferencia'}`;
-                    }
-                });
-            });
-        }
-
-        // ===== MODAL DE PAGO =====
-        function mostrarModalPago() {
-            if (carrito.length === 0) {
-                mostrarNotificacion('Tu carrito está vacío', 'error');
-                return;
-            }
-            
-            if (!metodoPagoSeleccionado) {
-                mostrarNotificacion('Por favor, seleccioná un método de pago', 'error');
-                return;
-            }
-            
-            // Actualizar resumen en el modal
-            const subtotal = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
-            const descuento = subtotal >= 10000 ? subtotal * 0.1 : 0;
-            const total = subtotal - descuento;
-            
-            let resumenHTML = '';
-            carrito.forEach(item => {
-                resumenHTML += `
-                    <div class="resumen-linea">
-                        <span>${item.nombre} x${item.cantidad}:</span>
-                        <span>$${(item.precio * item.cantidad).toLocaleString('es-AR')}</span>
-                    </div>
-                `;
+            const formattedTime = appointmentDate.toLocaleTimeString('es-ES', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
             });
             
-            if (descuento > 0) {
-                resumenHTML += `
-                    <div class="resumen-linea">
-                        <span>Descuento (10%):</span>
-                        <span style="color: var(--verde);">-$${descuento.toLocaleString('es-AR')}</span>
+            container.innerHTML = `
+                <div class="summary-item">
+                    <div class="summary-label">
+                        <i class="fas fa-tag"></i>
+                        Estado
                     </div>
-                `;
-            }
-            
-            document.getElementById('resumenModal').innerHTML = resumenHTML;
-            document.getElementById('totalModal').textContent = `$${total.toLocaleString('es-AR')}`;
-            
-            // Generar link de Mercado Pago (simulación)
-            const linkMP = document.getElementById('linkMercadoPago');
-            if (metodoPagoSeleccionado === 'mp') {
-                linkMP.href = `https://www.mercadopago.com.ar/checkout/v1/redirect?preference-id=LMN-${Date.now()}`;
-                linkMP.style.display = 'inline-block';
-            } else {
-                linkMP.style.display = 'none';
-            }
-            
-            // Mostrar modal
-            document.getElementById('modalPago').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function cerrarModal() {
-            document.getElementById('modalPago').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // ===== NOTIFICACIONES =====
-        function mostrarNotificacion(mensaje, tipo) {
-            const notification = document.createElement('div');
-            notification.textContent = mensaje;
-            notification.style.cssText = `
-                position: fixed;
-                top: 100px;
-                right: 30px;
-                background: ${tipo === 'success' ? 'linear-gradient(135deg, var(--verde), #20c997)' : 
-                             tipo === 'error' ? 'linear-gradient(135deg, #dc3545, #c82333)' : 
-                             'linear-gradient(135deg, var(--lila-medio), var(--lila-oscuro))'};
-                color: white;
-                padding: 15px 25px;
-                border-radius: 10px;
-                box-shadow: var(--sombra-hover);
-                z-index: 1000;
-                animation: slideIn 0.3s ease;
-                max-width: 300px;
+                    <div class="summary-value">
+                        <span class="status-badge">⏳ Pendiente de Pago</span>
+                    </div>
+                </div>
+                
+                <div class="summary-item">
+                    <div class="summary-label">
+                        <i class="fas fa-sparkles"></i>
+                        Servicio
+                    </div>
+                    <div class="summary-value">${appointmentData.service.name}</div>
+                </div>
+                
+                <div class="summary-item">
+                    <div class="summary-label">
+                        <i class="fas fa-calendar"></i>
+                        Fecha
+                    </div>
+                    <div class="summary-value">${formattedDate}</div>
+                </div>
+                
+                <div class="summary-item">
+                    <div class="summary-label">
+                        <i class="fas fa-clock"></i>
+                        Horario
+                    </div>
+                    <div class="summary-value">${formattedTime} hs</div>
+                </div>
+                
+                <div class="summary-item">
+                    <div class="summary-label">
+                        <i class="fas fa-hourglass"></i>
+                        Duración
+                    </div>
+                    <div class="summary-value">${appointmentData.service.duration_minutes} minutos</div>
+                </div>
+                
+                <div class="summary-item" style="margin-top: 15px; padding-top: 15px; border-top: 2px solid rgba(0,0,0,0.2);">
+                    <div class="summary-label" style="font-size: 1.2rem;">
+                        <i class="fas fa-dollar-sign"></i>
+                        Total a Pagar
+                    </div>
+                    <div class="summary-value highlight">${formatPrice(appointmentData.service.price)}</div>
+                </div>
             `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
         }
-
-        // Agregar estilos para animaciones de notificación
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
+        
+        // ===== SELECCIONAR MÉTODO DE PAGO =====
+        function selectPaymentMethod(method) {
+            // Remover selección anterior
+            document.querySelectorAll('.payment-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Marcar nuevo método
+            document.getElementById(`option-${method}`).classList.add('selected');
+            
+            selectedPaymentMethod = method;
+            console.log('💳 Método de pago seleccionado:', method);
+            
+            // Habilitar botón de confirmación
+            const btnConfirm = document.getElementById('btn-confirm-payment');
+            
+            // Para transferencia, requerir comprobante
+            if (method === 'transfer') {
+                btnConfirm.disabled = !uploadedFile;
+            } else {
+                btnConfirm.disabled = false;
             }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        // ===== COPIAR AL PORTAPAPELES =====
+        function copyToClipboard(elementId, event) {
+            event.stopPropagation();
+            
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                // Cambiar temporalmente el botón
+                const btn = event.target.closest('.copy-button');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                }, 2000);
+            });
+        }
+        
+        // ===== MANEJAR SUBIDA DE ARCHIVO =====
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            
+            if (file) {
+                uploadedFile = file;
+                
+                // Mostrar preview
+                const preview = document.getElementById('file-preview');
+                const fileName = document.getElementById('file-name');
+                
+                fileName.textContent = file.name;
+                preview.style.display = 'flex';
+                
+                // Habilitar botón si transferencia está seleccionada
+                if (selectedPaymentMethod === 'transfer') {
+                    document.getElementById('btn-confirm-payment').disabled = false;
+                }
+                
+                console.log('📎 Archivo seleccionado:', file.name);
             }
-        `;
-        document.head.appendChild(style);
-
-        // ===== CONFIGURACIÓN DE EVENTOS =====
-        function configurarEventos() {
-            // Botones de agregar al carrito
-            document.querySelectorAll('.btn-agregar').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = parseInt(this.dataset.id);
-                    const nombre = this.dataset.nombre;
-                    const precio = parseInt(this.dataset.precio);
+        }
+        
+        // ===== CONFIRMAR PAGO =====
+        async function confirmPayment() {
+            if (!selectedPaymentMethod) {
+                alert('Por favor, selecciona un método de pago');
+                return;
+            }
+            
+            // Mostrar loading
+            document.getElementById('loadingOverlay').classList.add('active');
+            
+            try {
+                console.log('💳 Procesando pago con método:', selectedPaymentMethod);
+                
+                if (selectedPaymentMethod === 'mercadopago') {
+                    // MERCADO PAGO
+                    await handleMercadoPagoPayment();
                     
-                    agregarAlCarrito(id, nombre, precio);
-                });
-            });
-            
-            // Botón de pagar
-            document.getElementById('btnPagar').addEventListener('click', mostrarModalPago);
-            
-            // Cerrar modal
-            document.getElementById('cerrarModal').addEventListener('click', cerrarModal);
-            
-            // Cerrar modal al hacer clic fuera
-            document.getElementById('modalPago').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    cerrarModal();
+                } else if (selectedPaymentMethod === 'transfer') {
+                    // TRANSFERENCIA
+                    await handleTransferPayment();
+                    
+                } else if (selectedPaymentMethod === 'cash') {
+                    // EFECTIVO
+                    await handleCashPayment();
                 }
-            });
-            
-            // Configurar filtros
-            configurarFiltros();
-            
-            // Configurar métodos de pago
-            configurarMetodosPago();
-            
-            // Efecto de carga de productos
-            const productosCards = document.querySelectorAll('.producto-card');
-            productosCards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
-            });
-            
-            // Limpiar carrito después de pago exitoso (simulación)
-            document.getElementById('linkMercadoPago').addEventListener('click', function(e) {
-                if (metodoPagoSeleccionado === 'mp') {
-                    setTimeout(() => {
-                        carrito = [];
-                        guardarCarrito();
-                        actualizarCarrito();
-                        cerrarModal();
-                        mostrarNotificacion('¡Pago realizado con éxito! Te contactaremos para coordinar tu servicio/curso.', 'success');
-                    }, 2000);
-                }
-            });
+                
+            } catch (error) {
+                console.error('❌ Error procesando pago:', error);
+                alert('Error al procesar el pago. Por favor, intenta nuevamente.');
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }
         }
-
-        // ===== FUNCIONES GLOBALES =====
-        window.eliminarDelCarrito = eliminarDelCarrito;
+        
+        // ===== PROCESAR PAGO CON MERCADO PAGO =====
+        async function handleMercadoPagoPayment() {
+            try {
+                // Llamar al backend para crear preferencia de MP
+                const response = await createMercadoPagoPreference(appointmentId);
+                
+                console.log('✅ Preferencia de MP creada:', response);
+                
+                // Redirigir a Mercado Pago
+                if (response.init_point) {
+                    window.location.href = response.init_point;
+                } else {
+                    throw new Error('No se recibió URL de pago');
+                }
+                
+            } catch (error) {
+                console.error('❌ Error con Mercado Pago:', error);
+                throw error;
+            }
+        }
+        
+        // ===== PROCESAR TRANSFERENCIA =====
+        async function handleTransferPayment() {
+            try {
+                // Subir comprobante
+                const formData = new FormData();
+                formData.append('proof', uploadedFile);
+                
+                const response = await uploadPaymentProof(appointmentId, formData);
+                
+                console.log('✅ Comprobante subido:', response);
+                
+                // Ocultar loading
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
+                // Mostrar mensaje de éxito
+                alert('¡Comprobante recibido! Tu pago será verificado en las próximas horas y recibirás un email de confirmación.');
+                
+                // Redirigir a mis turnos
+                window.location.href = '/mis-turnos.html';
+                
+            } catch (error) {
+                console.error('❌ Error subiendo comprobante:', error);
+                throw error;
+            }
+        }
+        
+        // ===== PROCESAR PAGO EN EFECTIVO =====
+        async function handleCashPayment() {
+            try {
+                // Confirmar el turno directamente
+                const response = await confirmAppointmentCash(appointmentId);
+                
+                console.log('✅ Turno confirmado para pago en efectivo:', response);
+                
+                // Ocultar loading
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
+                // Mostrar mensaje de éxito
+                alert('¡Turno confirmado! Podrás abonar en efectivo cuando llegues. Te esperamos 😊');
+                
+                // Redirigir a mis turnos
+                window.location.href = '/mis-turnos.html';
+                
+            } catch (error) {
+                console.error('❌ Error confirmando turno:', error);
+                throw error;
+            }
+        }
+        
+        // ===== CANCELAR RESERVA =====
+        async function cancelReservation() {
+            const confirm = window.confirm('¿Estás seguro de que quieres cancelar esta reserva?');
+            
+            if (!confirm) return;
+            
+            try {
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                await cancelAppointment(appointmentId, 'Cancelado desde página de pago');
+                
+                console.log('✅ Reserva cancelada');
+                
+                alert('Reserva cancelada correctamente');
+                window.location.href = '/turnera.html';
+                
+            } catch (error) {
+                console.error('❌ Error cancelando reserva:', error);
+                alert('Error al cancelar la reserva');
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }
+        }
+        
+        // ===== FUNCIONES AUXILIARES DE API =====
+        
+        async function getAppointmentById(id) {
+            const response = await authenticatedFetch(`${API_URL}/appointments/${id}/`);
+            return response;
+        }
+        
+        async function createMercadoPagoPreference(appointmentId) {
+            const response = await authenticatedFetch(
+                `${API_URL}/payments/create-preference/`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({ appointment_id: appointmentId })
+                }
+            );
+            return response;
+        }
+        
+        async function uploadPaymentProof(appointmentId, formData) {
+            const token = localStorage.getItem('access_token');
+            
+            const response = await fetch(`${API_URL}/payments/upload-proof/${appointmentId}/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Error subiendo comprobante');
+            }
+            
+            return await response.json();
+        }
+        
+        async function confirmAppointmentCash(appointmentId) {
+            const response = await authenticatedFetch(
+                `${API_URL}/payments/confirm-cash/${appointmentId}/`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({})
+                }
+            );
+            return response;
+        }
     </script>
-<script src="api.js"></script>
-
-<!-- Script de Pago -->
-<script>
-// Verificar que esté logueado
-requireAuth();
-
-let appointmentId = null;
-let appointmentData = null;
-
-// ===== INICIALIZAR =====
-document.addEventListener('DOMContentLoaded', async () => {
-    // Obtener appointment_id de la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    appointmentId = urlParams.get('appointment_id');
-    
-    if (!appointmentId) {
-        alert('No se especificó un turno');
-        window.location.href = '/turnera.html';
-        return;
-    }
-    
-    // Cargar datos del turno
-    await loadAppointmentData();
-});
-
-// ===== CARGAR DATOS DEL TURNO =====
-async function loadAppointmentData() {
-    try {
-        appointmentData = await getAppointment(appointmentId);
-        
-        // Mostrar resumen del turno
-        document.getElementById('service-name').textContent = appointmentData.service.name;
-        document.getElementById('appointment-date').textContent = formatDate(appointmentData.appointment_date);
-        document.getElementById('appointment-time').textContent = formatTime(appointmentData.appointment_date);
-        document.getElementById('service-price').textContent = formatPrice(appointmentData.service.price);
-        document.getElementById('total-amount').textContent = formatPrice(appointmentData.service.price);
-        
-    } catch (error) {
-        showError('Error cargando datos del turno');
-    }
-}
-
-// ===== PROCESAR PAGO CON MERCADOPAGO =====
-async function processPayment() {
-    if (!appointmentData) return;
-    
-    try {
-        // Mostrar loading
-        document.getElementById('pay-button').disabled = true;
-        document.getElementById('pay-button').textContent = 'Procesando...';
-        
-        // Crear preferencia de pago
-        const preference = await createPaymentPreference(
-            appointmentId,
-            appointmentData.service.price
-        );
-        
-        // Redirigir a MercadoPago
-        window.location.href = preference.init_point;
-        
-    } catch (error) {
-        showError('Error al procesar el pago');
-        document.getElementById('pay-button').disabled = false;
-        document.getElementById('pay-button').textContent = 'Pagar con MercadoPago';
-    }
-}
-
-// ===== PAGO EN EFECTIVO (MARCAR TURNO COMO PENDIENTE) =====
-function payInCash() {
-    if (confirm('¿Confirmas que pagarás en efectivo en el estudio?')) {
-        showSuccess('Turno confirmado. Recuerda pagar en efectivo al llegar.');
-        window.location.href = '/mis-turnos.html';
-    }
-}
-</script>
 </body>
 </html>

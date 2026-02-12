@@ -1,5 +1,5 @@
 # app/schemas/appointment.py
-from pydantic import BaseModel, Field, field_validator, validator
+from pydantic import BaseModel, Field, field_validator
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -14,18 +14,28 @@ class AppointmentBase(BaseModel):
     appointment_date: datetime
     notes: Optional[str] = Field(None, max_length=1000)
     
-    @validator('appointment_date')
-    def validate_future_date(cls, v):
+    @field_validator('appointment_date')
+    @classmethod
+    def validate_future_date(cls, v: datetime) -> datetime:
+        """
+        Valida que la fecha sea futura.
+        ✅ Maneja correctamente timezones.
+        """
         # Obtener ahora con timezone UTC
         now = datetime.now(timezone.utc)
         
-        # Si v no tiene timezone, agregar UTC
+        # Normalizar v a UTC aware
         if v.tzinfo is None:
+            # Si no tiene timezone, asumir UTC
             v = v.replace(tzinfo=timezone.utc)
+        else:
+            # Si tiene otro timezone, convertir a UTC
+            v = v.astimezone(timezone.utc)
         
         # Ahora podemos comparar
         if v < now:
             raise ValueError('La fecha del turno debe ser en el futuro')
+        
         return v
 
 
@@ -35,7 +45,7 @@ class AppointmentCreate(AppointmentBase):
     
     Requiere:
         - service_id: ID del servicio a reservar
-        - appointment_date: Fecha y hora del turno
+        - appointment_date: Fecha y hora del turno (puede ser naive o aware)
         - notes: Notas adicionales (opcional)
     
     El user_id se obtiene del token JWT (usuario autenticado).
@@ -55,15 +65,24 @@ class AppointmentUpdate(BaseModel):
     
     @field_validator('appointment_date')
     @classmethod
-    def validate_future_date(cls, v):
-        """Valida que la fecha sea futura, manejando timezones"""
+    def validate_future_date(cls, v: Optional[datetime]) -> Optional[datetime]:
+        """
+        Valida que la fecha sea futura, manejando timezones.
+        ✅ CORRECCIÓN completa.
+        """
+        if v is None:
+            return v
         
         # Obtener ahora con timezone UTC
         now = datetime.now(timezone.utc)
         
-        # Si v no tiene timezone, agregar UTC
+        # Normalizar v a UTC aware
         if v.tzinfo is None:
+            # Si no tiene timezone, asumir UTC
             v = v.replace(tzinfo=timezone.utc)
+        else:
+            # Si tiene otro timezone, convertir a UTC
+            v = v.astimezone(timezone.utc)
         
         # Ahora podemos comparar
         if v < now:
@@ -71,17 +90,22 @@ class AppointmentUpdate(BaseModel):
         
         return v
     
-    @validator('status')
-    def validate_status(cls, v):
+    @field_validator('status')
+    @classmethod
+    def validate_status(cls, v: Optional[str]) -> Optional[str]:
         """Valida que el estado sea válido"""
-        if v:
-            allowed_statuses = ['pending', 'confirmed', 'completed', 'cancelled']
-            if v.lower() not in allowed_statuses:
-                raise ValueError(
-                    f'Estado no válido. Debe ser uno de: {", ".join(allowed_statuses)}'
-                )
-            return v.lower()
-        return v
+        if v is None:
+            return v
+            
+        allowed_statuses = ['pending', 'confirmed', 'completed', 'cancelled']
+        v_lower = v.lower()
+        
+        if v_lower not in allowed_statuses:
+            raise ValueError(
+                f'Estado no válido. Debe ser uno de: {", ".join(allowed_statuses)}'
+            )
+        
+        return v_lower
 
 
 class AppointmentResponse(AppointmentBase):

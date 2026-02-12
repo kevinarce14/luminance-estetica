@@ -35,7 +35,7 @@ class Appointment(Base):
     Campos:
         - user_id: ID del cliente que reservó
         - service_id: ID del servicio reservado
-        - appointment_date: Fecha y hora del turno
+        - appointment_date: Fecha y hora del turno (UTC, sin timezone en BD)
         - status: Estado actual (pending, confirmed, completed, cancelled)
         - notes: Notas adicionales del cliente
         - reminder_sent: Si ya se envió recordatorio automático
@@ -56,8 +56,10 @@ class Appointment(Base):
     service_id = Column(Integer, ForeignKey("services.id"), nullable=False, index=True)
     
     # ===== FECHA Y HORA =====
+    # ✅ CORRECCIÓN: Usar timezone=False (naive datetime)
+    # Guardamos fechas en UTC pero sin timezone info en la BD
     appointment_date = Column(
-        DateTime(timezone=True),
+        DateTime(timezone=False),  # ✅ Cambiado de True a False
         nullable=False,
         index=True
     )
@@ -79,18 +81,20 @@ class Appointment(Base):
     # Se marca True cuando se envía el recordatorio automático 24h antes
     
     # ===== CANCELACIÓN =====
-    cancelled_at = Column(DateTime(timezone=True), nullable=True)
+    # ✅ CORRECCIÓN: También usar timezone=False para consistencia
+    cancelled_at = Column(DateTime(timezone=False), nullable=True)  # ✅ Cambiado
     cancellation_reason = Column(Text, nullable=True)
     # Ejemplo: "Cambio de planes", "Enfermedad", "Cambio de horario", etc.
     
     # ===== TIMESTAMPS =====
+    # ✅ CORRECCIÓN: Usar timezone=False
     created_at = Column(
-        DateTime(timezone=True),
+        DateTime(timezone=False),  # ✅ Cambiado
         server_default=func.now(),
         nullable=False
     )
     updated_at = Column(
-        DateTime(timezone=True),
+        DateTime(timezone=False),  # ✅ Cambiado
         onupdate=func.now(),
         nullable=True
     )

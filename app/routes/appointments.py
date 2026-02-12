@@ -50,13 +50,11 @@ def check_slot_availability(
     if not service:
         return False
     
-    # ==== CORRECCIÓN AQUÍ ====
-    # Convertir appointment_date a naive si es necesario
+    # ✅ CORRECCIÓN: Normalizar fecha a naive (sin timezone)
     # La base de datos generalmente almacena fechas sin timezone
-    from datetime import timezone
-    
     appointment_date_local = appointment_date
     if appointment_date_local.tzinfo is not None:
+        # Convertir a UTC y luego remover timezone
         appointment_date_local = appointment_date_local.astimezone(timezone.utc).replace(tzinfo=None)
     
     # Calcular hora de fin (sin timezone)
@@ -125,46 +123,52 @@ def create_appointment(
             detail="Este servicio no está disponible actualmente"
         )
     
-    # ==== CORRECCIÓN AQUÍ ====
-    # Obtener la fecha actual con timezone para comparar
-    from datetime import timezone
-    
-    # appointment_data.appointment_date ya es aware (por el validator)
-    # Necesitamos hacer que min_advance también sea aware
-    min_advance = datetime.now(timezone.utc) + timedelta(hours=settings.MIN_BOOKING_ADVANCE_HOURS)
-    
-    # Asegurarnos de que appointment_date también tiene timezone UTC
+    # ✅ CORRECCIÓN COMPLETA: Manejo de timezones
+    # 1. Normalizar la fecha del appointment a UTC aware
     appointment_date_utc = appointment_data.appointment_date
+    
+    # Si viene sin timezone, asumir que es UTC
     if appointment_date_utc.tzinfo is None:
         appointment_date_utc = appointment_date_utc.replace(tzinfo=timezone.utc)
+    else:
+        # Si tiene timezone diferente, convertir a UTC
+        appointment_date_utc = appointment_date_utc.astimezone(timezone.utc)
     
-    # Ahora podemos comparar
+    # 2. Crear min_advance y max_advance con UTC
+    now_utc = datetime.now(timezone.utc)
+    min_advance = now_utc + timedelta(hours=settings.MIN_BOOKING_ADVANCE_HOURS)
+    max_advance = now_utc + timedelta(days=settings.MAX_BOOKING_ADVANCE_DAYS)
+    
+    # 3. Ahora sí podemos comparar (todas las fechas son UTC aware)
     if appointment_date_utc < min_advance:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Debes reservar con al menos {settings.MIN_BOOKING_ADVANCE_HOURS} horas de anticipación"
         )
     
-    # Verificar anticipación máxima
-    max_advance = datetime.now(timezone.utc) + timedelta(days=settings.MAX_BOOKING_ADVANCE_DAYS)
     if appointment_date_utc > max_advance:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"No puedes reservar con más de {settings.MAX_BOOKING_ADVANCE_DAYS} días de anticipación"
         )
     
-    # Verificar disponibilidad del slot
-    if not check_slot_availability(db, service.id, appointment_data.appointment_date):
+    # 4. Verificar disponibilidad del slot
+    # check_slot_availability maneja la conversión a naive internamente
+    if not check_slot_availability(db, service.id, appointment_date_utc):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Este horario no está disponible"
         )
     
+    # 5. Guardar en la BD sin timezone (naive)
+    # La mayoría de BD guardan fechas sin timezone
+    appointment_date_naive = appointment_date_utc.replace(tzinfo=None)
+    
     # Crear turno
     db_appointment = Appointment(
         user_id=current_user.id,
         service_id=appointment_data.service_id,
-        appointment_date=appointment_data.appointment_date,
+        appointment_date=appointment_date_naive,  # ✅ Guardar como naive
         notes=appointment_data.notes,
         status=AppointmentStatus.PENDING,
     )
@@ -173,16 +177,16 @@ def create_appointment(
     db.commit()
     db.refresh(db_appointment)
     
-    # Enviar email de confirmación
-    try:
-        email_service.send_appointment_confirmation(
-            to_email=current_user.email,
-            user_name=current_user.full_name,
-            service_name=service.name,
-            appointment_date=db_appointment.appointment_date
-        )
-    except Exception as e:
-        print(f"⚠️ Error enviando email de confirmación: {str(e)}")
+    # Enviar email de confirmación (comentado por ahora)
+    # try:
+    #     email_service.send_appointment_confirmation(
+    #         to_email=current_user.email,
+    #         user_name=current_user.full_name,
+    #         service_name=service.name,
+    #         appointment_date=db_appointment.appointment_date
+    #     )
+    # except Exception as e:
+    #     print(f"⚠️ Error enviando email de confirmación: {str(e)}")
     
     return db_appointment
 
@@ -205,7 +209,13 @@ def list_my_appointments(
     
     Requiere autenticación.
     """
-    query = db.query(Appointment).filter(Appointment.user_id == current_user.id, Appointment.appointment_date >= datetime.now(timezone.utc))
+    # ✅ Crear fecha actual naive para comparar con BD
+    now_naive = datetime.now(timezone.utc).replace(tzinfo=None)
+    
+    query = db.query(Appointment).filter(
+        Appointment.user_id == current_user.id,
+        Appointment.appointment_date >= now_naive  # Comparar naive con naive
+    )
     
     if status_filter:
         query = query.filter(Appointment.status == status_filter)
@@ -289,10 +299,17 @@ def update_appointment(
     
     # Si cambia la fecha, verificar disponibilidad
     if appointment_data.appointment_date:
+        # ✅ Normalizar la nueva fecha
+        new_date = appointment_data.appointment_date
+        if new_date.tzinfo is None:
+            new_date = new_date.replace(tzinfo=timezone.utc)
+        else:
+            new_date = new_date.astimezone(timezone.utc)
+        
         if not check_slot_availability(
             db,
             appointment.service_id,
-            appointment_data.appointment_date,
+            new_date,
             exclude_appointment_id=appointment_id
         ):
             raise HTTPException(
@@ -300,7 +317,8 @@ def update_appointment(
                 detail="El nuevo horario no está disponible"
             )
         
-        appointment.appointment_date = appointment_data.appointment_date
+        # Guardar como naive en la BD
+        appointment.appointment_date = new_date.replace(tzinfo=None)
     
     # Actualizar otros campos
     if appointment_data.notes is not None:
@@ -352,7 +370,7 @@ def cancel_appointment(
     
     # Cancelar
     appointment.status = AppointmentStatus.CANCELLED
-    appointment.cancelled_at = datetime.now()
+    appointment.cancelled_at = datetime.now(timezone.utc).replace(tzinfo=None)  # ✅ Naive
     appointment.cancellation_reason = cancel_data.cancellation_reason
     
     db.commit()

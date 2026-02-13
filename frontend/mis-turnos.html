@@ -3,282 +3,681 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Turnos - Luminance Estética</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Mis Turnos | Luminance Studio by Cande</title>
+    <meta name="description" content="Gestiona tus turnos en Luminance Studio - Ver, modificar o cancelar tus reservas">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* ===== VARIABLES Y ESTILOS GLOBALES ===== */
+        :root {
+            --rosa-claro: #f8d7e6;
+            --rosa-medio: #e75480;
+            --rosa-fuerte: #d81b60;
+            --lila-claro: #f4f0ff;
+            --lila-medio: #9c89b8;
+            --lila-oscuro: #7b4bbd;
+            --violeta: #6a4c93;
+            --dorado: #d4af37;
+            --dorado-claro: #f1c40f;
+            --blanco: #ffffff;
+            --gris-claro: #f8f9fa;
+            --gris-medio: #e9ecef;
+            --gris-oscuro: #6c757d;
+            --texto-oscuro: #2d3436;
+            --texto-medio: #636e72;
+            --verde: #28a745;
+            --rojo: #dc3545;
+            --naranja: #fd7e14;
+            --amarillo: #ffc107;
+            --sombra: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --sombra-hover: 0 20px 40px rgba(0, 0, 0, 0.12);
+            --transicion: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            --border-radius: 15px;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f8d7e6 0%, #f4f0ff 100%);
+            background: linear-gradient(135deg, var(--rosa-claro) 0%, var(--lila-claro) 100%);
+            color: var(--texto-oscuro);
+            line-height: 1.7;
             min-height: 100vh;
-            padding: 20px;
+            padding: 40px 20px;
         }
-
+        
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
         }
-
-        h1 {
-            font-size: 2.5rem;
-            color: #2d3436;
-            margin-bottom: 30px;
+        
+        /* ===== HEADER ===== */
+        .page-header {
             text-align: center;
+            margin-bottom: 50px;
         }
-
-        .appointment-card {
-            background: linear-gradient(135deg, #fff 0%, #fef9ff 100%);
-            border: 2px solid #e9ecef;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            transition: transform 0.3s;
-        }
-
-        .appointment-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .appointment-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        
+        .page-header h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--rosa-fuerte), var(--lila-oscuro));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 15px;
         }
-
-        .service-name {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #e75480;
+        
+        .page-header p {
+            color: var(--texto-medio);
+            font-size: 1.1rem;
         }
-
-        .status-badge {
+        
+        /* ===== TABS ===== */
+        .tabs-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 30px;
+            box-shadow: var(--sombra);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 25px;
+            background: var(--gris-claro);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transicion);
+            color: var(--texto-medio);
+        }
+        
+        .tab-btn:hover {
+            background: var(--gris-medio);
+            transform: translateY(-2px);
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--rosa-medio), var(--lila-medio));
+            color: white;
+            border-color: transparent;
+        }
+        
+        .tab-btn i {
+            margin-right: 8px;
+        }
+        
+        /* ===== TURNOS GRID ===== */
+        .turnos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .turno-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--sombra);
+            transition: var(--transicion);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .turno-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(135deg, var(--rosa-medio), var(--lila-medio));
+        }
+        
+        .turno-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--sombra-hover);
+        }
+        
+        .turno-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .turno-service {
+            flex: 1;
+        }
+        
+        .turno-service h3 {
+            font-size: 1.5rem;
+            color: var(--violeta);
+            margin-bottom: 5px;
+        }
+        
+        .turno-service .service-category {
+            font-size: 0.9rem;
+            color: var(--texto-medio);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .turno-status {
             padding: 8px 16px;
             border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
         }
-
+        
         .status-pending {
             background: #fff3cd;
             color: #856404;
         }
-
+        
         .status-confirmed {
             background: #d4edda;
             color: #155724;
         }
-
+        
         .status-completed {
             background: #d1ecf1;
             color: #0c5460;
         }
-
+        
         .status-cancelled {
             background: #f8d7da;
             color: #721c24;
         }
-
-        .appointment-details {
+        
+        .turno-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--rosa-claro), var(--lila-claro));
+            border-radius: 10px;
         }
-
+        
         .detail-item {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
-        .detail-icon {
-            font-size: 1.5rem;
+        
+        .detail-item i {
+            font-size: 1.3rem;
+            color: var(--rosa-medio);
         }
-
-        .detail-text {
+        
+        .detail-item .label {
+            font-size: 0.85rem;
+            color: var(--texto-medio);
+            font-weight: 500;
+        }
+        
+        .detail-item .value {
             font-size: 1rem;
-            color: #636e72;
+            color: var(--texto-oscuro);
+            font-weight: 600;
         }
-
-        .appointment-actions {
+        
+        .turno-notes {
+            padding: 15px;
+            background: var(--gris-claro);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: var(--texto-medio);
+        }
+        
+        .turno-notes strong {
+            color: var(--texto-oscuro);
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .turno-actions {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
         }
-
+        
         .btn {
-            padding: 10px 20px;
+            flex: 1;
+            padding: 12px 20px;
             border: none;
             border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
             cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
+            transition: var(--transicion);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #e75480, #9c89b8);
-            color: white;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
+        
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--rosa-medio), var(--lila-medio));
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--rojo);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--gris-medio);
+            color: var(--texto-oscuro);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* ===== EMPTY STATE ===== */
         .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--sombra);
+        }
+        
+        .empty-state i {
+            font-size: 5rem;
+            color: var(--lila-medio);
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h2 {
+            font-size: 2rem;
+            color: var(--texto-oscuro);
+            margin-bottom: 15px;
+        }
+        
+        .empty-state p {
+            color: var(--texto-medio);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+        
+        .btn-cta {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, var(--rosa-medio), var(--lila-medio));
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transicion);
+        }
+        
+        .btn-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(231, 84, 128, 0.3);
+        }
+        
+        /* ===== LOADING ===== */
+        .loading {
             text-align: center;
             padding: 60px 20px;
         }
-
-        .empty-state h2 {
-            color: #636e72;
-            margin-bottom: 20px;
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--gris-medio);
+            border-top-color: var(--rosa-medio);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .turnos-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .turno-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs-container {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                min-width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Mis Turnos</h1>
-        
-        <div id="appointments-container">
-            <!-- Los turnos se cargarán aquí -->
+        <!-- Header -->
+        <div class="page-header">
+            <h1>📅 Mis Turnos</h1>
+            <p>Gestiona todas tus reservas en Luminance Studio</p>
         </div>
-
+        
+        <!-- Tabs para filtrar -->
+        <div class="tabs-container">
+            <button class="tab-btn active" data-status="all" onclick="filterByStatus('all')">
+                <i class="fas fa-calendar-alt"></i> Todos
+            </button>
+            <button class="tab-btn" data-status="pending" onclick="filterByStatus('pending')">
+                <i class="fas fa-clock"></i> Pendientes
+            </button>
+            <button class="tab-btn" data-status="confirmed" onclick="filterByStatus('confirmed')">
+                <i class="fas fa-check-circle"></i> Confirmados
+            </button>
+            <button class="tab-btn" data-status="completed" onclick="filterByStatus('completed')">
+                <i class="fas fa-star"></i> Completados
+            </button>
+            <button class="tab-btn" data-status="cancelled" onclick="filterByStatus('cancelled')">
+                <i class="fas fa-times-circle"></i> Cancelados
+            </button>
+        </div>
+        
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Cargando tus turnos...</p>
+        </div>
+        
+        <!-- Grid de turnos -->
+        <div id="turnos-grid" class="turnos-grid" style="display: none;">
+            <!-- Los turnos se cargarán aquí dinámicamente -->
+        </div>
+        
+        <!-- Empty state -->
         <div id="empty-state" class="empty-state" style="display: none;">
+            <i class="fas fa-calendar-times"></i>
             <h2>No tienes turnos reservados</h2>
-            <a href="/turnera.html" class="btn btn-primary">Reservar un turno</a>
+            <p>¡Es hora de reservar tu próximo tratamiento de belleza!</p>
+            <a href="/turnera.html" class="btn-cta">
+                <i class="fas fa-plus-circle"></i> Reservar Turno
+            </a>
         </div>
     </div>
-
-    <!-- API Client -->
+    
+    <!-- Scripts -->
     <script src="api.js"></script>
-
+    
     <script>
-        // Verificar que esté logueado
-        requireAuth();
-
-        // ===== CARGAR TURNOS =====
-        async function loadAppointments() {
-            try {
-                const appointments = await getAppointments();
-                
-                const container = document.getElementById('appointments-container');
-                const emptyState = document.getElementById('empty-state');
-                
-                if (appointments.length === 0) {
-                    container.style.display = 'none';
-                    emptyState.style.display = 'block';
-                    return;
-                }
-                
-                container.innerHTML = appointments.map(app => `
-                    <div class="appointment-card">
-                        <div class="appointment-header">
-                            <div class="service-name">${app.service.name}</div>
-                            <div class="status-badge status-${app.status}">
-                                ${getStatusText(app.status)}
-                            </div>
+    // ===== VERIFICAR LOGIN Y BOTÓN LOGOUT =====
+    if (!isLoggedIn()) {
+        showLoginModal('Para ver tus turnos debes iniciar sesión');
+        setTimeout(() => window.location.href = 'login.html', 2000);
+    } else {
+        // Crear botón "Volver al Inicio" (arriba izquierda)
+        const homeBtn = document.createElement('a');
+        homeBtn.href = '/bienvenida.html';
+        homeBtn.innerHTML = '🏠 Inicio';
+        homeBtn.style.cssText = `
+            position: fixed; top: 20px; left: 20px;
+            padding: 12px 25px; background: white; color: #2d3436;
+            text-decoration: none; border-radius: 25px; font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15); z-index: 1000;
+            transition: all 0.3s;
+        `;
+        homeBtn.onmouseenter = () => {
+            homeBtn.style.transform = 'translateY(-3px)';
+            homeBtn.style.background = 'linear-gradient(135deg, #f8d7e6, #f4f0ff)';
+        };
+        homeBtn.onmouseleave = () => {
+            homeBtn.style.transform = 'translateY(0)';
+            homeBtn.style.background = 'white';
+        };
+        document.body.appendChild(homeBtn);
+        
+        // Crear botón logout (arriba derecha)
+        const container = document.createElement('div');
+        container.style.cssText = 'position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 1000;';
+        
+        const userName = document.createElement('div');
+        userName.textContent = `Hola, ${getUserData()?.full_name || 'Usuario'}`;
+        userName.style.cssText = 'padding: 12px 20px; background: white; border-radius: 25px; font-weight: 600; box-shadow: 0 5px 15px rgba(0,0,0,0.15);';
+        
+        const logoutBtn = document.createElement('button');
+        logoutBtn.innerHTML = '🚪 Salir';
+        logoutBtn.style.cssText = 'padding: 12px 25px; background: linear-gradient(135deg, #e75480, #9c89b8); color: white; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: all 0.3s;';
+        logoutBtn.onclick = () => showLogoutModal().then(c => { if (c) logout(); });
+        
+        container.appendChild(userName);
+        container.appendChild(logoutBtn);
+        document.body.appendChild(container);
+    }
+    
+    // ===== VARIABLES GLOBALES =====
+    let allAppointments = [];
+    let currentFilter = 'all';
+    
+    // ===== INICIALIZAR =====
+    document.addEventListener('DOMContentLoaded', () => {
+        loadAppointments();
+    });
+    
+    // ===== CARGAR TURNOS =====
+    async function loadAppointments() {
+        try {
+            console.log('📡 Cargando turnos...');
+            const appointments = await getAppointments();
+            
+            allAppointments = appointments;
+            console.log('✅ Turnos cargados:', appointments.length);
+            
+            // Ocultar loading
+            document.getElementById('loading').style.display = 'none';
+            
+            if (appointments.length === 0) {
+                document.getElementById('empty-state').style.display = 'block';
+            } else {
+                renderAppointments(appointments);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error:', error);
+            document.getElementById('loading').style.display = 'none';
+            alert('Error al cargar tus turnos');
+        }
+    }
+    
+    // ===== RENDERIZAR TURNOS =====
+    function renderAppointments(appointments) {
+        const grid = document.getElementById('turnos-grid');
+        const emptyState = document.getElementById('empty-state');
+        
+        if (appointments.length === 0) {
+            grid.style.display = 'none';
+            emptyState.style.display = 'block';
+            return;
+        }
+        
+        grid.style.display = 'grid';
+        emptyState.style.display = 'none';
+        
+        grid.innerHTML = appointments.map(app => {
+            const statusText = getStatusText(app.status);
+            const statusClass = `status-${app.status}`;
+            
+            return `
+                <div class="turno-card">
+                    <div class="turno-header">
+                        <div class="turno-service">
+                            <h3>${app.service.name}</h3>
+                            <div class="service-category">${app.service.category}</div>
                         </div>
-                        
-                        <div class="appointment-details">
-                            <div class="detail-item">
-                                <span class="detail-icon">📅</span>
-                                <span class="detail-text">${formatDate(app.appointment_date)}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-icon">🕐</span>
-                                <span class="detail-text">${formatTime(app.appointment_date)}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-icon">💰</span>
-                                <span class="detail-text">${formatPrice(app.service.price)}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-icon">⏱️</span>
-                                <span class="detail-text">${app.service.duration_minutes} min</span>
-                            </div>
-                        </div>
-                        
-                        ${app.notes ? `<p><strong>Notas:</strong> ${app.notes}</p>` : ''}
-                        
-                        <div class="appointment-actions">
-                            ${app.status === 'pending' ? `
-                                <button class="btn btn-primary" onclick="payAppointment(${app.id})">
-                                    Pagar
-                                </button>
-                            ` : ''}
-                            
-                            ${app.status === 'pending' || app.status === 'confirmed' ? `
-                                <button class="btn btn-danger" onclick="handleCancelAppointment(${app.id})">
-                                    Cancelar
-                                </button>
-                            ` : ''}
+                        <div class="turno-status ${statusClass}">
+                            ${statusText}
                         </div>
                     </div>
-                `).join('');
-                
-            } catch (error) {
-                showError('Error cargando turnos');
-            }
-        }
-
-        // ===== OBTENER TEXTO DE ESTADO =====
-        function getStatusText(status) {
-            const texts = {
-                'pending': 'Pendiente',
-                'confirmed': 'Confirmado',
-                'completed': 'Completado',
-                'cancelled': 'Cancelado'
-            };
-            return texts[status] || status;
-        }
-
-        // ===== PAGAR TURNO =====
-        function payAppointment(appointmentId) {
-            window.location.href = `/pago.html?appointment_id=${appointmentId}`;
-        }
-
-        // ===== CANCELAR TURNO (RENOMBRADO PARA EVITAR CONFLICTO) =====
-        async function handleCancelAppointment(appointmentId) {
-            const reason = prompt('¿Por qué deseas cancelar el turno?');
-            
-            if (!reason) return;
-            
-            try {
-                // Usa la función de api.js
-                await cancelAppointment(appointmentId, reason);
-                showSuccess('Turno cancelado exitosamente');
-                loadAppointments(); // Recargar lista
-            } catch (error) {
-                showError('Error al cancelar el turno');
-            }
-        }
-
-        // Cargar al iniciar
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAppointments();
+                    
+                    <div class="turno-details">
+                        <div class="detail-item">
+                            <i class="fas fa-calendar-day"></i>
+                            <div>
+                                <div class="label">Fecha</div>
+                                <div class="value">${formatDate(app.appointment_date)}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <div class="label">Hora</div>
+                                <div class="value">${formatTime(app.appointment_date)}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <i class="fas fa-hourglass-half"></i>
+                            <div>
+                                <div class="label">Duración</div>
+                                <div class="value">${app.service.duration_minutes} min</div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <i class="fas fa-dollar-sign"></i>
+                            <div>
+                                <div class="label">Precio</div>
+                                <div class="value">${formatPrice(app.service.price)}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${app.notes ? `
+                        <div class="turno-notes">
+                            <strong>Notas:</strong>
+                            ${app.notes}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="turno-actions">
+                        ${app.status === 'pending' ? `
+                            <button class="btn btn-primary" onclick="goToPay(${app.id})">
+                                <i class="fas fa-credit-card"></i> Pagar
+                            </button>
+                        ` : ''}
+                        
+                        ${app.status === 'pending' || app.status === 'confirmed' ? `
+                            <button class="btn btn-danger" onclick="handleCancel(${app.id})">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        ` : ''}
+                        
+                        ${app.status === 'completed' ? `
+                            <button class="btn btn-secondary" disabled>
+                                <i class="fas fa-check"></i> Completado
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // ===== FILTRAR POR ESTADO =====
+    function filterByStatus(status) {
+        currentFilter = status;
+        
+        // Actualizar tabs activos
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
         });
+        document.querySelector(`[data-status="${status}"]`).classList.add('active');
+        
+        // Filtrar turnos
+        let filtered = allAppointments;
+        if (status !== 'all') {
+            filtered = allAppointments.filter(app => app.status === status);
+        }
+        
+        renderAppointments(filtered);
+    }
+    
+    // ===== HELPERS =====
+    function getStatusText(status) {
+        const texts = {
+            'pending': '⏳ Pendiente',
+            'confirmed': '✓ Confirmado',
+            'completed': '★ Completado',
+            'cancelled': '✗ Cancelado'
+        };
+        return texts[status] || status;
+    }
+    
+    function goToPay(appointmentId) {
+        window.location.href = `/pago.html?appointment_id=${appointmentId}`;
+    }
+    
+    async function handleCancel(appointmentId) {
+        const reason = prompt('¿Por qué deseas cancelar el turno?\n(Mínimo 5 caracteres)');
+        
+        if (!reason || reason.length < 5) {
+            alert('Debes ingresar un motivo válido (mínimo 5 caracteres)');
+            return;
+        }
+        
+        try {
+            await cancelAppointment(appointmentId, reason);
+            alert('✅ Turno cancelado exitosamente');
+            loadAppointments(); // Recargar lista
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al cancelar el turno');
+        }
+    }
+    
+    console.log('✅ Mis Turnos cargado');
     </script>
 </body>
 </html>

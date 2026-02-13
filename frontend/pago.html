@@ -904,25 +904,27 @@
         // ===== PROCESAR TRANSFERENCIA =====
         async function handleTransferPayment() {
             try {
-                // Subir comprobante
-                const formData = new FormData();
-                formData.append('proof', uploadedFile);
+                // Registrar el pago como transferencia pendiente
+                // El admin lo aprueba luego via PUT /payments/{id}/status
+                const amount = appointmentData?.service?.price ?? appointmentData?.price ?? 0;
                 
-                const response = await uploadPaymentProof(appointmentId, formData);
+                console.log('🔍 POST /payments/create-preference/ (transfer)');
+                await apiRequest('/payments/create-preference/', {
+                    method: 'POST',
+                    body: {
+                        appointment_id: parseInt(appointmentId),
+                        amount: parseFloat(amount),
+                        currency: 'ARS',
+                        payment_method: 'transfer'
+                    }
+                });
                 
-                console.log('✅ Comprobante subido:', response);
-                
-                // Ocultar loading
                 document.getElementById('loadingOverlay').classList.remove('active');
-                
-                // Mostrar mensaje de éxito
-                alert('¡Comprobante recibido! Tu pago será verificado en las próximas horas y recibirás un email de confirmación.');
-                
-                // Redirigir a mis turnos
+                alert('¡Datos recibidos! Una vez que verifiquemos tu transferencia, confirmaremos el turno y recibirás un email.');
                 window.location.href = '/mis-turnos.html';
                 
             } catch (error) {
-                console.error('❌ Error subiendo comprobante:', error);
+                console.error('❌ Error registrando transferencia:', error);
                 throw error;
             }
         }
@@ -930,22 +932,35 @@
         // ===== PROCESAR PAGO EN EFECTIVO =====
         async function handleCashPayment() {
             try {
-                // Confirmar el turno directamente
-                const response = await confirmAppointmentCash(appointmentId);
+                // El backend no tiene endpoint específico de cash.
+                // Creamos el Payment con method=cash (queda en PENDING hasta que admin lo apruebe)
+                // y confirmamos el appointment directamente via PATCH.
+                const amount = appointmentData?.service?.price ?? appointmentData?.price ?? 0;
                 
-                console.log('✅ Turno confirmado para pago en efectivo:', response);
+                console.log('🔍 POST /payments/create-preference/ (cash)');
+                await apiRequest('/payments/create-preference/', {
+                    method: 'POST',
+                    body: {
+                        appointment_id: parseInt(appointmentId),
+                        amount: parseFloat(amount),
+                        currency: 'ARS',
+                        payment_method: 'cash'
+                    }
+                });
                 
-                // Ocultar loading
+                // Confirmar el appointment directamente
+                console.log('🔍 PATCH /appointments/' + appointmentId + '/');
+                await apiRequest(`/appointments/${appointmentId}/`, {
+                    method: 'PATCH',
+                    body: { status: 'confirmed' }
+                });
+                
                 document.getElementById('loadingOverlay').classList.remove('active');
-                
-                // Mostrar mensaje de éxito
                 alert('¡Turno confirmado! Podrás abonar en efectivo cuando llegues. Te esperamos 😊');
-                
-                // Redirigir a mis turnos
                 window.location.href = '/mis-turnos.html';
                 
             } catch (error) {
-                console.error('❌ Error confirmando turno:', error);
+                console.error('❌ Error confirmando turno en efectivo:', error);
                 throw error;
             }
         }
@@ -983,51 +998,28 @@
         
         async function createMercadoPagoPreference(id) {
             console.log('🔍 POST /payments/create-preference/');
+            // PaymentCreate requiere: appointment_id, amount, currency, payment_method
+            const amount = appointmentData?.service?.price ?? appointmentData?.price ?? 0;
             return await apiRequest('/payments/create-preference/', {
                 method: 'POST',
-                body: { appointment_id: parseInt(id) }
+                body: {
+                    appointment_id: parseInt(id),
+                    amount: parseFloat(amount),
+                    currency: 'ARS',
+                    payment_method: 'mercadopago'
+                }
             });
         }
         
-        async function uploadPaymentProof(id, formData) {
-            // FormData no puede ir por apiRequest (que agrega Content-Type: application/json)
-            // así que usamos fetch directo con el token
-            const token = localStorage.getItem('access_token') 
-                       || localStorage.getItem('token')
-                       || localStorage.getItem('authToken');
-            console.log('🔍 POST /payments/upload-proof/' + id + '/');
-            const response = await fetch(`${API_URL}/payments/upload-proof/${id}/`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: formData
-            });
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                throw { status: response.status, message: errData.detail || 'Error subiendo comprobante' };
-            }
-            return await response.json();
-        }
+        // uploadPaymentProof: endpoint no implementado en el backend todavía.
+        // La transferencia se registra via POST /payments/create-preference/ con method=transfer.
         
         async function confirmAppointmentCash(id) {
-            // Intentamos el endpoint específico de cash; si no existe en el backend,
-            // usamos el PATCH de appointments para cambiar status a confirmed
-            console.log('🔍 POST /payments/confirm-cash/' + id + '/');
-            try {
-                return await apiRequest(`/payments/confirm-cash/${id}/`, {
-                    method: 'POST',
-                    body: {}
-                });
-            } catch (err) {
-                // Si el endpoint no existe (404), usamos PATCH directo sobre el appointment
-                if (err.status === 404 || err.status === 405) {
-                    console.warn('⚠️ /payments/confirm-cash/ no existe, usando PATCH /appointments/');
-                    return await apiRequest(`/appointments/${id}/`, {
-                        method: 'PATCH',
-                        body: { status: 'confirmed' }
-                    });
-                }
-                throw err;
-            }
+            // Wrapper — ya no se llama directamente, handleCashPayment lo reemplazó
+            return await apiRequest(`/appointments/${id}/`, {
+                method: 'PATCH',
+                body: { status: 'confirmed' }
+            });
         }
     </script>
 </body>

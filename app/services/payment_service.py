@@ -66,13 +66,25 @@ class PaymentService:
             "auto_return": "approved",
             "external_reference": str(appointment_id),
             "statement_descriptor": "LUMINANCE STUDIO",
-            "notification_url": f"{settings.FRONTEND_URL}/api/v1/payments/webhook",
+            "notification_url": "http://localhost:8000/api/payments/webhook",
             "expires": False,  # La preferencia no expira
         }
 
         try:
             preference_response = self.sdk.preference().create(preference_data)
-            preference = preference_response["response"]
+
+            http_status = preference_response.get("status")
+            preference  = preference_response.get("response", {}) or {}
+
+            print(f"📡 MP http_status: {http_status}")
+            print(f"📡 MP response: {preference}")
+
+            if http_status != 201:
+                error_msg = preference.get("message", "Error desconocido de MercadoPago")
+                raise Exception(f"MercadoPago error {http_status}: {error_msg}")
+
+            if not preference.get("id"):
+                raise Exception("MercadoPago no devolvió un ID de preferencia válido")
 
             print(f"✅ Preferencia creada: {preference.get('id')}")
 

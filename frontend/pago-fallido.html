@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago No Procesado | Luminance Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { --rosa-medio:#e75480; --rosa-fuerte:#d81b60; --lila-claro:#f4f0ff; --rosa-claro:#f8d7e6; --violeta:#6a4c93; --rojo:#dc3545; }
+        *{ margin:0; padding:0; box-sizing:border-box; }
+        body{ font-family:'Poppins',sans-serif; background:linear-gradient(135deg,var(--rosa-claro),var(--lila-claro)); min-height:100vh; display:flex; align-items:center; justify-content:center; }
+        .card{ background:white; border-radius:20px; padding:50px 40px; text-align:center; max-width:500px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.1); animation:fadeIn 0.5s ease; }
+        @keyframes fadeIn{ from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .icon{ width:90px; height:90px; background:linear-gradient(135deg,#dc3545,#c82333); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 25px; font-size:2.5rem; color:white; }
+        h1{ font-family:'Playfair Display',serif; color:var(--violeta); font-size:2rem; margin-bottom:15px; }
+        .subtitle{ color:#636e72; line-height:1.7; margin-bottom:30px; }
+        .alert{ background:#fff3cd; border:1px solid #ffc107; border-radius:12px; padding:15px 20px; margin-bottom:25px; font-size:0.9rem; color:#856404; text-align:left; }
+        .buttons{ display:flex; gap:15px; flex-wrap:wrap; justify-content:center; }
+        .btn{ display:inline-flex; align-items:center; gap:8px; padding:13px 26px; border-radius:50px; font-weight:600; text-decoration:none; transition:transform 0.2s,box-shadow 0.2s; }
+        .btn-primary{ background:linear-gradient(135deg,var(--rosa-medio),var(--rosa-fuerte)); color:white; }
+        .btn-secondary{ background:#f0f0f0; color:#2d3436; }
+        .btn:hover{ transform:translateY(-2px); }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="icon"><i class="fas fa-times"></i></div>
+    <h1>Pago No Procesado</h1>
+    <p class="subtitle">No pudimos procesar tu pago. <strong>Tu turno sigue reservado</strong> y podés intentarlo nuevamente.</p>
+    <div class="alert">
+        <i class="fas fa-info-circle"></i>&nbsp;
+        El turno está pendiente de pago. Tenés tiempo para volver a intentarlo o elegir otro método de pago.
+    </div>
+    <div class="buttons">
+        <a href="javascript:history.back()" class="btn btn-primary">
+            <i class="fas fa-redo"></i> Reintentar pago
+        </a>
+        <a href="/turnera.html" class="btn btn-secondary">
+            <i class="fas fa-calendar"></i> Nueva reserva
+        </a>
+    </div>
+</div>
+<script>
+    // Obtener appointment_id para poder redirigir a pago.html directamente
+    const params = new URLSearchParams(window.location.search);
+    const aptId  = params.get('external_reference');
+    console.log('❌ Pago fallido — appointment_id:', aptId);
+
+    if (aptId) {
+        // Reemplazar "Reintentar pago" con link directo a pago.html
+        document.querySelector('.btn-primary').href = '/pago.html?appointment_id=' + aptId;
+    }
+</script>
+</body>
+</html>

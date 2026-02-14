@@ -260,3 +260,307 @@ def delete_availability(
     db.commit()
     
     return None
+
+# CÓDIGO ADICIONAL PARA app/routes/availability.py
+# Agrega estos endpoints AL FINAL de tu archivo existente (después de delete_availability)
+
+# ========== ENDPOINTS ADICIONALES PARA ADMIN DASHBOARD ==========
+
+@router.get("/regular", response_model=List[AvailabilityResponse])
+def get_regular_schedules(
+    db: Session = Depends(get_db),
+    current_admin = Depends(get_current_admin)
+):
+    """
+    Obtener solo horarios regulares (por día de la semana).
+    
+    Endpoint específico para el dashboard de admin.
+    Retorna solo las configuraciones de Lunes-Domingo.
+    
+    Requiere permisos de administrador.
+    """
+    schedules = (
+        db.query(Availability)
+        .filter(Availability.day_of_week.isnot(None))
+        .order_by(Availability.day_of_week)
+        .all()
+    )
+    
+    return schedules
+
+
+@router.post("/regular", response_model=AvailabilityResponse, status_code=status.HTTP_201_CREATED)
+def create_regular_schedule(
+    availability_data: AvailabilityCreate,
+    db: Session = Depends(get_db),
+    current_admin = Depends(get_current_admin)
+):
+    """
+    Crear un horario regular específicamente.
+    
+    Valida que tenga day_of_week y no specific_date.
+    
+    Requiere permisos de administrador.
+    """
+    # Validar que sea un horario regular
+    if availability_data.day_of_week is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Para crear un horario regular debe especificar day_of_week"
+        )
+    
+    if availability_data.specific_date is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Un horario regular no debe tener specific_date. Use /exceptions para fechas específicas."
+        )
+    
+    # Verificar si ya existe
+    existing = db.query(Availability).filter(
+        Availability.day_of_week == availability_data.day_of_week
+    ).first()
+    
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Ya existe un horario para el día {availability_data.day_of_week}"
+        )
+    
+    # Crear
+    db_availability = Availability(**availability_data.model_dump())
+    db.add(db_availability)
+    db.commit()
+    db.refresh(db_availability)
+    
+    return db_availability
+
+
+@router.put("/regular/{schedule_id}", response_model=AvailabilityResponse)
+def update_regular_schedule(
+    schedule_id: int,
+    availability_data: AvailabilityUpdate,
+    db: Session = Depends(get_db),
+    current_admin = Depends(get_current_admin)
+):
+    """
+    Actualizar un horario regular específicamente.
+    
+    Requiere permisos de administrador.
+    """
+    schedule = db.query(Availability).filter(
+        Availability.id == schedule_id,
+        Availability.day_of_week.isnot(None)
+    ).first()
+    
+    if not schedule:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Horario regular no encontrado"
+        )
+    
+    # Actualizar campos
+    update_data = availability_data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(schedule, field, value)
+    
+    db.commit()
+    db.refresh(schedule)
+    
+    return schedule
+
+
+@router.delete("/regular/{schedule_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_regular_schedule(
+    schedule_id: int,
+    db: Session = Depends(get_db),
+    current_admin = Depends(get_current_admin)
+):
+    """
+    Eliminar un horario regular específicamente.
+    
+    Requiere permisos de administrador.
+    """
+    schedule = db.query(Availability).filter(
+        Availability.id == schedule_id,
+        Availability.day_of_week.isnot(None)
+    ).first()
+    
+    if not schedule:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Horario regular no encontrado"
+        )
+    
+    db.delete(schedule)
+    db.commit()
+    
+    return None
+
+
+@router.get("/exceptions", response_model=List[AvailabilityResponse])
+def get_exceptions(
+    future_only: bool = True,
+    db: Session = Depends(get_db),
+    current_admin = Depends(get_current_admin)
+):
+    """
+    Obtener solo excepciones (fechas específicas).
+    
+    Query params:
+    - **future_only**: Si True, solo retorna excepciones futuras (default: True)
+    
+    Requiere permisos de administrador.
+    """
+    query = db.query(Availability).filter(
+        Availability.specific_date.isnot(None)
+    )
+    
+    if future_only:
+        today = date.today()
+        query = query.filter(Availability.specific_date >= today)
+    
+    exceptions = query.order_by(Availability.specific_date).all()
+    
+    return exceptions
+
+
+@router.post("/exceptions", response_model=AvailabilityResponse, status_code=status.HTTP_201_CREATED)
+def create_exception(
+    availability_data: AvailabilityCreate,
+    db: Session = Depends(get_db),
+    current_admin = Depends(get_current_admin)
+):
+    """
+    Crear una excepción específicamente.
+    
+    Valida que tenga specific_date y no day_of_week.
+    
+    Requiere permisos de administrador.
+    """
+    # Validar que sea una excepción
+    if availability_data.specific_date is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Para crear una excepción debe especificar specific_date"
+        )
+    
+    if availability_data.day_of_week is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Una excepción no debe tener day_of_week. Use /regular para horarios regulares."
+        )
+    
+    # Verificar si ya existe
+    existing = db.query(Availability).filter(
+        Availability.specific_date == availability_data.specific_date
+    ).first()
+    
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Ya existe una excepción para la fecha {availability_data.specific_date}"
+        )
+    
+    # Crear
+    db_availability = Availability(**availability_data.model_dump())
+    db.add(db_availability)
+    db.commit()
+    db.refresh(db_availability)
+    
+    return db_availability
+
+
+@router.delete("/exceptions/{exception_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_exception(
+    exception_id: int,
+    db: Session = Depends(get_db),
+    current_admin = Depends(get_current_admin)
+):
+    """
+    Eliminar una excepción específicamente.
+    
+    Requiere permisos de administrador.
+    """
+    exception = db.query(Availability).filter(
+        Availability.id == exception_id,
+        Availability.specific_date.isnot(None)
+    ).first()
+    
+    if not exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Excepción no encontrada"
+        )
+    
+    db.delete(exception)
+    db.commit()
+    
+    return None
+
+
+@router.get("/check/{date_str}")
+def check_availability_for_date(
+    date_str: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Verificar disponibilidad para una fecha específica.
+    
+    Endpoint público (no requiere autenticación).
+    
+    Retorna:
+    - Si hay excepciones para esa fecha, las retorna
+    - Si no, retorna el horario regular del día de la semana
+    - Indica si el día está disponible o bloqueado
+    
+    Path params:
+    - **date_str**: Fecha en formato YYYY-MM-DD
+    """
+    try:
+        target_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Formato de fecha inválido. Use YYYY-MM-DD"
+        )
+    
+    # Primero buscar excepciones
+    exception = db.query(Availability).filter(
+        Availability.specific_date == target_date
+    ).first()
+    
+    if exception:
+        return {
+            "date": target_date,
+            "day_of_week": target_date.weekday(),
+            "is_available": exception.is_available,
+            "start_time": str(exception.start_time) if exception.start_time else None,
+            "end_time": str(exception.end_time) if exception.end_time else None,
+            "is_exception": True
+        }
+    
+    # No hay excepción, buscar horario regular
+    day_of_week = target_date.weekday()
+    regular = db.query(Availability).filter(
+        Availability.day_of_week == day_of_week
+    ).first()
+    
+    if regular:
+        return {
+            "date": target_date,
+            "day_of_week": day_of_week,
+            "is_available": regular.is_available,
+            "start_time": str(regular.start_time) if regular.start_time else None,
+            "end_time": str(regular.end_time) if regular.end_time else None,
+            "is_exception": False
+        }
+    
+    # No hay configuración
+    return {
+        "date": target_date,
+        "day_of_week": day_of_week,
+        "is_available": False,
+        "start_time": None,
+        "end_time": None,
+        "is_exception": False
+    }

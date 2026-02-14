@@ -638,56 +638,232 @@
         
         <!-- Availability Section -->
         <section id="availability" class="section">
+            <!-- Horarios Regulares -->
             <div class="card">
                 <div class="card-header">
-                    <h2>Configurar Horarios</h2>
-                    <button class="btn btn-primary" onclick="openAvailabilityModal()">
+                    <h2>📅 Horarios Regulares por Día</h2>
+                    <button class="btn btn-primary" onclick="openRegularScheduleModal()">
                         <i class="fas fa-plus"></i> Agregar Horario
                     </button>
                 </div>
-                <div id="availability-container">
-                    <p>Próximamente...</p>
+                <div id="regular-schedule-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Día</th>
+                                <th>Horario</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="regular-schedule-body">
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 30px;">
+                                    <div class="loading">
+                                        <div class="spinner"></div>
+                                        <p>Cargando horarios...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Excepciones / Fechas Bloqueadas -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>🚫 Excepciones y Bloqueos</h2>
+                    <button class="btn btn-primary" onclick="openExceptionModal()">
+                        <i class="fas fa-plus"></i> Agregar Excepción
+                    </button>
+                </div>
+                <div id="exceptions-container">
+                    <p style="color: var(--texto-medio); padding: 20px;">Bloquea fechas específicas (feriados, vacaciones, etc.)</p>
+                    <div id="exceptions-list">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
                 </div>
             </div>
         </section>
+
+        <!-- Modal Horario Regular -->
+        <div id="regularScheduleModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Configurar Horario Regular</h2>
+                    <button class="btn-close" onclick="closeRegularScheduleModal()">&times;</button>
+                </div>
+                <form id="regularScheduleForm" onsubmit="saveRegularSchedule(event)">
+                    <div class="form-group">
+                        <label>Día de la Semana *</label>
+                        <select id="schedule-day" required>
+                            <option value="1">Lunes</option>
+                            <option value="2">Martes</option>
+                            <option value="3">Miércoles</option>
+                            <option value="4">Jueves</option>
+                            <option value="5">Viernes</option>
+                            <option value="6">Sábado</option>
+                            <option value="0">Domingo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Hora de Inicio *</label>
+                            <input type="time" id="schedule-start" required value="09:00">
+                        </div>
+                        <div class="form-group">
+                            <label>Hora de Fin *</label>
+                            <input type="time" id="schedule-end" required value="20:00">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="schedule-available" checked>
+                            Disponible para reservas
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-save"></i> Guardar Horario
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal Excepción -->
+        <div id="exceptionModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Agregar Excepción</h2>
+                    <button class="btn-close" onclick="closeExceptionModal()">&times;</button>
+                </div>
+                <form id="exceptionForm" onsubmit="saveException(event)">
+                    <div class="form-group">
+                        <label>Tipo de Excepción *</label>
+                        <select id="exception-type" required onchange="updateExceptionFields()">
+                            <option value="closed">Día Cerrado (Feriado/Vacaciones)</option>
+                            <option value="custom">Horario Especial</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Fecha *</label>
+                        <input type="date" id="exception-date" required>
+                    </div>
+                    
+                    <div id="exception-times" style="display: none;">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Hora de Inicio</label>
+                                <input type="time" id="exception-start">
+                            </div>
+                            <div class="form-group">
+                                <label>Hora de Fin</label>
+                                <input type="time" id="exception-end">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Descripción (opcional)</label>
+                        <input type="text" id="exception-description" placeholder="Ej: Navidad, Vacaciones, etc.">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-save"></i> Guardar Excepción
+                    </button>
+                </form>
+            </div>
+        </div>
         
         <!-- Reports Section -->
         <section id="reports" class="section">
+            <!-- Gráficos -->
             <div class="card">
                 <div class="card-header">
-                    <h2>Reportes Mensuales</h2>
+                    <h2>📊 Gráficos del Mes Actual</h2>
                 </div>
-                <div class="form-grid">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                    <div>
+                        <h3 style="text-align: center; color: var(--violeta); margin-bottom: 15px;">Ingresos Mensuales</h3>
+                        <canvas id="revenueChart" height="250"></canvas>
+                    </div>
+                    <div>
+                        <h3 style="text-align: center; color: var(--violeta); margin-bottom: 15px;">Servicios Más Vendidos</h3>
+                        <canvas id="servicesChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reportes -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>📈 Reportes</h2>
+                </div>
+                
+                <!-- Tabs -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--gris-medio); padding-bottom: 10px;">
+                    <button class="btn btn-sm" onclick="showReportTab('monthly')" id="tab-monthly" style="background: var(--rosa-medio); color: white;">
+                        Mensual
+                    </button>
+                    <button class="btn btn-sm" onclick="showReportTab('yearly')" id="tab-yearly" style="background: var(--gris-medio);">
+                        Anual
+                    </button>
+                </div>
+                
+                <!-- Reporte Mensual -->
+                <div id="report-monthly" class="report-tab">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Año</label>
+                            <select id="report-year">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026" selected>2026</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Mes</label>
+                            <select id="report-month">
+                                <option value="1">Enero</option>
+                                <option value="2" selected>Febrero</option>
+                                <option value="3">Marzo</option>
+                                <option value="4">Abril</option>
+                                <option value="5">Mayo</option>
+                                <option value="6">Junio</option>
+                                <option value="7">Julio</option>
+                                <option value="8">Agosto</option>
+                                <option value="9">Septiembre</option>
+                                <option value="10">Octubre</option>
+                                <option value="11">Noviembre</option>
+                                <option value="12">Diciembre</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateMonthlyReport()">
+                        <i class="fas fa-download"></i> Generar Reporte Mensual
+                    </button>
+                    <div id="report-monthly-container" style="margin-top: 30px;"></div>
+                </div>
+                
+                <!-- Reporte Anual -->
+                <div id="report-yearly" class="report-tab" style="display: none;">
                     <div class="form-group">
                         <label>Año</label>
-                        <select id="report-year">
+                        <select id="report-year-yearly">
                             <option value="2024">2024</option>
                             <option value="2025">2025</option>
                             <option value="2026" selected>2026</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Mes</label>
-                        <select id="report-month">
-                            <option value="1">Enero</option>
-                            <option value="2" selected>Febrero</option>
-                            <option value="3">Marzo</option>
-                            <option value="4">Abril</option>
-                            <option value="5">Mayo</option>
-                            <option value="6">Junio</option>
-                            <option value="7">Julio</option>
-                            <option value="8">Agosto</option>
-                            <option value="9">Septiembre</option>
-                            <option value="10">Octubre</option>
-                            <option value="11">Noviembre</option>
-                            <option value="12">Diciembre</option>
-                        </select>
-                    </div>
+                    <button class="btn btn-primary" onclick="generateYearlyReport()">
+                        <i class="fas fa-download"></i> Generar Reporte Anual
+                    </button>
+                    <div id="report-yearly-container" style="margin-top: 30px;"></div>
                 </div>
-                <button class="btn btn-primary" onclick="generateReport()">
-                    <i class="fas fa-download"></i> Generar Reporte
-                </button>
-                <div id="report-container" style="margin-top: 30px;"></div>
             </div>
         </section>
     </div>
@@ -741,6 +917,57 @@
             </form>
         </div>
     </div>
+
+    <!-- Modal Reprogramar -->
+    <div id="rescheduleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Reprogramar Turno</h2>
+                <button class="btn-close" onclick="closeRescheduleModal()">&times;</button>
+            </div>
+            <form id="rescheduleForm" onsubmit="saveReschedule(event)">
+                <div id="reschedule-info" style="background: var(--lila-claro); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <!-- Info del turno actual -->
+                </div>
+                
+                <div class="form-group">
+                    <label>Nueva Fecha *</label>
+                    <input type="date" id="reschedule-date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Nueva Hora *</label>
+                    <select id="reschedule-time" required>
+                        <option value="">Selecciona una hora</option>
+                        <option value="09:00">09:00</option>
+                        <option value="09:30">09:30</option>
+                        <option value="10:00">10:00</option>
+                        <option value="10:30">10:30</option>
+                        <option value="11:00">11:00</option>
+                        <option value="11:30">11:30</option>
+                        <option value="12:00">12:00</option>
+                        <option value="13:00">13:00</option>
+                        <option value="14:00">14:00</option>
+                        <option value="14:30">14:30</option>
+                        <option value="15:00">15:00</option>
+                        <option value="15:30">15:30</option>
+                        <option value="16:00">16:00</option>
+                        <option value="16:30">16:30</option>
+                        <option value="17:00">17:00</option>
+                        <option value="17:30">17:30</option>
+                        <option value="18:00">18:00</option>
+                        <option value="18:30">18:30</option>
+                        <option value="19:00">19:00</option>
+                        <option value="19:30">19:30</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+            </form>
+        </div>
+    </div>
     
     <script src="api.js"></script>
     <script>
@@ -752,6 +979,8 @@
         // Variables globales
         let dashboardData = null;
         let currentServiceId = null;
+        let currentScheduleId = null;
+        let currentRescheduleId = null;
         
         // Inicializar
         document.addEventListener('DOMContentLoaded', () => {
@@ -796,6 +1025,10 @@
                         case 'clients':
                             loadClients();
                             break;
+                        case 'availability':
+                            loadRegularSchedule();
+                            loadExceptions();
+                            break;
                     }
                 });
             });
@@ -822,6 +1055,7 @@
             } catch (error) {
                 console.error('Error:', error);
             }
+            await initCharts();
         }
         
         // Turnos de hoy
@@ -941,6 +1175,11 @@
                                                 Confirmar (Efectivo)
                                             </button>
                                         ` : ''}
+                                        ${apt.status !== 'cancelled' && apt.status !== 'completed' ? `
+                                            <button class="btn btn-warning btn-sm" onclick="rescheduleAppointment(${apt.id})">
+                                                <i class="fas fa-calendar-alt"></i> Reprogramar
+                                            </button>
+                                        ` : ''}
                                         <button class="btn btn-danger btn-sm" onclick="cancelAppointment(${apt.id})">
                                             Cancelar
                                         </button>
@@ -984,11 +1223,14 @@
                                     <td>${formatPrice(s.price)}</td>
                                     <td>${s.is_active ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>'}</td>
                                     <td>
-                                        <button class="btn btn-warning btn-sm" onclick="editService(${s.id})">
+                                        <button class="btn btn-warning btn-sm" onclick="editService(${s.id})" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="btn btn-danger btn-sm" onclick="toggleServiceActive(${s.id}, ${!s.is_active})">
+                                        <button class="btn btn-danger btn-sm" onclick="toggleServiceActive(${s.id}, ${!s.is_active})" title="${s.is_active ? 'Desactivar' : 'Activar'}">
                                             <i class="fas fa-${s.is_active ? 'eye-slash' : 'eye'}"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="deleteService(${s.id})" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -1299,6 +1541,563 @@
         }
         
         console.log('✅ Admin Dashboard cargado');
+
+        async function deleteService(id) {
+            if (!confirm('⚠️ ¿ESTÁS SEGURA?\n\nEliminar el servicio borrará:\n- El servicio\n- Todos los turnos asociados\n- Todos los pagos relacionados\n\nEsta acción NO se puede deshacer.\n\n¿Continuar?')) {
+                return;
+            }
+            
+            const confirmText = prompt('Escribe "ELIMINAR" para confirmar:');
+            if (confirmText !== 'ELIMINAR') {
+                alert('Cancelado');
+                return;
+            }
+            
+            try {
+                await apiRequest(`/services/${id}`, 'DELETE');
+                alert('✅ Servicio eliminado');
+                loadServices();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al eliminar: ' + (error.message || 'Intenta de nuevo'));
+            }
+        }
+
+
+
+
+        // Abrir modal de reprogramar
+        async function rescheduleAppointment(id) {
+            try {
+                const apt = await apiRequest(`/appointments/${id}`);
+                currentRescheduleId = id;
+                
+                // Mostrar info actual
+                document.getElementById('reschedule-info').innerHTML = `
+                    <p><strong>Turno actual:</strong></p>
+                    <p>📅 ${formatDate(apt.appointment_date)} a las ${formatTime(apt.appointment_date)}</p>
+                    <p>👤 ${apt.user.full_name}</p>
+                    <p>💅 ${apt.service.name}</p>
+                `;
+                
+                // Establecer fecha mínima (hoy)
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('reschedule-date').min = today;
+                
+                document.getElementById('rescheduleModal').classList.add('active');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar el turno');
+            }
+        }
+
+        function closeRescheduleModal() {
+            document.getElementById('rescheduleModal').classList.remove('active');
+            document.getElementById('rescheduleForm').reset();
+        }
+
+        async function saveReschedule(event) {
+            event.preventDefault();
+            
+            const date = document.getElementById('reschedule-date').value;
+            const time = document.getElementById('reschedule-time').value;
+            const newDateTime = `${date}T${time}:00`;
+            
+            try {
+                await apiRequest(`/appointments/${currentRescheduleId}`, 'PUT', {
+                    appointment_date: newDateTime
+                });
+                
+                alert('✅ Turno reprogramado exitosamente');
+                closeRescheduleModal();
+                loadUpcomingAppointments();
+                loadTodayAppointments();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al reprogramar: ' + (error.message || 'Verifica que el horario esté disponible'));
+            }
+        }
+
+        // Tabs de reportes
+        function showReportTab(tab) {
+            // Ocultar todos
+            document.querySelectorAll('.report-tab').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('[id^="tab-"]').forEach(t => {
+                t.style.background = 'var(--gris-medio)';
+                t.style.color = 'var(--texto-oscuro)';
+            });
+            
+            // Mostrar seleccionado
+            document.getElementById(`report-${tab}`).style.display = 'block';
+            document.getElementById(`tab-${tab}`).style.background = 'var(--rosa-medio)';
+            document.getElementById(`tab-${tab}`).style.color = 'white';
+        }
+
+        // Reporte mensual (función ya existe, renombrar)
+        async function generateMonthlyReport() {
+            const year = parseInt(document.getElementById('report-year').value);
+            const month = parseInt(document.getElementById('report-month').value);
+            
+            try {
+                const report = await apiRequest(`/admin/reports/monthly?year=${year}&month=${month}`);
+                const container = document.getElementById('report-monthly-container');
+                
+                container.innerHTML = `
+                    <div class="stats-grid">
+                        <div class="stat-card blue">
+                            <div class="stat-value">${report.appointments.total}</div>
+                            <div class="stat-label">Total Turnos</div>
+                        </div>
+                        <div class="stat-card green">
+                            <div class="stat-value">${formatPrice(report.revenue.total)}</div>
+                            <div class="stat-label">Ingresos</div>
+                        </div>
+                        <div class="stat-card orange">
+                            <div class="stat-value">${report.new_clients}</div>
+                            <div class="stat-label">Nuevos Clientes</div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-top: 30px;">Servicios Vendidos</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Servicio</th>
+                                <th>Cantidad</th>
+                                <th>Ingresos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${report.services.map(s => `
+                                <tr>
+                                    <td>${s.name}</td>
+                                    <td>${s.appointments_count}</td>
+                                    <td>${formatPrice(s.revenue)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al generar el reporte');
+            }
+        }
+
+        // Reporte anual
+        async function generateYearlyReport() {
+            const year = parseInt(document.getElementById('report-year-yearly').value);
+            
+            try {
+                // Obtener reportes de todos los meses
+                const months = [1,2,3,4,5,6,7,8,9,10,11,12];
+                const promises = months.map(m => apiRequest(`/admin/reports/monthly?year=${year}&month=${m}`));
+                const reports = await Promise.all(promises);
+                
+                // Calcular totales
+                const totalAppointments = reports.reduce((sum, r) => sum + r.appointments.total, 0);
+                const totalRevenue = reports.reduce((sum, r) => sum + r.revenue.total, 0);
+                const totalClients = reports.reduce((sum, r) => sum + r.new_clients, 0);
+                
+                // Agrupar servicios
+                const servicesMap = {};
+                reports.forEach(r => {
+                    r.services.forEach(s => {
+                        if (!servicesMap[s.name]) {
+                            servicesMap[s.name] = { count: 0, revenue: 0 };
+                        }
+                        servicesMap[s.name].count += s.appointments_count;
+                        servicesMap[s.name].revenue += s.revenue;
+                    });
+                });
+                
+                const servicesArray = Object.entries(servicesMap).map(([name, data]) => ({
+                    name,
+                    ...data
+                })).sort((a, b) => b.count - a.count);
+                
+                const container = document.getElementById('report-yearly-container');
+                
+                container.innerHTML = `
+                    <h2 style="text-align: center; color: var(--violeta); margin-bottom: 30px;">Resumen Anual ${year}</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card blue">
+                            <div class="stat-value">${totalAppointments}</div>
+                            <div class="stat-label">Total Turnos del Año</div>
+                        </div>
+                        <div class="stat-card green">
+                            <div class="stat-value">${formatPrice(totalRevenue)}</div>
+                            <div class="stat-label">Ingresos del Año</div>
+                        </div>
+                        <div class="stat-card orange">
+                            <div class="stat-value">${totalClients}</div>
+                            <div class="stat-label">Nuevos Clientes</div>
+                        </div>
+                        <div class="stat-card blue">
+                            <div class="stat-value">${formatPrice(totalRevenue / 12)}</div>
+                            <div class="stat-label">Promedio Mensual</div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-top: 30px;">Ingresos por Mes</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mes</th>
+                                <th>Turnos</th>
+                                <th>Ingresos</th>
+                                <th>Nuevos Clientes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${reports.map((r, i) => `
+                                <tr>
+                                    <td>${['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][i]}</td>
+                                    <td>${r.appointments.total}</td>
+                                    <td><strong>${formatPrice(r.revenue.total)}</strong></td>
+                                    <td>${r.new_clients}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <h3 style="margin-top: 30px;">Servicios Más Vendidos del Año</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Servicio</th>
+                                <th>Cantidad</th>
+                                <th>Ingresos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${servicesArray.slice(0, 10).map(s => `
+                                <tr>
+                                    <td>${s.name}</td>
+                                    <td>${s.count}</td>
+                                    <td><strong>${formatPrice(s.revenue)}</strong></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al generar el reporte anual');
+            }
+        }
+
+        // Inicializar gráficos al cargar dashboard
+        async function initCharts() {
+            try {
+                const year = new Date().getFullYear();
+                const month = new Date().getMonth() + 1;
+                const report = await apiRequest(`/admin/reports/monthly?year=${year}&month=${month}`);
+                
+                // Gráfico de Ingresos (por método de pago)
+                const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+                new Chart(revenueCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: report.revenue.by_payment_method.map(p => p.method),
+                        datasets: [{
+                            data: report.revenue.by_payment_method.map(p => p.amount),
+                            backgroundColor: ['#e75480', '#9c89b8', '#28a745', '#fd7e14']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+                
+                // Gráfico de Servicios
+                const servicesCtx = document.getElementById('servicesChart').getContext('2d');
+                new Chart(servicesCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: report.services.slice(0, 5).map(s => s.name),
+                        datasets: [{
+                            label: 'Cantidad de Turnos',
+                            data: report.services.slice(0, 5).map(s => s.appointments_count),
+                            backgroundColor: '#9c89b8'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== DISPONIBILIDAD =====
+
+        // Cargar horarios regulares
+        async function loadRegularSchedule() {
+            try {
+                const schedules = await apiRequest('/availability/regular');
+                const tbody = document.getElementById('regular-schedule-body');
+                
+                const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+                
+                if (schedules.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#636e72;">No hay horarios configurados</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = schedules.map(s => `
+                    <tr>
+                        <td><strong>${dayNames[s.day_of_week]}</strong></td>
+                        <td>${s.start_time} - ${s.end_time}</td>
+                        <td>${s.is_available ? '<span class="badge badge-success">Disponible</span>' : '<span class="badge badge-danger">Cerrado</span>'}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editRegularSchedule(${s.id})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('regular-schedule-body').innerHTML = `
+                    <tr><td colspan="4" style="text-align:center; padding:20px;">
+                        <p style="color: var(--texto-medio);">⚠️ Error al cargar horarios</p>
+                    </td></tr>
+                `;
+            }
+        }
+
+
+
+        // Editar horario regular
+        async function editRegularSchedule(id) {
+            try {
+                console.log('📝 Editando horario ID:', id);
+                
+                // Cargar datos del horario
+                const schedules = await apiRequest('/availability/regular');
+                const schedule = schedules.find(s => s.id === id);
+                
+                if (!schedule) {
+                    alert('❌ Horario no encontrado');
+                    return;
+                }
+                
+                console.log('✅ Horario encontrado:', schedule);
+                
+                // Guardar ID para el guardado
+                currentScheduleId = id;
+                
+                // Llenar formulario con datos actuales
+                document.getElementById('schedule-day').value = schedule.day_of_week;
+                document.getElementById('schedule-start').value = schedule.start_time;
+                document.getElementById('schedule-end').value = schedule.end_time;
+                document.getElementById('schedule-available').checked = schedule.is_available;
+                
+                // Deshabilitar selector de día (no se puede cambiar al editar)
+                document.getElementById('schedule-day').disabled = true;
+                
+                // Abrir modal
+                document.getElementById('regularScheduleModal').classList.add('active');
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('Error al cargar el horario: ' + error.message);
+            }
+        }
+
+        function openRegularScheduleModal() {
+            currentScheduleId = null;
+            document.getElementById('regularScheduleForm').reset();
+            
+            // Habilitar selector de día (solo para crear nuevo)
+            document.getElementById('schedule-day').disabled = false;
+            
+            document.getElementById('regularScheduleModal').classList.add('active');
+        }
+
+        function closeRegularScheduleModal() {
+            document.getElementById('regularScheduleModal').classList.remove('active');
+            document.getElementById('regularScheduleForm').reset();
+            
+            // Habilitar selector por si quedó deshabilitado
+            document.getElementById('schedule-day').disabled = false;
+            
+            // Limpiar ID
+            currentScheduleId = null;
+        }
+
+        async function saveRegularSchedule(event) {
+            event.preventDefault();
+            
+            const dayOfWeek = parseInt(document.getElementById('schedule-day').value);
+            const startTime = document.getElementById('schedule-start').value;
+            const endTime = document.getElementById('schedule-end').value;
+            const isAvailable = document.getElementById('schedule-available').checked;
+            
+            try {
+                if (currentScheduleId) {
+                    // ===== ACTUALIZAR =====
+                    console.log('📝 Actualizando horario ID:', currentScheduleId);
+                    
+                    const updateData = {
+                        start_time: startTime,
+                        end_time: endTime,
+                        is_available: isAvailable
+                    };
+                    
+                    await apiRequest(`/availability/regular/${currentScheduleId}`, 'PUT', updateData);
+                    alert('✅ Horario actualizado exitosamente');
+                    
+                } else {
+                    // ===== CREAR NUEVO =====
+                    console.log('➕ Creando nuevo horario');
+                    
+                    const createData = {
+                        day_of_week: dayOfWeek,
+                        start_time: startTime,
+                        end_time: endTime,
+                        is_available: isAvailable
+                    };
+                    
+                    await apiRequest('/availability/regular', 'POST', createData);
+                    alert('✅ Horario creado exitosamente');
+                }
+                
+                // Cerrar modal
+                closeRegularScheduleModal();
+                
+                // Habilitar de nuevo el selector
+                document.getElementById('schedule-day').disabled = false;
+                
+                // Recargar lista
+                loadRegularSchedule();
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('❌ Error: ' + (error.message || 'Intenta de nuevo'));
+            }
+        }
+
+        async function deleteRegularSchedule(id) {
+            if (!confirm('¿Eliminar este horario?')) return;
+            
+            try {
+                await apiRequest(`/availability/regular/${id}`, 'DELETE');
+                alert('✅ Horario eliminado');
+                loadRegularSchedule();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar');
+            }
+        }
+
+        // Excepciones
+        async function loadExceptions() {
+            try {
+                const exceptions = await apiRequest('/availability/exceptions');
+                const container = document.getElementById('exceptions-list');
+                
+                if (exceptions.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; color:#636e72; padding:20px;">No hay excepciones configuradas</p>';
+                    return;
+                }
+                
+                container.innerHTML = exceptions.map(e => `
+                    <div style="background: ${e.is_available ? 'var(--lila-claro)' : '#ffe6e6'}; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${formatDate(e.specific_date)}</strong>
+                            ${e.is_available ? `<br>⏰ ${e.start_time} - ${e.end_time}` : '<br>🚫 Cerrado'}
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="deleteException(${e.id})">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('exceptions-list').innerHTML = `
+                    <p style="text-align:center; color:#636e72; padding:20px;">⚠️ Error al cargar excepciones</p>
+                `;
+            }
+        }
+
+        function openExceptionModal() {
+            document.getElementById('exceptionForm').reset();
+            document.getElementById('exception-times').style.display = 'none';
+            document.getElementById('exceptionModal').classList.add('active');
+            
+            // Establecer fecha mínima (hoy)
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('exception-date').min = today;
+        }
+
+        function closeExceptionModal() {
+            document.getElementById('exceptionModal').classList.remove('active');
+        }
+
+        function updateExceptionFields() {
+            const type = document.getElementById('exception-type').value;
+            const timesDiv = document.getElementById('exception-times');
+            
+            if (type === 'custom') {
+                timesDiv.style.display = 'block';
+                document.getElementById('exception-start').required = true;
+                document.getElementById('exception-end').required = true;
+            } else {
+                timesDiv.style.display = 'none';
+                document.getElementById('exception-start').required = false;
+                document.getElementById('exception-end').required = false;
+            }
+        }
+
+        async function saveException(event) {
+            event.preventDefault();
+            
+            const type = document.getElementById('exception-type').value;
+            const date = document.getElementById('exception-date').value;
+            
+            const data = {
+                specific_date: date,
+                is_available: type === 'custom',
+                start_time: type === 'custom' ? document.getElementById('exception-start').value : null,
+                end_time: type === 'custom' ? document.getElementById('exception-end').value : null,
+                description: document.getElementById('exception-description').value
+            };
+            
+            try {
+                await apiRequest('/availability/exceptions', 'POST', data);
+                alert('✅ Excepción creada');
+                closeExceptionModal();
+                loadExceptions();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error: ' + (error.message || 'Intenta de nuevo'));
+            }
+        }
+
+        async function deleteException(id) {
+            if (!confirm('¿Eliminar esta excepción?')) return;
+            
+            try {
+                await apiRequest(`/availability/exceptions/${id}`, 'DELETE');
+                alert('✅ Excepción eliminada');
+                loadExceptions();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar');
+            }
+        }
+
+
     </script>
 </body>
 </html>

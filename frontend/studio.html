@@ -1646,6 +1646,37 @@
             container.appendChild(userName);
             container.appendChild(logoutBtn);
             document.body.appendChild(container);
+
+            // Botón admin — solo si is_admin, aparece debajo del container original
+            if (userData?.is_admin === true) {
+                const adminBtn = document.createElement('a');
+                adminBtn.href = '/admin-dashboard.html';
+                adminBtn.innerHTML = '⚙️ Panel Admin';
+                adminBtn.style.cssText = `
+                    position: fixed;
+                    top: 70px;
+                    right: 115px;
+                    padding: 10px 22px;
+                    background: linear-gradient(135deg, #6a4c93, #9c89b8);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 25px;
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                    box-shadow: 0 5px 15px rgba(106,76,147,0.3);
+                    z-index: 1000;
+                    transition: all 0.3s;
+                `;
+                adminBtn.onmouseenter = () => {
+                    adminBtn.style.transform = 'translateY(-2px)';
+                    adminBtn.style.boxShadow = '0 8px 20px rgba(106,76,147,0.5)';
+                };
+                adminBtn.onmouseleave = () => {
+                    adminBtn.style.transform = 'translateY(0)';
+                    adminBtn.style.boxShadow = '0 5px 15px rgba(106,76,147,0.3)';
+                };
+                document.body.appendChild(adminBtn);
+            }
             
         } else {
             // Botón flotante de login

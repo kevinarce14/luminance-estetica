@@ -11,7 +11,7 @@ from typing import List
 from app.core.database import get_db
 from app.routes.deps import get_current_user, get_current_admin
 from app.models.user import User
-from app.models.payment import Payment, PaymentStatus
+from app.models.payment import Payment, PaymentMethod, PaymentStatus
 from app.models.appointment import Appointment, AppointmentStatus
 from app.schemas.payment import (
     PaymentCreate,
@@ -22,6 +22,11 @@ from app.schemas.payment import (
 )
 from app.services.payment_service import payment_service
 from app.services.email_service import email_service
+
+from pydantic import BaseModel
+
+class CashPaymentRequest(BaseModel):
+    appointment_id: int
 
 router = APIRouter(prefix="/payments", tags=["Pagos"])
 
@@ -344,3 +349,64 @@ def update_payment_status(
     db.refresh(payment)
     
     return payment
+
+
+@router.post("/cash-payment", response_model=PaymentResponse, status_code=status.HTTP_201_CREATED)
+def create_cash_payment(
+    request: CashPaymentRequest,  # ← Cambio aquí
+    current_admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """
+    Crear y aprobar un pago en efectivo.
+    
+    Este endpoint es para que el admin confirme pagos en efectivo.
+    Crea el pago y lo marca como aprobado inmediatamente.
+    
+    Requiere permisos de administrador.
+    """
+    appointment_id = request.appointment_id  # ← Y aquí
+    
+    # Verificar que el turno existe
+    appointment = db.query(Appointment).filter(
+        Appointment.id == appointment_id
+    ).first()
+    
+    if not appointment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Turno no encontrado"
+        )
+    
+    # Verificar que no tenga un pago ya
+    existing_payment = db.query(Payment).filter(
+        Payment.appointment_id == appointment_id,
+        Payment.status.in_([PaymentStatus.PENDING, PaymentStatus.APPROVED])
+    ).first()
+    
+    if existing_payment:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Este turno ya tiene un pago asociado"
+        )
+    
+    # Crear pago en efectivo
+    db_payment = Payment(
+        appointment_id=appointment_id,
+        user_id=appointment.user_id,
+        amount=appointment.service.price,
+        currency="ARS",
+        payment_method=PaymentMethod.CASH,
+        status=PaymentStatus.APPROVED,
+        approved_at=datetime.now()
+    )
+    
+    db.add(db_payment)
+    
+    # Confirmar el turno
+    appointment.status = AppointmentStatus.CONFIRMED
+    
+    db.commit()
+    db.refresh(db_payment)
+    
+    return db_payment

@@ -6,7 +6,7 @@ Endpoints para consultar y gestionar disponibilidad de horarios.
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from datetime import datetime, date, time, timedelta
+from datetime import datetime, date, time, timedelta, timezone as tz
 
 from app.core.database import get_db
 from app.core.config import settings
@@ -26,6 +26,7 @@ from app.schemas.availability import (
 router = APIRouter(prefix="/availability", tags=["Disponibilidad"])
 
 
+
 def get_available_slots_for_date(
     db: Session,
     service_id: int,
@@ -33,6 +34,8 @@ def get_available_slots_for_date(
 ) -> List[TimeSlot]:
     """
     Calcula los slots de tiempo disponibles para un servicio en una fecha específica.
+    
+    ✅ CORREGIDO: Ahora detecta correctamente solapamientos de horarios.
     
     Args:
         db: Sesión de base de datos
@@ -77,6 +80,32 @@ def get_available_slots_for_date(
         start_time = regular_availability.start_time
         end_time = regular_availability.end_time
     
+    # ✅ OBTENER TODOS LOS TURNOS DEL DÍA DE UNA VEZ
+    # Esto es más eficiente que hacer una query por cada slot
+    # IMPORTANTE: Crear el rango en timezone-aware (UTC) para que coincida con la DB
+    from zoneinfo import ZoneInfo
+    tz_argentina = ZoneInfo("America/Argentina/Buenos_Aires")
+    
+    # Crear día en hora local de Argentina
+    day_start_local = datetime.combine(target_date, time.min).replace(tzinfo=tz_argentina)
+    day_end_local = datetime.combine(target_date, time.max).replace(tzinfo=tz_argentina)
+    
+    # Convertir a UTC para la query (la DB guarda en UTC)
+    day_start = day_start_local.astimezone(tz.utc)
+    day_end = day_end_local.astimezone(tz.utc)
+    
+    existing_appointments = db.query(Appointment).filter(
+        ##Appointment.service_id == service_id,   ##DESCOMENTAR ESTO PARA PERMITIR QUE PUEDAN ELEGIR EL MISMO DIA/HORARIO CON LA CONDICION QUE SEA OTRO SERVICIO, SOLO SI ESCALA EL PERSONAL
+        Appointment.status.in_([AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED]),
+        Appointment.appointment_date >= day_start,
+        Appointment.appointment_date <= day_end
+    ).all()
+    # DEBUG: Agregar logging temporal
+    print(f"🔍 Buscando turnos para servicio {service_id} en fecha {target_date}")
+    print(f"📅 Rango: {day_start} a {day_end}")
+    print(f"📋 Turnos encontrados: {len(existing_appointments)}")
+    for apt in existing_appointments:
+        print(f"   - Turno #{apt.id}: {apt.appointment_date} (status: {apt.status})")
     # Generar slots cada MIN_APPOINTMENT_DURATION minutos
     slots = []
     current_time = datetime.combine(target_date, start_time)
@@ -85,23 +114,40 @@ def get_available_slots_for_date(
     while current_time + timedelta(minutes=service.duration_minutes) <= end_datetime:
         slot_end = current_time + timedelta(minutes=service.duration_minutes)
         
-        # Verificar si hay un turno en este horario
-        conflicting_appointment = db.query(Appointment).filter(
-            Appointment.service_id == service_id,
-            Appointment.status.in_([AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED]),
-            Appointment.appointment_date == current_time
-        ).first()
+        # ✅ VERIFICAR SOLAPAMIENTO CON TODOS LOS TURNOS EXISTENTES
+        is_available = True
         
+        for apt in existing_appointments:
+            # Convertir el turno de la DB (UTC) a hora local Argentina
+            apt_start = apt.appointment_date
+            if apt_start.tzinfo is None:
+                # Si por alguna razón está naive, asumimos que es UTC
+                apt_start = apt_start.replace(tzinfo=tz.utc)
+            
+            apt_start_local = apt_start.astimezone(tz_argentina).replace(tzinfo=None)
+            apt_end_local = apt_start_local + timedelta(minutes=service.duration_minutes)
+            
+            # Los slots ya están en hora local (naive)
+            slot_start_naive = current_time.replace(tzinfo=None) if current_time.tzinfo else current_time
+            slot_end_naive = slot_end.replace(tzinfo=None) if slot_end.tzinfo else slot_end
+            
+            # Hay solapamiento si los rangos se cruzan
+            # Lógica: start_A < end_B AND end_A > start_B
+            if apt_start_local < slot_end_naive and apt_end_local > slot_start_naive:
+                is_available = False
+                print(f"   ❌ Slot {slot_start_naive.strftime('%H:%M')} bloqueado por turno #{apt.id}")
+                break
         slots.append(TimeSlot(
             start_time=current_time,
             end_time=slot_end,
-            is_available=conflicting_appointment is None
+            is_available=is_available
         ))
         
         # Avanzar al siguiente slot
         current_time += timedelta(minutes=settings.MIN_APPOINTMENT_DURATION)
     
     return slots
+
 
 
 @router.post("/available-slots", response_model=AvailableSlotsResponse)

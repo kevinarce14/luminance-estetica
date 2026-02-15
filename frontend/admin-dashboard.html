@@ -980,7 +980,9 @@
         let dashboardData = null;
         let currentServiceId = null;
         let currentScheduleId = null;
+        // Variable global para turno a reprogramar
         let currentRescheduleId = null;
+        let currentRescheduleService = null;
         
         // Inicializar
         document.addEventListener('DOMContentLoaded', () => {
@@ -995,8 +997,20 @@
             
             loadDashboard();
             setupNavigation();
+                // Listener para cargar horarios disponibles al cambiar fecha
+            const dateInput = document.getElementById('reschedule-date');
+            if (dateInput) {
+                dateInput.addEventListener('change', async function() {
+                    const selectedDate = this.value;
+                    if (!selectedDate || !currentRescheduleService) return;
+                    
+                    await loadAvailableTimesForReschedule(selectedDate);
+                });
+            }
         });
-        
+        console.log('📅 Fecha seleccionada:', date);
+        console.log('✅ Slots disponibles:', availableSlots.length);
+        console.log('❌ Slots ocupados:', response.available_slots.length - availableSlots.length);
         // Navegación
         function setupNavigation() {
             document.querySelectorAll('.nav-link').forEach(link => {
@@ -1175,7 +1189,7 @@
                                                 Confirmar (Efectivo)
                                             </button>
                                         ` : ''}
-                                        ${apt.status !== 'cancelled' && apt.status !== 'completed' ? `
+                                        ${apt.status !== 'cancelled' && apt.status !== 'pending' && apt.status !== 'completed' ? `
                                             <button class="btn btn-warning btn-sm" onclick="rescheduleAppointment(${apt.id})">
                                                 <i class="fas fa-calendar-alt"></i> Reprogramar
                                             </button>
@@ -1402,33 +1416,31 @@
             if (!confirm('¿Confirmar que el cliente pagó en efectivo?')) return;
             
             try {
-                // Obtener datos del turno
-                const apt = await apiRequest(`/appointments/${id}`);
-                
-                // Crear pago en efectivo
-                await apiRequest('/payments/create-preference', 'POST', {
-                    appointment_id: id,
-                    amount: apt.service.price,
-                    payment_method: 'cash'
+                // ✅ CORRECTO: options como objeto
+                await apiRequest('/payments/cash-payment', {
+                    method: 'POST',
+                    body: {
+                        appointment_id: id
+                    }
                 });
-                
-                // Aprobar el pago manualmente
-                const payments = await apiRequest('/payments/all/payments');
-                const payment = payments.find(p => p.appointment_id === id);
-                
-                if (payment) {
-                    await apiRequest(`/payments/${payment.id}/status`, 'PUT', {
-                        status: 'approved',
-                        notes: 'Pago en efectivo confirmado por admin'
-                    });
-                }
                 
                 alert('✅ Turno confirmado con pago en efectivo');
                 loadUpcomingAppointments();
+                loadTodayAppointments();
                 loadDashboard();
             } catch (error) {
-                console.error('Error:', error);
-                alert('Error al confirmar el turno');
+                console.error('Error completo:', error);
+                
+                let errorMsg = 'Error al confirmar el turno';
+                if (error.message) {
+                    if (Array.isArray(error.message)) {
+                        errorMsg += ':\n' + error.message.join('\n');
+                    } else {
+                        errorMsg += ': ' + error.message;
+                    }
+                }
+                
+                alert(errorMsg);
             }
         }
         
@@ -1569,31 +1581,53 @@
         // Abrir modal de reprogramar
         async function rescheduleAppointment(id) {
             try {
-                const apt = await apiRequest(`/appointments/${id}`);
+                const apt = await apiRequest(`/appointments/${id}`, { method: 'GET' });
                 currentRescheduleId = id;
+                currentRescheduleService = apt.service;
                 
                 // Mostrar info actual
                 document.getElementById('reschedule-info').innerHTML = `
                     <p><strong>Turno actual:</strong></p>
                     <p>📅 ${formatDate(apt.appointment_date)} a las ${formatTime(apt.appointment_date)}</p>
                     <p>👤 ${apt.user.full_name}</p>
-                    <p>💅 ${apt.service.name}</p>
+                    <p>💅 ${apt.service.name} (${apt.service.duration_minutes} min)</p>
                 `;
                 
-                // Establecer fecha mínima (hoy)
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('reschedule-date').min = today;
+                // Establecer fecha mínima (mañana)
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const minDate = tomorrow.toISOString().split('T')[0];
+                
+                const dateInput = document.getElementById('reschedule-date');
+                dateInput.min = minDate;
+                
+                // ✅ BLOQUEAR DOMINGOS: Agregar listener para validar
+                dateInput.addEventListener('input', function() {
+                    const selectedDate = new Date(this.value + 'T00:00:00');
+                    const dayOfWeek = selectedDate.getDay(); // 0 = Domingo
+                    
+                    if (dayOfWeek === 0) {
+                        alert('❌ Los domingos no trabajamos. Por favor selecciona otro día.');
+                        this.value = ''; // Limpiar selección
+                        document.getElementById('reschedule-time').innerHTML = '<option value="">Primero selecciona una fecha</option>';
+                    }
+                });
+                
+                // Limpiar selector de horarios
+                document.getElementById('reschedule-time').innerHTML = '<option value="">Primero selecciona una fecha</option>';
                 
                 document.getElementById('rescheduleModal').classList.add('active');
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al cargar el turno');
+                alert('Error al cargar el turno: ' + (error.message || 'Intenta de nuevo'));
             }
         }
 
         function closeRescheduleModal() {
             document.getElementById('rescheduleModal').classList.remove('active');
             document.getElementById('rescheduleForm').reset();
+            currentRescheduleId = null;
+            currentRescheduleService = null;
         }
 
         async function saveReschedule(event) {
@@ -1601,20 +1635,53 @@
             
             const date = document.getElementById('reschedule-date').value;
             const time = document.getElementById('reschedule-time').value;
-            const newDateTime = `${date}T${time}:00`;
+            
+            if (!date || !time) {
+                alert('Debes seleccionar fecha y hora');
+                return;
+            }
+            
+            // Combinar fecha y hora en formato ISO 8601 con timezone
+            const dateTimeStr = `${date}T${time}:00`;
+            const dateTime = new Date(dateTimeStr);
+            
+            // Convertir a formato ISO con timezone offset
+            const tzOffset = -dateTime.getTimezoneOffset();
+            const tzHours = Math.floor(Math.abs(tzOffset) / 60);
+            const tzMinutes = Math.abs(tzOffset) % 60;
+            const tzSign = tzOffset >= 0 ? '+' : '-';
+            const tzString = `${tzSign}${String(tzHours).padStart(2, '0')}:${String(tzMinutes).padStart(2, '0')}`;
+            
+            const isoDateTime = `${date}T${time}:00${tzString}`;
+            
+            console.log('📅 Reprogramando a:', isoDateTime);
             
             try {
-                await apiRequest(`/appointments/${currentRescheduleId}`, 'PUT', {
-                    appointment_date: newDateTime
+                await apiRequest(`/appointments/${currentRescheduleId}`, {
+                    method: 'PUT',
+                    body: {
+                        appointment_date: isoDateTime
+                    }
                 });
                 
                 alert('✅ Turno reprogramado exitosamente');
                 closeRescheduleModal();
                 loadUpcomingAppointments();
                 loadTodayAppointments();
+                loadDashboard();
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error al reprogramar: ' + (error.message || 'Verifica que el horario esté disponible'));
+                
+                let errorMsg = '❌ Error al reprogramar';
+                if (error.message) {
+                    if (Array.isArray(error.message)) {
+                        errorMsg += ':\n' + error.message.join('\n');
+                    } else {
+                        errorMsg += ': ' + error.message;
+                    }
+                }
+                
+                alert(errorMsg);
             }
         }
 
@@ -2097,7 +2164,66 @@
             }
         }
 
+        // Cargar horarios disponibles para reprogramar
+        async function loadAvailableTimesForReschedule(date) {
+            const timeSelect = document.getElementById('reschedule-time');
+            
+            try {
+                timeSelect.innerHTML = '<option value="">Cargando horarios...</option>';
+                
+                console.log('📅 Fecha seleccionada:', date);
+                console.log('🔧 Servicio:', currentRescheduleService);
+                
+                const response = await apiRequest('/availability/available-slots', {
+                    method: 'POST',
+                    body: {
+                        service_id: currentRescheduleService.id,
+                        date: date
+                    }
+                });
+                
+                console.log('📊 Respuesta completa:', response);
+                console.log('📋 Total de slots:', response.available_slots.length);
+                
+                const availableSlots = response.available_slots.filter(slot => slot.is_available);
+                
+                console.log('✅ Slots disponibles:', availableSlots.length);
+                console.log('❌ Slots ocupados:', response.available_slots.length - availableSlots.length);
+                
+                // Mostrar slots ocupados para debugging
+                response.available_slots.forEach(slot => {
+                    if (!slot.is_available) {
+                        const time = new Date(slot.start_time);
+                        console.log(`❌ Ocupado: ${time.toLocaleTimeString()}`);
+                    }
+                });
+                
+                if (availableSlots.length === 0) {
+                    timeSelect.innerHTML = '<option value="">No hay horarios disponibles</option>';
+                    return;
+                }
+                
+                timeSelect.innerHTML = '<option value="">Selecciona un horario</option>';
+                availableSlots.forEach(slot => {
+                    const startTime = new Date(slot.start_time);
+                    const hours = String(startTime.getHours()).padStart(2, '0');
+                    const minutes = String(startTime.getMinutes()).padStart(2, '0');
+                    const timeStr = `${hours}:${minutes}`;
+                    
+                    const option = document.createElement('option');
+                    option.value = timeStr;
+                    option.textContent = timeStr;
+                    timeSelect.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                timeSelect.innerHTML = '<option value="">Error al cargar horarios</option>';
+            }
+        }
+
 
     </script>
+    
 </body>
 </html>

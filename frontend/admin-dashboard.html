@@ -2019,7 +2019,9 @@
                 console.log('📝 Editando horario ID:', id);
                 
                 // Cargar datos del horario
-                const schedules = await apiRequest('/availability/regular');
+                const schedules = await apiRequest('/availability/regular', {
+                    method: 'GET'
+                });
                 const schedule = schedules.find(s => s.id === id);
                 
                 if (!schedule) {
@@ -2090,7 +2092,11 @@
                         is_available: isAvailable
                     };
                     
-                    await apiRequest(`/availability/regular/${currentScheduleId}`, 'PUT', updateData);
+                    // ✅ CORRECTO
+                    await apiRequest(`/availability/regular/${currentScheduleId}`, {
+                        method: 'PUT',
+                        body: updateData
+                    });
                     alert('✅ Horario actualizado exitosamente');
                     
                 } else {
@@ -2104,17 +2110,16 @@
                         is_available: isAvailable
                     };
                     
-                    await apiRequest('/availability/regular', 'POST', createData);
+                    // ✅ CORRECTO
+                    await apiRequest('/availability/regular', {
+                        method: 'POST',
+                        body: createData
+                    });
                     alert('✅ Horario creado exitosamente');
                 }
                 
-                // Cerrar modal
                 closeRegularScheduleModal();
-                
-                // Habilitar de nuevo el selector
                 document.getElementById('schedule-day').disabled = false;
-                
-                // Recargar lista
                 loadRegularSchedule();
                 
             } catch (error) {
@@ -2127,7 +2132,10 @@
             if (!confirm('¿Eliminar este horario?')) return;
             
             try {
-                await apiRequest(`/availability/regular/${id}`, 'DELETE');
+                // ✅ CORRECTO
+                await apiRequest(`/availability/regular/${id}`, {
+                    method: 'DELETE'
+                });
                 alert('✅ Horario eliminado');
                 loadRegularSchedule();
             } catch (error) {
@@ -2205,12 +2213,15 @@
                 specific_date: date,
                 is_available: type === 'custom',
                 start_time: type === 'custom' ? document.getElementById('exception-start').value : null,
-                end_time: type === 'custom' ? document.getElementById('exception-end').value : null,
-                description: document.getElementById('exception-description').value
+                end_time: type === 'custom' ? document.getElementById('exception-end').value : null
             };
             
             try {
-                await apiRequest('/availability/exceptions', 'POST', data);
+                // ✅ CORRECTO
+                await apiRequest('/availability/exceptions', {
+                    method: 'POST',
+                    body: data
+                });
                 alert('✅ Excepción creada');
                 closeExceptionModal();
                 loadExceptions();
@@ -2224,7 +2235,10 @@
             if (!confirm('¿Eliminar esta excepción?')) return;
             
             try {
-                await apiRequest(`/availability/exceptions/${id}`, 'DELETE');
+                // ✅ CORRECTO
+                await apiRequest(`/availability/exceptions/${id}`, {
+                    method: 'DELETE'
+                });
                 alert('✅ Excepción eliminada');
                 loadExceptions();
             } catch (error) {

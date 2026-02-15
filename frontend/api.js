@@ -264,14 +264,20 @@ async function getMyAppointments() {
 /**
  * Obtener todos los servicios activos
  */
-async function getServices(category = null) {
-    let endpoint = '/services/?is_active=true';
-    if (category) {
-        endpoint += `&category=${category}`;
+async function getServices(category = null, includeInactive = false) {
+    let endpoint = '/services/';
+    
+    // Para admin, no filtrar por is_active (mostrar todos)
+    if (!includeInactive) {
+        endpoint += '?is_active=true';
     }
+    
+    if (category) {
+        endpoint += (includeInactive ? '?' : '&') + `category=${category}`;
+    }
+    
     return await apiRequest(endpoint);
 }
-
 /**
  * Obtener un servicio específico
  */

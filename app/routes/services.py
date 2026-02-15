@@ -232,3 +232,16 @@ def toggle_service_active(
     db.refresh(service)
     
     return service
+
+@router.get("/admin/all", response_model=List[ServiceResponse])
+def list_all_services_admin(
+    db: Session = Depends(get_db),
+    current_admin = Depends(get_current_admin)
+):
+    """
+    Listar TODOS los servicios (activos e inactivos) - Solo admin.
+    
+    Requiere permisos de administrador.
+    """
+    services = db.query(Service).all()
+    return services

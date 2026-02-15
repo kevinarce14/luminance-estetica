@@ -1211,7 +1211,14 @@
         // Servicios
         async function loadServices() {
             try {
-                const services = await getServices();
+                // ✅ Llamar directamente al endpoint SIN filtro is_active
+                const services = await apiRequest('/services/admin/all', {
+                    method: 'GET'
+                });
+                
+                console.log('📊 Servicios cargados:', services);
+                console.log('📋 Primer servicio is_active:', services[0]?.is_active, typeof services[0]?.is_active);
+                
                 const container = document.getElementById('services-container');
                 
                 container.innerHTML = `
@@ -1254,6 +1261,7 @@
                 `;
             } catch (error) {
                 console.error('Error:', error);
+                alert('Error al cargar servicios');
             }
         }
         
@@ -1364,7 +1372,7 @@
                 document.getElementById('service-duration').value = service.duration_minutes;
                 document.getElementById('service-price').value = service.price;
                 document.getElementById('service-category').value = service.category;
-                document.getElementById('service-active').checked = service.is_active;
+                document.getElementById('service-active').checked = service.is_active = true;
                 
                 document.getElementById('serviceModal').classList.add('active');
             } catch (error) {
@@ -1387,27 +1395,52 @@
             
             try {
                 if (currentServiceId) {
-                    await apiRequest(`/services/${currentServiceId}`, 'PUT', data);
+                    // ✅ ACTUALIZAR - Agregar method explícitamente
+                    await apiRequest(`/services/${currentServiceId}`, {
+                        method: 'PUT',
+                        body: data
+                    });
                     alert('✅ Servicio actualizado');
                 } else {
-                    await apiRequest('/services/', 'POST', data);
+                    // ✅ CREAR - Agregar method explícitamente
+                    await apiRequest('/services/', {
+                        method: 'POST',
+                        body: data
+                    });
                     alert('✅ Servicio creado');
                 }
                 
                 closeServiceModal();
                 loadServices();
             } catch (error) {
-                console.error('Error:', error);
-                alert('Error al guardar el servicio');
+                console.error('Error completo:', error);
+                
+                let errorMsg = 'Error al guardar el servicio';
+                if (error.message) {
+                    if (Array.isArray(error.message)) {
+                        errorMsg += ':\n' + error.message.join('\n');
+                    } else {
+                        errorMsg += ': ' + error.message;
+                    }
+                }
+                
+                alert(errorMsg);
             }
         }
         
         async function toggleServiceActive(id, isActive) {
             try {
-                await apiRequest(`/services/${id}`, 'PUT', { is_active: isActive });
+                // ✅ Usar method explícito
+                await apiRequest(`/services/${id}`, {
+                    method: 'PUT',
+                    body: { is_active: isActive }
+                });
+                
+                alert(`✅ Servicio ${isActive ? 'activado' : 'desactivado'}`);
                 loadServices();
             } catch (error) {
                 console.error('Error:', error);
+                alert('Error al cambiar estado del servicio: ' + (error.message || ''));
             }
         }
         
@@ -1588,12 +1621,26 @@
             }
             
             try {
-                await apiRequest(`/services/${id}`, 'DELETE');
+                // ✅ Usar method explícito
+                await apiRequest(`/services/${id}`, {
+                    method: 'DELETE'
+                });
+                
                 alert('✅ Servicio eliminado');
                 loadServices();
             } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error al eliminar: ' + (error.message || 'Intenta de nuevo'));
+                console.error('Error completo:', error);
+                
+                let errorMsg = '❌ Error al eliminar';
+                if (error.message) {
+                    if (Array.isArray(error.message)) {
+                        errorMsg += ':\n' + error.message.join('\n');
+                    } else {
+                        errorMsg += ': ' + error.message;
+                    }
+                }
+                
+                alert(errorMsg);
             }
         }
 

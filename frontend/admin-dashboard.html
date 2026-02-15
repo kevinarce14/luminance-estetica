@@ -1464,21 +1464,43 @@
         
         // Cancelar turno
         async function cancelAppointment(id) {
-            const reason = prompt('Motivo de cancelación:');
-            if (!reason) return;
+            const reason = prompt('¿Por qué motivo se cancela el turno?\n(Mínimo 5 caracteres)');
+            
+            if (!reason) {
+                return; // Usuario canceló
+            }
+            
+            if (reason.length < 5) {
+                alert('La razón debe tener al menos 5 caracteres');
+                return;
+            }
             
             try {
-                await apiRequest(`/appointments/${id}/cancel`, 'POST', {
-                    cancellation_reason: reason
+                // ✅ USAR POST, NO GET
+                await apiRequest(`/appointments/${id}/cancel`, {
+                    method: 'POST',
+                    body: {
+                        cancellation_reason: reason
+                    }
                 });
                 
-                alert('✅ Turno cancelado');
+                alert('✅ Turno cancelado exitosamente');
                 loadUpcomingAppointments();
                 loadTodayAppointments();
                 loadDashboard();
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al cancelar el turno');
+                
+                let errorMsg = 'Error al cancelar el turno';
+                if (error.message) {
+                    if (Array.isArray(error.message)) {
+                        errorMsg += ':\n' + error.message.join('\n');
+                    } else {
+                        errorMsg += ': ' + error.message;
+                    }
+                }
+                
+                alert(errorMsg);
             }
         }
         

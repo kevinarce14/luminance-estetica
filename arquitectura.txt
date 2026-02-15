@@ -1,9 +1,12 @@
 luminance-estetica/
 ├──frontend/
+│         ├──admin-dashboard.html
 │         ├──api.js
 │         ├──bienvenida.html
 │         ├──login.html
 │         ├──mis-turnos.html
+│         ├──pago-exitoso.html
+│         ├──pago-fallido.html
 │         ├──pago.html
 │         ├──studio.html
 │         └──turnera.html
@@ -54,6 +57,7 @@ luminance-estetica/
 │       ├── whatsapp_service.py      # Twilio WhatsApp
 │       ├── payment_service.py       # MercadoPago
 │       ├── appointment_service.py   # Lógica de reservas
+│       ├──scheduler_service.py   # actualizacion automatica estados de los turnos
 │       └── notification_service.py  # Recordatorios automáticos
 │   
 ├── .env.example                     # Template de variables

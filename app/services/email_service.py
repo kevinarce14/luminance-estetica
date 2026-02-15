@@ -233,23 +233,26 @@ class EmailService:
 
     def _get_password_reset_content(self, user_name: str, reset_token: str) -> str:
         """Template de reseteo de contraseña"""
-        reset_link = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
+        # ✅ Apunta a login.html?token= donde el frontend detecta el token automáticamente
+        reset_link = f"{settings.FRONTEND_URL}/login.html?token={reset_token}"
 
         return f"""
-        <h2 style="color: #e75480;">Reseteo de Contraseña</h2>
+        <h2 style="color: #e75480;">Recuperar Contraseña</h2>
         <p>Hola {user_name},</p>
         <p>
-            Recibimos una solicitud para resetear tu contraseña. Si no fuiste tú, 
-            puedes ignorar este email.
+            Recibimos una solicitud para restablecer tu contraseña. Si no fuiste vos, 
+            podés ignorar este email sin problema.
         </p>
-        <p>
-            Para crear una nueva contraseña, haz click en el siguiente botón:
-        </p>
+        <p>Hacé click en el botón para crear una nueva contraseña:</p>
         <div style="text-align: center; margin: 30px 0;">
-            <a href="{reset_link}" class="button">Resetear Contraseña</a>
+            <a href="{reset_link}" class="button">Restablecer Contraseña</a>
         </div>
-        <p style="font-size: 12px; color: #999;">
-            Este link expira en 1 hora. Si no solicitaste este cambio, puedes ignorar este mensaje.
+        <p style="font-size: 13px; color: #636e72;">
+            O copiá este link en tu navegador:<br>
+            <span style="word-break: break-all; color: #9c89b8;">{reset_link}</span>
+        </p>
+        <p style="font-size: 12px; color: #999; margin-top: 20px;">
+            ⏱ Este link expira en 1 hora.
         </p>
         """
 
@@ -302,6 +305,11 @@ class EmailService:
             from sendgrid import SendGridAPIClient
             from sendgrid.helpers.mail import Mail, Email, To, Content
 
+            print(f"📡 [SendGrid] Enviando a: {to_email}")
+            print(f"📡 [SendGrid] Asunto: {subject}")
+            print(f"📡 [SendGrid] From: {self.from_email}")
+            print(f"📡 [SendGrid] API Key: {self.sendgrid_key[:20]}...")
+
             message = Mail(
                 from_email=Email(self.from_email, self.from_name),
                 to_emails=To(to_email),
@@ -312,11 +320,15 @@ class EmailService:
             sg = SendGridAPIClient(self.sendgrid_key)
             response = sg.send(message)
 
-            print(f"✅ Email enviado a {to_email} (SendGrid: {response.status_code})")
+            print(f"✅ [SendGrid] Status: {response.status_code}")
             return True
 
         except Exception as e:
-            print(f"❌ Error enviando email con SendGrid: {str(e)}")
+            print(f"❌ [SendGrid] {type(e).__name__}: {str(e)}")
+            if hasattr(e, 'body'):
+                print(f"❌ [SendGrid] Body: {e.body}")
+            if hasattr(e, 'status_code'):
+                print(f"❌ [SendGrid] HTTP Status: {e.status_code}")
             return False
 
     def _send_with_resend(self, to_email: str, subject: str, html_content: str) -> bool:
@@ -398,9 +410,13 @@ class EmailService:
         self, to_email: str, user_name: str, reset_token: str
     ) -> bool:
         """Envía email con link para resetear contraseña"""
+        print(f"🔐 [PasswordReset] Iniciando envío a: {to_email} | usuario: {user_name}")
+        print(f"🔐 [PasswordReset] Token (primeros 20 chars): {reset_token[:20]}...")
         content = self._get_password_reset_content(user_name, reset_token)
-        html = self._get_base_template(content, "Resetea tu contraseña")
-        return self._send_email(to_email, "Reseteo de Contraseña - Luminance Studio", html)
+        html = self._get_base_template(content, "Recuperá tu contraseña")
+        result = self._send_email(to_email, "Recuperar Contraseña - Luminance Studio", html)
+        print(f"🔐 [PasswordReset] Resultado envío: {'✅ OK' if result else '❌ FALLÓ'}")
+        return result
 
     def send_password_changed_email(self, to_email: str, user_name: str) -> bool:
         """Envía email confirmando cambio de contraseña"""

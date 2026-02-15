@@ -299,6 +299,13 @@
                     </button>
                 </form>
 
+                <div class="form-footer" style="margin-top:12px;">
+                    <a href="#" onclick="toggleForms('forgot'); return false;" 
+                       style="color:#9c89b8; font-weight:500; font-size:0.9rem;">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+
                 <div class="form-footer">
                     ¿No tienes cuenta? 
                     <a href="#" onclick="toggleForms('register'); return false;">Regístrate aquí</a>
@@ -365,6 +372,87 @@
                     <a href="#" onclick="toggleForms('login'); return false;">Inicia sesión aquí</a>
                 </div>
             </div>
+            <!-- Formulario RECUPERAR CONTRASEÑA (paso 1: email) -->
+            <div id="forgot-form-container" class="toggle-form">
+                <h2>Recuperar</h2>
+                <p>Te enviaremos un link para restablecer tu contraseña</p>
+
+                <div id="forgot-alert-success" class="alert alert-success"></div>
+                <div id="forgot-alert-error" class="alert alert-error"></div>
+
+                <form id="forgot-form">
+                    <div class="form-group">
+                        <label for="forgot-email">Email de tu cuenta</label>
+                        <input 
+                            type="email" 
+                            id="forgot-email" 
+                            placeholder="tu@email.com"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="forgot-btn">
+                        Enviar instrucciones
+                    </button>
+                </form>
+
+                <div class="form-footer" style="margin-top:20px;">
+                    <a href="#" onclick="toggleForms('login'); return false;">← Volver al inicio de sesión</a>
+                </div>
+            </div>
+
+            <!-- Formulario NUEVA CONTRASEÑA (paso 2: token + nueva pass) -->
+            <div id="reset-form-container" class="toggle-form">
+                <h2>Nueva contraseña</h2>
+                <p>Ingresá el código que recibiste por email</p>
+
+                <div id="reset-alert-success" class="alert alert-success"></div>
+                <div id="reset-alert-error" class="alert alert-error"></div>
+
+                <form id="reset-form">
+                    <div class="form-group">
+                        <label for="reset-token">Código de verificación</label>
+                        <input 
+                            type="text" 
+                            id="reset-token" 
+                            placeholder="Pegá el código del email"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reset-password">Nueva contraseña</label>
+                        <input 
+                            type="password" 
+                            id="reset-password" 
+                            placeholder="••••••••"
+                            minlength="8"
+                            required
+                        >
+                        <small style="color:#9c89b8; margin-top:5px; display:block;">
+                            Mínimo 8 caracteres, con mayúscula, minúscula y número
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reset-password-confirm">Confirmar contraseña</label>
+                        <input 
+                            type="password" 
+                            id="reset-password-confirm" 
+                            placeholder="••••••••"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="reset-btn">
+                        Cambiar contraseña
+                    </button>
+                </form>
+
+                <div class="form-footer" style="margin-top:20px;">
+                    <a href="#" onclick="toggleForms('login'); return false;">← Volver al inicio de sesión</a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -372,20 +460,14 @@
     <script src="api.js"></script>
 
     <script>
-        // ===== ALTERNAR ENTRE LOGIN Y REGISTRO =====
+        // ===== ALTERNAR ENTRE FORMULARIOS =====
         function toggleForms(formType) {
-            const loginForm = document.getElementById('login-form-container');
-            const registerForm = document.getElementById('register-form-container');
-            
-            if (formType === 'register') {
-                loginForm.classList.remove('active');
-                registerForm.classList.add('active');
-            } else {
-                registerForm.classList.remove('active');
-                loginForm.classList.add('active');
-            }
-            
-            // Limpiar alertas
+            // Ocultar todos
+            ['login','register','forgot','reset'].forEach(id => {
+                document.getElementById(id + '-form-container').classList.remove('active');
+            });
+            // Mostrar el pedido
+            document.getElementById(formType + '-form-container').classList.add('active');
             hideAlerts();
         }
 
@@ -533,9 +615,103 @@
             return errors;
         }
 
+        // ===== FORM: SOLICITAR RECUPERACIÓN (paso 1) =====
+        document.getElementById('forgot-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('forgot-email').value.trim();
+            const btn   = document.getElementById('forgot-btn');
+            const ok    = document.getElementById('forgot-alert-success');
+            const err   = document.getElementById('forgot-alert-error');
+
+            ok.classList.remove('show');
+            err.classList.remove('show');
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+
+            try {
+                await apiRequest('/auth/password-reset', {
+                    method: 'POST',
+                    body: { email }
+                });
+
+                // El backend siempre responde igual por seguridad
+                ok.textContent = '✅ Si el email existe, recibirás las instrucciones en unos minutos. Revisá también la carpeta de spam.';
+                ok.classList.add('show');
+                btn.textContent = 'Enviado';
+
+                // Mostrar el form de reset después de 2s
+                setTimeout(() => toggleForms('reset'), 2500);
+
+            } catch (error) {
+                err.textContent = error?.message || 'Error al enviar. Intentá de nuevo.';
+                err.classList.add('show');
+                btn.disabled = false;
+                btn.textContent = 'Enviar instrucciones';
+            }
+        });
+
+        // ===== FORM: CONFIRMAR NUEVA CONTRASEÑA (paso 2) =====
+        document.getElementById('reset-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token    = document.getElementById('reset-token').value.trim();
+            const pass     = document.getElementById('reset-password').value;
+            const passConf = document.getElementById('reset-password-confirm').value;
+            const btn      = document.getElementById('reset-btn');
+            const ok       = document.getElementById('reset-alert-success');
+            const err      = document.getElementById('reset-alert-error');
+
+            ok.classList.remove('show');
+            err.classList.remove('show');
+
+            // Validar que las contraseñas coincidan
+            if (pass !== passConf) {
+                err.textContent = 'Las contraseñas no coinciden.';
+                err.classList.add('show');
+                return;
+            }
+
+            // Validar fuerza
+            const passErrors = validatePassword(pass);
+            if (passErrors.length > 0) {
+                err.textContent = 'La contraseña debe tener: ' + passErrors.join(', ');
+                err.classList.add('show');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Cambiando contraseña...';
+
+            try {
+                await apiRequest('/auth/password-reset/confirm', {
+                    method: 'POST',
+                    body: { token, new_password: pass }
+                });
+
+                ok.textContent = '✅ ¡Contraseña actualizada! Redirigiendo al login...';
+                ok.classList.add('show');
+                btn.textContent = '¡Listo!';
+
+                setTimeout(() => toggleForms('login'), 2000);
+
+            } catch (error) {
+                const msg = error?.message || error?.detail || 'Código inválido o expirado. Solicitá uno nuevo.';
+                err.textContent = msg;
+                err.classList.add('show');
+                btn.disabled = false;
+                btn.textContent = 'Cambiar contraseña';
+            }
+        });
+
         // ===== VERIFICAR SI YA ESTÁ LOGUEADO =====
         if (isLoggedIn()) {
             window.location.href = 'studio.html';
+        }
+
+        // Si la URL tiene ?token=xxx, ir directo al form de reset
+        const urlToken = new URLSearchParams(window.location.search).get('token');
+        if (urlToken) {
+            document.getElementById('reset-token').value = urlToken;
+            toggleForms('reset');
         }
 
         console.log('✅ Página de login cargada');

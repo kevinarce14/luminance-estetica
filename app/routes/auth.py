@@ -28,41 +28,29 @@ def register(
     user_data: UserCreate,
     db: Session = Depends(get_db)
 ):
-    """
-    Registrar un nuevo usuario.
-    
-    - **email**: Email único (se validará que no exista)
-    - **full_name**: Nombre completo
-    - **password**: Contraseña (mínimo 8 caracteres, con mayúscula, minúscula y número)
-    - **phone**: Teléfono (opcional)
-    
-    Retorna el usuario creado (sin la contraseña).
-    """
-    # NORMALIZAR EMAIL (minúsculas y trim)
-    admin_email_normalized = user_data.email.strip().lower()
-    # Verificar que el email no exista
-    existing_user = db.query(User).filter(User.email == admin_email_normalized).first()
+    """Registrar un nuevo usuario."""
+    email_normalized = user_data.email.strip().lower()
+
+    existing_user = db.query(User).filter(User.email == email_normalized).first()
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="El email ya está registrado"
         )
-    
-    # Crear usuario
+
     db_user = User(
-        email=user_data.email,
+        email=email_normalized,          # ✅ siempre guardamos en minúsculas
         full_name=user_data.full_name,
         phone=user_data.phone,
         hashed_password=get_password_hash(user_data.password),
         is_active=True,
         is_admin=False,
     )
-    
+
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    
-    # Enviar email de bienvenida (opcional, no bloqueante)
+
     try:
         email_service.send_welcome_email(
             to_email=db_user.email,
@@ -70,7 +58,7 @@ def register(
         )
     except Exception as e:
         print(f"⚠️ No se pudo enviar email de bienvenida: {str(e)}")
-    
+
     return db_user
 
 
@@ -79,35 +67,26 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    """
-    Login con email y contraseña.
-    
-    Retorna un token JWT para autenticación.
-    
-    **Nota**: FastAPI espera que uses OAuth2PasswordRequestForm,
-    donde `username` es el email y `password` es la contraseña.
-    """
-    # NORMALIZAR EMAIL (minúsculas y trim)
-    admin_email_normalized = form_data.username.strip().lower()
-    # Buscar usuario por email
-    user = db.query(User).filter(User.email == admin_email_normalized).first()
-    
+    """Login con email y contraseña. Retorna token JWT."""
+    email_normalized = form_data.username.strip().lower()   # ✅ normalizar
+
+    user = db.query(User).filter(User.email == email_normalized).first()
+
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email o contraseña incorrectos",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Usuario inactivo"
         )
-    
-    # Crear token JWT
+
     access_token = create_access_token(data={"sub": user.email})
-    
+
     return {
         "access_token": access_token,
         "token_type": "bearer"
@@ -121,31 +100,41 @@ def request_password_reset(
 ):
     """
     Solicitar reseteo de contraseña.
-    
-    Envía un email con un link para resetear la contraseña.
-    El token expira en 1 hora.
+    Envía un email con link para resetear. El token expira en 1 hora.
     """
-    # Buscar usuario
-    user = db.query(User).filter(User.email == reset_data.email).first()
-    
-    # Por seguridad, siempre retornamos el mismo mensaje
-    # (no revelamos si el email existe o no)
+    # ✅ Normalizar email antes de buscar en la BD
+    email_normalized = str(reset_data.email).strip().lower()
+
+    print(f"🔐 [PasswordReset] Solicitud para: {email_normalized}")
+
+    user = db.query(User).filter(User.email == email_normalized).first()
+
+    # Por seguridad, siempre respondemos igual (no revelamos si el email existe)
     message = "Si el email existe, recibirás instrucciones para resetear tu contraseña"
-    
-    if user:
-        # Generar token de reseteo
-        reset_token = generate_password_reset_token(user.email)
-        
-        # Enviar email con el token
-        try:
-            email_service.send_password_reset_email(
-                to_email=user.email,
-                user_name=user.full_name,
-                reset_token=reset_token
-            )
-        except Exception as e:
-            print(f"⚠️ Error enviando email de reseteo: {str(e)}")
-    
+
+    if not user:
+        print(f"⚠️ [PasswordReset] Usuario no encontrado: {email_normalized}")
+        return {"message": message}
+
+    if not user.is_active:
+        print(f"⚠️ [PasswordReset] Usuario inactivo: {email_normalized}")
+        return {"message": message}
+
+    print(f"✅ [PasswordReset] Usuario encontrado: {user.full_name} ({user.email})")
+
+    reset_token = generate_password_reset_token(user.email)
+
+    try:
+        sent = email_service.send_password_reset_email(
+            to_email=user.email,
+            user_name=user.full_name,
+            reset_token=reset_token
+        )
+        if not sent:
+            print(f"❌ [PasswordReset] email_service.send_password_reset_email devolvió False")
+    except Exception as e:
+        print(f"❌ [PasswordReset] Excepción en email_service: {type(e).__name__}: {str(e)}")
+
     return {"message": message}
 
 
@@ -156,33 +145,32 @@ def confirm_password_reset(
 ):
     """
     Confirmar reseteo de contraseña con el token recibido por email.
-    
-    - **token**: Token JWT recibido por email
-    - **new_password**: Nueva contraseña
     """
-    # Verificar token
+    print(f"🔐 [PasswordResetConfirm] Verificando token...")
+
     email = verify_password_reset_token(reset_data.token)
-    
+
     if not email:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Token inválido o expirado"
         )
-    
-    # Buscar usuario
+
+    print(f"✅ [PasswordResetConfirm] Token válido para: {email}")
+
     user = db.query(User).filter(User.email == email).first()
-    
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario no encontrado"
         )
-    
-    # Actualizar contraseña
+
     user.hashed_password = get_password_hash(reset_data.new_password)
     db.commit()
-    
-    # Enviar email de confirmación (opcional)
+
+    print(f"✅ [PasswordResetConfirm] Contraseña actualizada para: {email}")
+
     try:
         email_service.send_password_changed_email(
             to_email=user.email,
@@ -190,5 +178,5 @@ def confirm_password_reset(
         )
     except Exception as e:
         print(f"⚠️ Error enviando email de confirmación: {str(e)}")
-    
+
     return {"message": "Contraseña actualizada exitosamente"}

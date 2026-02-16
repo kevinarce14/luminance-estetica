@@ -51,7 +51,7 @@ def get_available_slots_for_date(
         return []
     
     # Obtener día de la semana (0=Lunes, 6=Domingo)
-    day_of_week = target_date.weekday()
+    day_of_week = (target_date.weekday() + 1) % 7
     
     # Buscar disponibilidad específica para esta fecha
     specific_availability = db.query(Availability).filter(

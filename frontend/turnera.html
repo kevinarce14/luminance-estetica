@@ -571,7 +571,7 @@
                     <i class="fas fa-info-circle"></i>
                     <span>Hacé click en el día que prefieras para tu turno. Los días con turnos confirmados se muestran en rojo.</span>
                 </div>
-                <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
+                <!-- <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <div style="width: 12px; height: 12px; background: #dc3545; border-radius: 50%;"></div>
                         <span style="font-size: 0.9rem; color: var(--texto-medio);">Turno Confirmado</span>
@@ -579,7 +579,7 @@
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <div style="width: 12px; height: 12px; background: rgba(231, 84, 128, 0.3); border: 2px solid var(--rosa-medio); border-radius: 50%;"></div>
                         <span style="font-size: 0.9rem; color: var(--texto-medio);">Disponible</span>
-                    </div>
+                    </div> -->
                 </div>
                 <div id="calendar"></div>
             </div>
@@ -779,7 +779,16 @@
                 }
                 
                 // Obtener todos los turnos
-                const appointments = await getAppointments();
+                let appointments = [];
+                try {
+                    appointments = await apiRequest('/appointments/public/confirmed', {
+                        method: 'GET'
+                    });
+                    console.log('📋 Turnos públicos:', appointments.length);
+                } catch (error) {
+                    console.warn('⚠️ Usando turnos propios');
+                    appointments = await getAppointments();
+                }
                 
                 console.log('📋 Turnos existentes cargados:', appointments.length);
                 
@@ -1104,23 +1113,13 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
 
-            let appointmentCreatedId = null; // Para el fallback del catch
+            let appointmentCreatedId = null;
 
             try {
                 console.log('📤 Creando appointment...');
-                console.log('📌 selectedServiceId:', selectedServiceId, typeof selectedServiceId);
-                console.log('📌 selectedTime:', selectedTime, typeof selectedTime);
-                console.log('📌 selectedDate:', selectedDate, typeof selectedDate);
                 
-                // Asegurar que service_id sea número
                 const serviceIdNum = parseInt(selectedServiceId);
-                
-                // ✅ IMPORTANTE: El backend espera la fecha con timezone explícito.
-                // Convertimos el string "2026-02-12T11:00:00" a un objeto Date
-                // y luego lo formateamos con el offset local (ej: -03:00 para Argentina)
-                // para que el backend sepa exactamente qué hora es.
                 const appointmentDateTime = toLocalISOString(new Date(selectedTime));
-                console.log('🕐 Fecha con timezone:', appointmentDateTime);
                 
                 const appointmentData = {
                     service_id: serviceIdNum,
@@ -1131,12 +1130,10 @@
                 console.log('📦 Datos a enviar:', JSON.stringify(appointmentData, null, 2));
 
                 const appointment = await createAppointment(appointmentData);
-                appointmentCreatedId = appointment.id; // Guardar por si falla algo después
+                appointmentCreatedId = appointment.id;
                 console.log('✅ Appointment creado:', appointment);
 
-                // Actualizar el calendario con el nuevo turno
-                // Usamos selectedService (ya cargado en memoria) porque el backend
-                // devuelve AppointmentResponse que solo tiene service_id, no el objeto completo
+                // Actualizar calendario
                 if (calendar && selectedService) {
                     const appointmentDate = new Date(appointment.appointment_date);
                     calendar.addEvent({
@@ -1149,14 +1146,58 @@
                     });
                 }
 
-                // Redirigir a página de pago
-                window.location.href = `/pago.html?appointment_id=${appointment.id}`;
+                // ✅ VERIFICAR SI ES ADMIN
+                const userData = getUserData();
+                const isAdmin = userData && userData.is_admin === true;
+                
+                console.log('👤 Usuario:', userData);
+                console.log('🔐 Es admin:', isAdmin);
+
+                if (isAdmin) {
+                    // ===== FLUJO ADMIN: Crear pago en efectivo automáticamente =====
+                    console.log('💼 Usuario admin detectado, creando pago en efectivo...');
+                    
+                    try {
+                        // Crear pago en efectivo
+                        await apiRequest('/payments/cash-payment', {
+                            method: 'POST',
+                            body: {
+                                appointment_id: appointment.id
+                            }
+                        });
+                        
+                        console.log('✅ Pago en efectivo creado y turno confirmado');
+                        
+                        // Mostrar mensaje de éxito
+                        showSuccessMessage(appointment);
+                        
+                        // Resetear formulario después de 3 segundos
+                        setTimeout(() => {
+                            resetForm();
+                        }, 3000);
+                        
+                    } catch (paymentError) {
+                        console.error('❌ Error creando pago:', paymentError);
+                        
+                        // Si falla el pago, igual mostrar éxito pero advertir
+                        alert('⚠️ Turno creado pero hubo un error al confirmar el pago.\n\nPuedes confirmarlo manualmente desde el dashboard.');
+                        
+                        // Resetear formulario
+                        setTimeout(() => {
+                            resetForm();
+                        }, 2000);
+                    }
+                    
+                } else {
+                    // ===== FLUJO NORMAL: Redirigir a pago =====
+                    console.log('👤 Usuario normal, redirigiendo a pago...');
+                    window.location.href = `/pago.html?appointment_id=${appointment.id}`;
+                }
 
             } catch (error) {
                 console.error('❌ Error:', error);
 
-                // Si el error es de JS (TypeError) y el appointment ya fue creado,
-                // igual redirigimos al pago — el turno existe en el backend
+                // Si el error es de JS pero el appointment fue creado
                 if (error instanceof TypeError && appointmentCreatedId) {
                     console.warn('⚠️ Error de JS pero appointment creado, redirigiendo...');
                     window.location.href = `/pago.html?appointment_id=${appointmentCreatedId}`;
@@ -1173,6 +1214,184 @@
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-calendar-check"></i> Confirmar Reserva';
             }
+        }
+
+        // ===== FUNCIÓN PARA MOSTRAR MENSAJE DE ÉXITO =====
+        function showSuccessMessage(appointment) {
+            // Ocultar el contenido del resumen actual
+            const summarySection = document.getElementById('section-summary');
+            
+            if (!summarySection) {
+                console.error('❌ No se encontró section-summary');
+                alert('✅ Turno confirmado exitosamente!\n\nID: #' + appointment.id);
+                setTimeout(() => resetForm(), 2000);
+                return;
+            }
+            
+            // Crear mensaje de éxito
+            const successHTML = `
+                <div style="text-align: center; padding: 60px 20px; animation: fadeIn 0.5s;">
+                    <div style="background: linear-gradient(135deg, var(--rosa-medio) 0%, var(--violeta) 100%); 
+                                width: 100px; height: 100px; border-radius: 50%; 
+                                display: flex; align-items: center; justify-content: center; 
+                                margin: 0 auto 30px; box-shadow: 0 10px 30px rgba(231, 84, 128, 0.3);">
+                        <i class="fas fa-check" style="font-size: 50px; color: white;"></i>
+                    </div>
+                    
+                    <h2 style="color: var(--violeta); margin-bottom: 15px; font-size: 2rem;">
+                        ¡Turno Confirmado!
+                    </h2>
+                    
+                    <p style="font-size: 1.2rem; color: var(--texto-medio); margin-bottom: 30px;">
+                        La reserva se ha realizado exitosamente
+                    </p>
+                    
+                    <div style="background: var(--lila-claro); padding: 25px; border-radius: 15px; 
+                                max-width: 500px; margin: 0 auto 30px; text-align: left;">
+                        <p style="margin: 10px 0;"><strong>📋 ID Turno:</strong> #${appointment.id}</p>
+                        <p style="margin: 10px 0;"><strong>💅 Servicio:</strong> ${selectedService ? selectedService.name : 'N/A'}</p>
+                        <p style="margin: 10px 0;"><strong>📅 Fecha:</strong> ${selectedDate ? formatDate(selectedDate) : 'N/A'}</p>
+                        <p style="margin: 10px 0;"><strong>🕐 Hora:</strong> ${selectedTime ? formatTime(selectedTime) : 'N/A'}</p>
+                        <p style="margin: 10px 0;"><strong>💰 Estado Pago:</strong> <span style="color: #28a745;">Confirmado (Efectivo)</span></p>
+                        <p style="margin: 10px 0;"><strong>✅ Estado Turno:</strong> <span style="color: #28a745;">Confirmado</span></p>
+                    </div>
+                    
+                    <p style="color: var(--texto-medio); margin-bottom: 20px;">
+                        El turno se guardó automáticamente. Puedes ver todos tus turnos en el dashboard.
+                    </p>
+                    
+                    <button onclick="resetForm()" class="btn-primary" style="margin-right: 10px;">
+                        <i class="fas fa-plus"></i> Crear Otro Turno
+                    </button>
+                    
+                    <a href="/admin-dashboard.html" class="btn-secondary" style="display: inline-block; padding: 12px 30px; text-decoration: none;">
+                        <i class="fas fa-chart-line"></i> Ir al Dashboard
+                    </a>
+                </div>
+                
+                <style>
+                    @keyframes fadeIn {
+                        from { opacity: 0; transform: translateY(20px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                </style>
+            `;
+            
+            // Reemplazar contenido completo del section-summary
+            summarySection.innerHTML = `
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-check-circle"></i></div>
+                    <h2>¡Reserva Confirmada!</h2>
+                </div>
+                ${successHTML}
+            `;
+            
+            // Asegurar que está visible
+            summarySection.classList.remove('disabled');
+            
+            // Scroll suave al mensaje
+            summarySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ===== FUNCIÓN PARA RESETEAR FORMULARIO =====
+        function resetForm() {
+            console.log('🔄 Reseteando formulario...');
+            
+            // ===== RESETEAR VARIABLES =====
+            selectedServiceId = null;
+            selectedService = null;
+            selectedDate = null;
+            selectedTime = null;
+            
+            // ===== RESTAURAR SECCIÓN DE RESUMEN AL ESTADO ORIGINAL =====
+            const summarySection = document.getElementById('section-summary');
+            if (summarySection) {
+                summarySection.innerHTML = `
+                    <div class="section-header">
+                        <div class="section-icon"><i class="fas fa-check-circle"></i></div>
+                        <h2>Paso 4: Resumen de tu Reserva</h2>
+                    </div>
+                    
+                    <div class="summary-box" id="summary-content">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+
+                    <div class="message-box warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Importante:</strong> Al confirmar se creará tu reserva con estado "Pendiente de Pago". 
+                            Deberás completar el pago para que tu turno quede confirmado.
+                        </div>
+                    </div>
+
+                    <button id="btn-confirm" class="btn-primary" disabled onclick="confirmReservation()">
+                        <i class="fas fa-calendar-check"></i>
+                        Confirmar Reserva
+                    </button>
+                `;
+                
+                // Deshabilitar sección de resumen
+                summarySection.classList.add('disabled');
+            }
+            
+            // ===== DESHABILITAR OTRAS SECCIONES =====
+            const serviceSection = document.getElementById('section-service');
+            if (serviceSection) {
+                serviceSection.classList.add('disabled');
+            }
+            
+            const timeSection = document.getElementById('section-time');
+            if (timeSection) {
+                timeSection.classList.add('disabled');
+                
+                // Limpiar horarios
+                const timeSlotsContainer = document.getElementById('time-slots-container');
+                if (timeSlotsContainer) {
+                    timeSlotsContainer.innerHTML = `
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Seleccioná un servicio para ver horarios disponibles
+                        </div>
+                    `;
+                }
+            }
+            
+            // ===== HABILITAR SECCIÓN DE FECHA =====
+            const dateSection = document.getElementById('section-date');
+            if (dateSection) {
+                dateSection.classList.remove('disabled');
+            }
+            
+            // ===== LIMPIAR SELECCIONES DE SERVICIOS =====
+            document.querySelectorAll('.service-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // ===== RESETEAR PASOS EN LA BARRA DE PROGRESO =====
+            // Desmarcar todos los pasos
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step-${i}`);
+                if (step) {
+                    step.classList.remove('completed', 'active');
+                }
+            }
+            
+            // Activar paso 1
+            activateStep(1);
+            
+            // ===== LIMPIAR CALENDARIO =====
+            if (calendar) {
+                // Recargar eventos del servidor
+                calendar.refetchEvents();
+                
+                // Limpiar selección visual
+                calendar.unselect();
+            }
+            
+            // ===== SCROLL AL INICIO =====
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            console.log('✅ Formulario reseteado completamente');
         }
 
         // ===== FUNCIONES AUXILIARES =====

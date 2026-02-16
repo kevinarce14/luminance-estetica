@@ -422,3 +422,20 @@ def delete_appointment(
     db.commit()
     
     return None
+
+
+@router.get("/public/confirmed", response_model=List[AppointmentWithDetails])
+def list_confirmed_appointments_public(
+    db: Session = Depends(get_db)
+):
+    """
+    Listar turnos confirmados (público, sin auth).
+    Para mostrar disponibilidad en calendario.
+    """
+    appointments = (
+        db.query(Appointment)
+        .filter(Appointment.status == AppointmentStatus.CONFIRMED)
+        .order_by(Appointment.appointment_date)
+        .all()
+    )
+    return appointments

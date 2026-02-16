@@ -456,6 +456,13 @@ function showError(message) {
  * Formatear fecha para mostrar
  */
 function formatDate(dateString) {
+    // Si es solo fecha (YYYY-MM-DD), parsear manualmente
+    if (typeof dateString === 'string' && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [year, month, day] = dateString.split('-');
+        return `${day}/${month}/${year}`;
+    }
+    
+    // Si tiene hora, usar Date()
     const date = new Date(dateString);
     return date.toLocaleDateString('es-AR', {
         day: '2-digit',

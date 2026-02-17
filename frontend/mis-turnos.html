@@ -397,6 +397,22 @@
                 min-width: 100%;
             }
         }
+        /* Botón Reprogramar */
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-warning i {
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
@@ -608,6 +624,12 @@
                             </button>
                         ` : ''}
                         
+                        ${app.status === 'confirmed' ? `
+                            <button class="btn btn-warning" onclick="requestReschedule(${app.id}, '${app.service.name}', '${formatDate(app.appointment_date)}', '${formatTime(app.appointment_date)}')">
+                                <i class="fas fa-calendar-alt"></i> Solicitar Reprogramar
+                            </button>
+                        ` : ''}
+                        
                         ${app.status === 'pending' || app.status === 'confirmed' ? `
                             <button class="btn btn-danger" onclick="handleCancel(${app.id})">
                                 <i class="fas fa-times"></i> Cancelar
@@ -678,6 +700,41 @@
     }
     
     console.log('✅ Mis Turnos cargado');
+
+    // ===== SOLICITAR REPROGRAMAR VÍA WHATSAPP =====
+    function requestReschedule(appointmentId, serviceName, date, time) {
+        // Obtener datos del usuario
+        const userData = getUserData();
+        const clientName = userData?.full_name || 'Cliente';
+        
+        // Formatear mensaje para WhatsApp
+        const message = `Hola Cande! 🌸
+
+    Soy *${clientName}* y quisiera reprogramar mi turno:
+
+    📋 *ID Turno:* #${appointmentId}
+    💅 *Servicio:* ${serviceName}
+    📅 *Fecha actual:* ${date}
+    🕐 *Hora actual:* ${time}
+
+    ¿Podrías ayudarme a cambiar la fecha/hora?
+
+    ¡Gracias! 💖`;
+
+        // URL encode del mensaje
+        const encodedMessage = encodeURIComponent(message);
+        
+        // Número de WhatsApp (Argentina)
+        const whatsappNumber = '541162815014';
+        
+        // Abrir WhatsApp
+        const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+        
+        console.log('📱 Abriendo WhatsApp para reprogramar turno #' + appointmentId);
+        
+        // Abrir en nueva pestaña
+        window.open(whatsappURL, '_blank');
+    }
     </script>
 </body>
 </html>

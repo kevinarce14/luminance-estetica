@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     # ========== MERCADOPAGO ==========
     MERCADOPAGO_ACCESS_TOKEN: str
     MERCADOPAGO_PUBLIC_KEY: str | None = None
-    FRONTEND_URL: str = "http://localhost:3000"
+    FRONTEND_URL: str = "http://localhost:5000"
     PAYMENT_SUCCESS_URL: str = "http://localhost:3000/pago-exitoso"
     PAYMENT_FAILURE_URL: str = "http://localhost:3000/pago-fallido"
     PAYMENT_PENDING_URL: str = "http://localhost:3000/pago-pendiente"

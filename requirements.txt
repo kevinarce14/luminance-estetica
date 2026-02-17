@@ -14,7 +14,6 @@ python-multipart==0.0.6
 # ==================
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
-alembic==1.12.1
 
 # ==================
 # AUTHENTICATION & SECURITY
@@ -33,7 +32,6 @@ email-validator==2.1.0
 # ==================
 # EMAIL SERVICES
 # ==================
-sendgrid==6.11.0
 resend==0.7.0
 
 # ==================
@@ -69,28 +67,25 @@ pytz==2023.3
 slowapi==0.1.9
 
 # ==================
-# BACKGROUND TASKS
+# BACKGROUND TASKS & SCHEDULING
 # ==================
-celery==5.3.4
-redis==5.0.1
+apscheduler==3.10.4
 
 # ==================
-# UTILITIES
+# MONITORING (Producción)
 # ==================
-python-slugify==8.0.1
+sentry-sdk[fastapi]==1.38.0
 
 # ==================
-# MONITORING (Opcional)
+# TESTING (Desarrollo)
 # ==================
-# sentry-sdk[fastapi]==1.38.0
+pytest==7.4.3
+pytest-asyncio==0.21.1
 
 # ==================
-# CORS
+# OPCIONAL: IMÁGENES
 # ==================
-# (incluido en FastAPI, no necesita instalación separada)
+# Pillow==10.1.0
+# python-magic==0.4.27
 
 
-
-#pip install python-jose[cryptography]
-#pip install bcrypt==4.0.1
-#pip install apscheduler

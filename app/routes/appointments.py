@@ -23,6 +23,46 @@ from app.schemas.appointment import (
     AppointmentCancel
 )
 from app.services.email_service import email_service
+from pydantic import BaseModel
+from typing import Optional, Any
+from decimal import Decimal
+
+# ✅ Schema del servicio para serializar dentro del historial
+class ServiceInHistory(BaseModel):
+    model_config = {"from_attributes": True}
+    id: int
+    name: str
+    description: Optional[str] = None
+    duration_minutes: int
+    price: float
+    category: str
+    is_active: bool = True
+
+# ✅ Schema del pago para serializar dentro del historial
+class PaymentInHistory(BaseModel):
+    model_config = {"from_attributes": True}
+    id: int
+    amount: float
+    payment_method: Optional[str] = None
+    status: Any = None
+
+# ✅ Schema para historial que NO valida fecha futura
+# AppointmentWithDetails rechaza fechas pasadas al serializar,
+# por eso usamos este schema propio para el endpoint GET /
+class AppointmentHistory(BaseModel):
+    model_config = {"from_attributes": True}
+    id: int
+    user_id: int
+    service_id: int
+    appointment_date: datetime
+    status: Any
+    notes: Optional[str] = None
+    reminder_sent: bool = False
+    cancelled_at: Optional[datetime] = None
+    cancellation_reason: Optional[str] = None
+    created_at: Optional[datetime] = None
+    service: Optional[ServiceInHistory] = None
+    payment: Optional[PaymentInHistory] = None
 
 router = APIRouter(prefix="/appointments", tags=["Turnos/Citas"])
 
@@ -191,7 +231,7 @@ def create_appointment(
     return db_appointment
 
 
-@router.get("/", response_model=List[AppointmentWithDetails])
+@router.get("/", response_model=List[AppointmentHistory])
 def list_my_appointments(
     skip: int = 0,
     limit: int = 100,
@@ -213,8 +253,8 @@ def list_my_appointments(
     now_naive = datetime.now(timezone.utc).replace(tzinfo=None)
     
     query = db.query(Appointment).filter(
-        Appointment.user_id == current_user.id,
-        Appointment.appointment_date >= now_naive  # Comparar naive con naive
+        Appointment.user_id == current_user.id
+        # Sin filtro de fecha → muestra completados y cancelados también
     )
     
     if status_filter:

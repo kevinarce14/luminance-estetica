@@ -42,7 +42,6 @@ luminance-estetica/
 │   ├── routes/                         # Endpoints
 │   │   ├── __init__.py
 │   │   ├── deps.py                  # Dependencias (get_db, get_current_user)
-│   │   ├── __init__.py
 │   │   ├── auth.py              # Login, register, password reset
 │   │   ├── appointments.py      # CRUD de turnos
 │   │   ├── services.py          # CRUD de servicios
@@ -67,3 +66,8 @@ luminance-estetica/
 ├── runtime.txt                      # Python version para Render
 ├── alembic.ini
 └── README.md
+
+
+
+Yo levanto el front con "fronted/ python -m http.server 5000" 
+Y el backend con "python -m uvicorn app.main:app --reload"

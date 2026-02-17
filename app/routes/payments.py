@@ -70,7 +70,7 @@ def create_payment_preference(
     # Verificar que no tenga un pago ya
     existing_payment = db.query(Payment).filter(
         Payment.appointment_id == appointment.id,
-        Payment.status.in_([PaymentStatus.APPROVED])
+        Payment.status.in_([PaymentStatus.PENDING, PaymentStatus.APPROVED])
     ).first()
     
     if existing_payment:
@@ -378,17 +378,31 @@ def create_cash_payment(
             detail="Turno no encontrado"
         )
     
-    # Verificar que no tenga un pago ya
+    # Verificar que no tenga un pago ya (cualquier estado)
     existing_payment = db.query(Payment).filter(
-        Payment.appointment_id == appointment_id,
-        Payment.status.in_([PaymentStatus.APPROVED])
+        Payment.appointment_id == appointment_id
     ).first()
     
     if existing_payment:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Este turno ya tiene un pago asociado"
-        )
+        # Si ya existe un pago APPROVED, no hacer nada
+        if existing_payment.status == PaymentStatus.APPROVED:
+            # Ya está pagado, solo confirmar el turno si no lo está
+            if appointment.status != AppointmentStatus.CONFIRMED:
+                appointment.status = AppointmentStatus.CONFIRMED
+                db.commit()
+            return existing_payment
+        
+        # Si existe un pago en otro estado (PENDING, CANCELLED, etc.)
+        # actualizarlo en vez de crear uno nuevo (evita UniqueViolation)
+        existing_payment.payment_method = PaymentMethod.CASH
+        existing_payment.status = PaymentStatus.APPROVED
+        existing_payment.approved_at = datetime.now()
+        
+        appointment.status = AppointmentStatus.CONFIRMED
+        
+        db.commit()
+        db.refresh(existing_payment)
+        return existing_payment
     
     # Crear pago en efectivo
     db_payment = Payment(

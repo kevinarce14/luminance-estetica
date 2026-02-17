@@ -1879,6 +1879,8 @@
                 </div>
             </div>
 
+            <div id="otros-container" class="services-grid-detailed"></div>
+
             <!-- APARATOLOGÍA -->
             <div class="service-category" id="aparato">
                 <h3><i class="fas fa-user-md"></i> Estética Corporal con Aparatología</h3>
@@ -2540,42 +2542,169 @@ async function loadServices() {
         const services = await getServices();
         console.log('✅ Servicios cargados:', services);
         
-        // Agrupar por categoría
-        const byCategory = {
-            'cejas': services.filter(s => s.name.toLowerCase().includes('ceja')),
-            'pestanas': services.filter(s => s.name.toLowerCase().includes('pestaña')),
-            'depilacion': services.filter(s => s.name.toLowerCase().includes('láser') || s.name.toLowerCase().includes('depilación')),
-            'facial': services.filter(s => s.name.toLowerCase().includes('facial') || s.name.toLowerCase().includes('radiofrecuencia')),
-            'corporal': services.filter(s => s.name.toLowerCase().includes('corporal') || s.name.toLowerCase().includes('velashape')),
-            'pies': services.filter(s => s.name.toLowerCase().includes('pedicur') || s.name.toLowerCase().includes('pies'))
+        // ✅ Agrupar por el campo 'category' de la BD
+        const byCategory = {};
+        
+        services.forEach(service => {
+            const cat = service.category || 'otros';
+            if (!byCategory[cat]) {
+                byCategory[cat] = [];
+            }
+            byCategory[cat].push(service);
+        });
+        
+        console.log('📊 Categorías encontradas:', Object.keys(byCategory));
+        
+        // ✅ Definir orden y títulos de categorías
+        const categoryConfig = {
+            'cejas': { title: 'Cejas & Diseño', icon: '🎨' },
+            'pestañas': { title: 'Pestañas & Lifting', icon: '👁️' },
+            'laser': { title: 'Depilación Láser', icon: '✨' },
+            'facial': { title: 'Tratamientos Faciales', icon: '💆' },
+            'corporal': { title: 'Tratamientos Corporales', icon: '🌟' },
+            'pies': { title: 'Pies & Pedicuría', icon: '🦶' },
+            'otros': { title: 'Otros Servicios', icon: '💅' }
         };
         
-        // Renderizar CEJAS
-        if (byCategory.cejas.length > 0) {
-            renderCategory('Cejas & Diseño', byCategory.cejas, '#cejas-container');
+        // ✅ Buscar la sección hardcoded de Aparatología
+        const aparatoSection = document.querySelector('#aparato');
+        
+        // ✅ Guardar temporalmente el HTML de Aparatología
+        const aparatoHTML = aparatoSection ? aparatoSection.outerHTML : '';
+        
+        // ✅ Ahora sí, limpiar contenido
+        const servicesSection = document.querySelector('#servicios .container');
+        
+        if (!servicesSection) {
+            console.error('❌ No se encontró el contenedor de servicios');
+            return;
         }
         
-        // Renderizar PESTAÑAS
-        if (byCategory.pestanas.length > 0) {
-            renderCategory('Pestañas & Lifting', byCategory.pestanas, '#pestanas-container');
+        servicesSection.innerHTML = '';
+        
+        // ✅ Renderizar categorías dinámicas
+        Object.keys(categoryConfig).forEach(catKey => {
+            if (byCategory[catKey] && byCategory[catKey].length > 0) {
+                const config = categoryConfig[catKey];
+                // ✅ PASAR catKey como 4to parámetro
+                renderCategorySection(config.title, config.icon, byCategory[catKey], catKey);
+            }
+        });
+        
+        // ✅ RESTAURAR sección hardcoded de Aparatología AL FINAL
+        if (aparatoHTML) {
+            servicesSection.insertAdjacentHTML('beforeend', aparatoHTML);
+            console.log('✅ Sección de Aparatología preservada');
         }
+
+        // ✅ NUEVO: Poblar menú desplegable
+        populateServicesMenu(categoryConfig, byCategory);
         
-        // Renderizar DEPILACIÓN
-        if (byCategory.depilacion.length > 0) {
-            renderCategory('Depilación Láser', byCategory.depilacion, '#depilacion-container');
-        }
-        
-        // Renderizar PIES
-        if (byCategory.facial.length > 0) {
-            renderCategory('Pies & Pedicuría', byCategory.pies, '#pies-container');
-        }
-        
-        
-        console.log('✅ Servicios renderizados por categoría');
+        console.log('✅ Servicios renderizados automáticamente');
         
     } catch (error) {
         console.error('❌ Error cargando servicios:', error);
     }
+}
+
+function renderCategorySection(categoryTitle, categoryIcon, services, categoryKey) {
+    const servicesSection = document.querySelector('#servicios .container');
+    
+    // ✅ AGREGAR ID basado en la categoría
+    const sectionHTML = `
+        <div class="service-category-section" id="categoria-${categoryKey}" style="margin-bottom: 60px; scroll-margin-top: 100px;">
+            <div class="section-title" style="text-align: center; margin-bottom: 40px;">
+                <span style="font-size: 3rem; display: block; margin-bottom: 10px;">${categoryIcon}</span>
+                <h3 style="font-size: 2rem; color: var(--violeta); font-weight: 700; margin-bottom: 10px;">
+                    ${categoryTitle}
+                </h3>
+                <div style="width: 80px; height: 4px; background: linear-gradient(90deg, var(--rosa-medio), var(--violeta)); margin: 0 auto;"></div>
+            </div>
+            
+            <div class="services-grid-detailed">
+                ${services.map(service => `
+                    <div class="service-item fade-in">
+                        <div class="service-header">
+                            <div class="service-icon">${categoryIcon}</div>
+                            <div class="service-title">
+                                <h4>${service.name}</h4>
+                                <span class="service-duration">
+                                    <i class="far fa-clock"></i> ${service.duration_minutes} minutos
+                                </span>
+                            </div>
+                        </div>
+                        <p>${service.description || 'Tratamiento profesional de belleza'}</p>
+                        <ul class="service-features">
+                            <li><i class="fas fa-check-circle"></i> Profesional certificada</li>
+                            <li><i class="fas fa-check-circle"></i> Productos de primera calidad</li>
+                            <li><i class="fas fa-check-circle"></i> Ambiente higienizado</li>
+                        </ul>
+                        <div class="service-price">${formatPrice(service.price)}</div>
+                        <button class="btn btn-rosa" onclick="reserveService(${service.id})" style="width: 100%; margin-top: 15px;">
+                            <i class="fas fa-calendar-check"></i>
+                            Reservar Turno
+                        </button>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    servicesSection.insertAdjacentHTML('beforeend', sectionHTML);
+}
+
+function populateServicesMenu(categoryConfig, byCategory) {
+    // Iconos para cada categoría
+    const categoryIcons = {
+        'cejas': 'fas fa-paint-brush',
+        'pestañas': 'fas fa-eye',
+        'laser': 'fas fa-spa',
+        'facial': 'fas fa-user-md',
+        'corporal': 'fas fa-dumbbell',
+        'pies': 'fas fa-shoe-prints',
+        'otros': 'fas fa-spa'
+    };
+    
+    // ✅ POBLAR MENÚ DESKTOP
+    const desktopDropdown = document.querySelector('.dropdown .dropdown-content');
+    if (desktopDropdown) {
+        let menuHTML = '';
+        
+        // Agregar categorías que tienen servicios
+        Object.keys(categoryConfig).forEach(catKey => {
+            if (byCategory[catKey] && byCategory[catKey].length > 0) {
+                const config = categoryConfig[catKey];
+                const icon = categoryIcons[catKey] || 'fas fa-spa';
+                menuHTML += `<a href="#categoria-${catKey}"><i class="${icon}"></i> ${config.title}</a>\n`;
+            }
+        });
+        
+        // ✅ Siempre agregar Aparatología al final
+        menuHTML += `<a href="#aparato"><i class="fas fa-user-md"></i> Aparatología</a>`;
+        
+        desktopDropdown.innerHTML = menuHTML;
+    }
+    
+    // ✅ POBLAR MENÚ MOBILE
+    const mobileDropdown = document.querySelector('#mobileDropdown');
+    if (mobileDropdown) {
+        let menuHTML = '';
+        
+        // Agregar categorías que tienen servicios
+        Object.keys(categoryConfig).forEach(catKey => {
+            if (byCategory[catKey] && byCategory[catKey].length > 0) {
+                const config = categoryConfig[catKey];
+                menuHTML += `<a href="#categoria-${catKey}">${config.title}</a>\n`;
+            }
+        });
+        
+        // ✅ Siempre agregar Aparatología al final
+        menuHTML += `<a href="#aparato">Aparatología</a>`;
+        
+        mobileDropdown.innerHTML = menuHTML;
+    }
+    
+    console.log('✅ Menús desplegables actualizados');
 }
 
 // ===== RENDERIZAR CATEGORÍA (MANTIENE TU DISEÑO EXACTO) =====
@@ -2751,6 +2880,37 @@ function updateMyAppointmentsButtons() {
 // Ejecutar al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
     updateMyAppointmentsButtons();
+});
+
+
+// ✅ Smooth scroll para todos los links con #
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        
+        // No hacer nada si es solo #
+        if (href === '#') return;
+        
+        e.preventDefault();
+        
+        const target = document.querySelector(href);
+        if (target) {
+            // Cerrar menú mobile si está abierto
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('overlay');
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            
+            // Scroll suave
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
 });
 
 </script>

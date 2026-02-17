@@ -1422,6 +1422,72 @@
                 transform: translateY(0);
             }
         }
+
+        /* Botón violeta en navbar */
+        .btn-violeta {
+            background: linear-gradient(135deg, var(--violeta) 0%, var(--rosa-oscuro) 100%);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-violeta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 51, 153, 0.3);
+        }
+        /* Alineación perfecta de botones en header */
+        header nav ul li a.btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 25px;
+        }
+
+        header nav ul li a.btn i {
+            font-size: 14px;
+        }
+
+        /* Botón flotante */
+        .fab-button {
+            position: fixed;
+            bottom: 80px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--violeta) 0%, var(--rosa-oscuro) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(102, 51, 153, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 999;
+            text-decoration: none;
+        }
+
+        .fab-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(102, 51, 153, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .fab-button {
+                bottom: 70px;
+                right: 20px;
+                width: 55px;
+                height: 55px;
+                font-size: 20px;
+            }
+        }
         
         /* ===== WHATSAPP FLOAT BUTTON ===== */
         .whatsapp-float {
@@ -1479,7 +1545,12 @@
                     <li><a href="#formacion">Formación</a></li>
                     <li><a href="#testimonios">Testimonios</a></li>
                     <li><a href="#contacto">Contacto</a></li>
-                    <li><a class="btn btn-rosa" onclick="reserveService()">📅 Reservar Turno</a></li>
+                    <li><a class="btn btn-rosa" onclick="reserveService()"><i class="fas fa-calendar-check"></i> Reservar Turno</a></li>
+                    <li id="my-appointments-nav" style="display: none;">
+                        <a class="btn btn-violeta" href="/mis-turnos.html">
+                            <i class="fas fa-calendar-alt"></i> Mis Turnos
+                        </a>
+                    </li>
                 </ul>
                 
             </nav>
@@ -2660,6 +2731,28 @@ if (document.readyState !== 'loading') {
 // Cargar servicios
 document.addEventListener('DOMContentLoaded', loadServices);
 if (document.readyState !== 'loading') loadServices();
+
+// Mostrar/ocultar botones "Mis Turnos" según login
+function updateMyAppointmentsButtons() {
+    const navBtn = document.getElementById('my-appointments-nav');
+    const fabBtn = document.getElementById('fab-my-appointments');
+    
+    const isAuth = isLoggedIn();
+    
+    if (navBtn) {
+        navBtn.style.display = isAuth ? 'block' : 'none';
+    }
+    
+    if (fabBtn) {
+        fabBtn.style.display = isAuth ? 'flex' : 'none';
+    }
+}
+
+// Ejecutar al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    updateMyAppointmentsButtons();
+});
+
 </script>
 </body>
 </html>

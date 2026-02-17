@@ -96,7 +96,7 @@ def get_available_slots_for_date(
     
     existing_appointments = db.query(Appointment).filter(
         ##Appointment.service_id == service_id,   ##DESCOMENTAR ESTO PARA PERMITIR QUE PUEDAN ELEGIR EL MISMO DIA/HORARIO CON LA CONDICION QUE SEA OTRO SERVICIO, SOLO SI ESCALA EL PERSONAL
-        Appointment.status.in_([AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED]),
+        Appointment.status == AppointmentStatus.CONFIRMED,
         Appointment.appointment_date >= day_start,
         Appointment.appointment_date <= day_end
     ).all()

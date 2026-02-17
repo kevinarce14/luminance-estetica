@@ -70,7 +70,7 @@ def create_payment_preference(
     # Verificar que no tenga un pago ya
     existing_payment = db.query(Payment).filter(
         Payment.appointment_id == appointment.id,
-        Payment.status.in_([PaymentStatus.PENDING, PaymentStatus.APPROVED])
+        Payment.status.in_([PaymentStatus.APPROVED])
     ).first()
     
     if existing_payment:
@@ -381,7 +381,7 @@ def create_cash_payment(
     # Verificar que no tenga un pago ya
     existing_payment = db.query(Payment).filter(
         Payment.appointment_id == appointment_id,
-        Payment.status.in_([PaymentStatus.PENDING, PaymentStatus.APPROVED])
+        Payment.status.in_([PaymentStatus.APPROVED])
     ).first()
     
     if existing_payment:

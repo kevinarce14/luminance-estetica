@@ -1,0 +1,11 @@
+# En la raíz de luminance-estetica/
+cat > .vercelignore << EOF
+app/
+Dockerfile*
+requirements.txt
+*.py
+__pycache__/
+.env
+alembic/
+render.yaml
+EOF

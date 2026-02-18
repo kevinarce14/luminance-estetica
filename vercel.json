@@ -4,11 +4,5 @@
       "source": "/",
       "destination": "/bienvenida.html"
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
   ]
 }

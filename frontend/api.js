@@ -6,10 +6,8 @@
  */
 const API_CONFIG = {
     // Cambiar según el entorno
-    BASE_URL: window.location.hostname === 'localhost' 
-    ? 'http://localhost:8000'                              // Local
-    : 'https://luminance-backend.onrender.com',           // Producción
-    // BASE_URL: 'https://tu-backend.render.com',  // Producción
+    //BASE_URL: 'http://localhost:8000',  // Desarrollo local
+    BASE_URL: 'https://luminance-backend.onrender.com',  // Producción
     API_PREFIX: '/api',
     TIMEOUT: 10000, // 10 segundos
 };
@@ -218,7 +216,7 @@ async function login(email, password) {
  */
 function logout() {
     removeAuthToken();
-    window.location.href = '/index.html';
+    window.location.href = '/bienvenida.html';
 }
 
 /**
@@ -498,7 +496,7 @@ function formatPrice(price) {
 function requireAuth() {
     if (!isLoggedIn()) {
         alert('Debes iniciar sesión para acceder a esta página');
-        window.location.href = '/index.html';
+        window.location.href = '/bienvenida.html';
     }
 }
 
@@ -690,7 +688,7 @@ async function logoutWithConfirmation() {
     const confirmed = await showLogoutModal();
     if (confirmed) {
         removeAuthToken();
-        window.location.href = '/index.html';
+        window.location.href = '/bienvenida.html';
     }
 }
 

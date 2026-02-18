@@ -6,7 +6,9 @@
  */
 const API_CONFIG = {
     // Cambiar según el entorno
-    BASE_URL: 'http://localhost:8000',  // Desarrollo local
+    BASE_URL: window.location.hostname === 'localhost' 
+    ? 'http://localhost:8000'                              // Local
+    : 'https://luminance-backend.onrender.com',           // Producción
     // BASE_URL: 'https://tu-backend.render.com',  // Producción
     API_PREFIX: '/api',
     TIMEOUT: 10000, // 10 segundos

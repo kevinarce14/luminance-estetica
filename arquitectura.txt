@@ -59,12 +59,15 @@ luminance-estetica/
 │       ├──scheduler_service.py   # actualizacion automatica estados de los turnos
 │       └── notification_service.py  # Recordatorios automáticos
 │   
-├── .env.example                     # Template de variables
+├── .env                    # Template de variables
 ├── .gitignore
 ├── requirements.txt
 ├── requirements-dev.txt
 ├── runtime.txt                      # Python version para Render
 ├── alembic.ini
+├── dockerignore
+├── Dockerfile
+├── render.yaml
 └── README.md
 
 

@@ -54,7 +54,7 @@ class Settings(BaseSettings):
     PAYMENT_PENDING_URL: str = "http://localhost:3000/pago-pendiente"
     
     # ========== CORS ==========
-    CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
+    CORS_ORIGINS: str = "https://luminance-estetica.vercel.app"
     # DESPUÉS (agregá tu dominio de Vercel):
     #CORS_ORIGINS: str = "https://tu-proyecto.vercel.app,http://localhost:5000,http://localhost:3000
     

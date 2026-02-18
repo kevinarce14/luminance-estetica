@@ -2,7 +2,7 @@ luminance-estetica/
 ├──frontend/
 │         ├──admin-dashboard.html
 │         ├──api.js
-│         ├──bienvenida.html
+│         ├──index.html
 │         ├──login.html
 │         ├──mis-turnos.html
 │         ├──pago-exitoso.html

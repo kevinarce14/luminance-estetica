@@ -216,7 +216,7 @@ async function login(email, password) {
  */
 function logout() {
     removeAuthToken();
-    window.location.href = '/bienvenida.html';
+    window.location.href = '/index.html';
 }
 
 /**
@@ -496,7 +496,7 @@ function formatPrice(price) {
 function requireAuth() {
     if (!isLoggedIn()) {
         alert('Debes iniciar sesión para acceder a esta página');
-        window.location.href = '/bienvenida.html';
+        window.location.href = '/index.html';
     }
 }
 
@@ -688,7 +688,7 @@ async function logoutWithConfirmation() {
     const confirmed = await showLogoutModal();
     if (confirmed) {
         removeAuthToken();
-        window.location.href = '/bienvenida.html';
+        window.location.href = '/index.html';
     }
 }
 

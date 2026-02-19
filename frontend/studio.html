@@ -1597,6 +1597,126 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        /* ===== MODAL DE CONFIRMACIÓN ===== */
+        .logout-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .logout-modal.active {
+            display: flex;
+        }
+        
+        .logout-modal-content {
+            background: white;
+            border-radius: 25px;
+            padding: 40px 35px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            text-align: center;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logout-modal-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, #f8d7e6, #f4f0ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        
+        .logout-modal h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--violeta);
+            margin-bottom: 12px;
+        }
+        
+        .logout-modal p {
+            color: #636e72;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .logout-modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        .logout-modal-btn {
+            flex: 1;
+            padding: 14px 25px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .logout-modal-btn-cancel {
+            background: #f0f0f0;
+            color: #2d3436;
+        }
+        
+        .logout-modal-btn-cancel:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+        
+        .logout-modal-btn-confirm {
+            background: linear-gradient(135deg, #e75480, #9c89b8);
+            color: white;
+        }
+        
+        .logout-modal-btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(231, 84, 128, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .logout-modal-content {
+                padding: 35px 25px;
+            }
+            
+            .logout-modal-buttons {
+                flex-direction: column;
+            }
+            
+            .logout-modal-btn {
+                width: 100%;
+            }
+        }
     </style>
     <link rel="stylesheet" href="responsive.css">
 </head>
@@ -1672,7 +1792,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <div>
                         <p style="margin: 0; font-weight: 600; color: var(--violeta);" id="mobileUserName">Hola, Usuario</p>
-                        <p style="margin: 0; font-size: 0.85rem; color: #636e72;" id="mobileUserEmail">email@example.com</p>
+                        <p style="margin: 0; font-size: 0.85rem; color: #636e72;" id="mobileUserEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2e4b434f47426e4b564f435e424b004d4143">[email&#160;protected]</a></p>
                     </div>
                     <button onclick="logoutWithConfirmation()" style="padding: 8px 16px; font-size: 0.9rem; background: #f0f0f0; color: #2d3436; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                         Salir
@@ -2283,13 +2403,32 @@
         </div>
     </footer>
     
+    <!-- ===== MODAL DE CONFIRMACIÓN DE LOGOUT ===== -->
+    <div class="logout-modal" id="logoutModal">
+        <div class="logout-modal-content">
+            <div class="logout-modal-icon">
+                👋
+            </div>
+            <h3>¿Cerrar sesión?</h3>
+            <p>¿Estás segura de que querés salir? Siempre podés volver cuando quieras.</p>
+            <div class="logout-modal-buttons">
+                <button class="logout-modal-btn logout-modal-btn-cancel" onclick="closeLogoutModal()">
+                    Quedarme
+                </button>
+                <button class="logout-modal-btn logout-modal-btn-confirm" onclick="confirmLogout()">
+                    Sí, salir
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- ===== WHATSAPP FLOAT BUTTON ===== -->
     <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Quiero%20consultarte%20sobre%20tus%20servicios" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
     
     <!-- ===== SCRIPTS ===== -->
-    <script src="api.js"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="api.js"></script>
 
     <script>
         // ===== FUNCIONES DE AUTENTICACIÓN (deben estar definidas en api.js) =====
@@ -2317,10 +2456,17 @@
         
         // ✅ Función mejorada de logout con confirmación - AHORA SÍ FUNCIONA
         function logoutWithConfirmation() {
-            if (confirm('¿Seguro que quieres cerrar sesión?')) {
-                removeAuthToken();
-                window.location.reload();
-            }
+            // Mostrar el modal bonito en lugar de confirm() nativo
+            document.getElementById('logoutModal').classList.add('active');
+        }
+        
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').classList.remove('active');
+        }
+        
+        function confirmLogout() {
+            removeAuthToken();
+            window.location.reload();
         }
         
         // ===== BOTÓN FLOTANTE DE LOGOUT/LOGIN (SOLO ESCRITORIO) =====
@@ -2816,13 +2962,16 @@
                 });
             }
             
-            // Cerrar menú al hacer clic en un enlace
-            const mobileLinks = document.querySelectorAll('.mobile-nav a, .mobile-dropdown a');
+            // Cerrar menú al hacer clic en un enlace (excepto el toggle de Servicios)
+            const mobileLinks = document.querySelectorAll('.mobile-nav > li > a:not(.mobile-dropdown-toggle), .mobile-dropdown a');
             mobileLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.classList.remove('active');
-                    overlay.classList.remove('active');
-                    document.body.style.overflow = '';
+                link.addEventListener('click', (e) => {
+                    // Solo cerrar si NO es el toggle de servicios
+                    if (!link.classList.contains('mobile-dropdown-toggle')) {
+                        mobileMenu.classList.remove('active');
+                        overlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
                 });
             });
         }
@@ -3030,12 +3179,7 @@
             document.head.appendChild(style);
             
             // Reaccionar a cambios de tamaño de ventana para ocultar/mostrar botones flotantes
-            window.addEventListener('resize', () => {
-                const existingBtn = document.getElementById('auth-buttons');
-                if (existingBtn) existingBtn.remove();
-                
-                createFloatingButton();
-            });
+            createFloatingButton();
         });
     </script>
 </body>

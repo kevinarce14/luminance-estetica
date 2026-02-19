@@ -1577,6 +1577,39 @@
             }
         }
 
+        /* ============================================
+           🎨 ESTILOS BOTONES MENÚ MÓVIL
+           ============================================ */
+        .btn-violeta {
+            background: linear-gradient(135deg, var(--violeta), #8b6db8);
+            color: white;
+        }
+        
+        .btn-violeta:hover {
+            background: linear-gradient(135deg, #5a3d7a, var(--violeta));
+        }
+        
+        .btn-lila {
+            background: linear-gradient(135deg, #a78bca, #8b6db8);
+            color: white;
+        }
+        
+        .btn-lila:hover {
+            background: linear-gradient(135deg, #8b6db8, #7d5ba6);
+        }
+        
+        .mobile-auth-section .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
 
     </style>
     <link rel="stylesheet" href="responsive.css">
@@ -1636,6 +1669,45 @@
             </div>
             <div class="mobile-close" id="mobileClose">
                 <i class="fas fa-times"></i>
+            </div>
+        </div>
+        
+        <!-- Auth section (login/logout) -->
+        <div class="mobile-auth-section" style="padding: 20px 25px; border-bottom: 1px solid #f0f0f0;">
+            <!-- Si NO está logueado -->
+            <div id="mobileAuthGuest" style="display: none;">
+                <a href="/login.html" class="btn btn-rosa" style="width: 100%; margin-bottom: 10px;">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                </a>
+            </div>
+            
+            <!-- Si está logueado -->
+            <div id="mobileAuthUser" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>
+                        <p style="margin: 0; font-weight: 600; color: var(--violeta);" id="mobileUserName">Hola, Usuario</p>
+                        <p style="margin: 0; font-size: 0.85rem; color: #636e72;" id="mobileUserEmail">email@example.com</p>
+                    </div>
+                    <button onclick="logout()" class="btn" style="padding: 8px 16px; font-size: 0.9rem; background: #f0f0f0; color: #2d3436;">
+                        Salir
+                    </button>
+                </div>
+                
+                <!-- Panel Admin (solo si es admin) -->
+                <a href="/admin-dashboard.html" 
+                   id="mobileAdminLink" 
+                   class="btn btn-violeta" 
+                   style="width: 100%; display: none; margin-bottom: 10px;">
+                    <i class="fas fa-user-shield"></i> Panel Admin
+                </a>
+                
+                <!-- Mis Turnos (para usuarios normales) -->
+                <a href="/mis-turnos.html" 
+                   id="mobileMisTurnosLink" 
+                   class="btn btn-lila" 
+                   style="width: 100%; display: none;">
+                    <i class="fas fa-calendar-check"></i> Mis Turnos
+                </a>
             </div>
         </div>
         
@@ -2945,7 +3017,49 @@ function updateMyAppointmentsButtons() {
 // Ejecutar al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
     updateMyAppointmentsButtons();
+    updateMobileMenuAuth(); // ✅ Actualizar menú móvil también
 });
+
+// ✅ Actualizar sección de auth en menú móvil
+function updateMobileMenuAuth() {
+    const mobileAuthGuest = document.getElementById('mobileAuthGuest');
+    const mobileAuthUser = document.getElementById('mobileAuthUser');
+    const mobileUserName = document.getElementById('mobileUserName');
+    const mobileUserEmail = document.getElementById('mobileUserEmail');
+    const mobileAdminLink = document.getElementById('mobileAdminLink');
+    const mobileMisTurnosLink = document.getElementById('mobileMisTurnosLink');
+    
+    const userData = getUserData();
+    const isAuth = isLoggedIn();
+    
+    if (!isAuth) {
+        // Usuario NO logueado → Mostrar botón "Iniciar sesión"
+        if (mobileAuthGuest) mobileAuthGuest.style.display = 'block';
+        if (mobileAuthUser) mobileAuthUser.style.display = 'none';
+    } else {
+        // Usuario logueado → Mostrar info + botones
+        if (mobileAuthGuest) mobileAuthGuest.style.display = 'none';
+        if (mobileAuthUser) mobileAuthUser.style.display = 'block';
+        
+        // Actualizar nombre y email
+        if (mobileUserName) {
+            mobileUserName.textContent = `Hola, ${userData.full_name || 'Usuario'}`;
+        }
+        if (mobileUserEmail) {
+            mobileUserEmail.textContent = userData.email || '';
+        }
+        
+        // Mostrar Panel Admin si es admin
+        if (mobileAdminLink) {
+            mobileAdminLink.style.display = userData.is_admin ? 'block' : 'none';
+        }
+        
+        // Mostrar Mis Turnos si NO es admin
+        if (mobileMisTurnosLink) {
+            mobileMisTurnosLink.style.display = userData.is_admin ? 'none' : 'block';
+        }
+    }
+}
 
 
 // ✅ Smooth scroll para todos los links con #

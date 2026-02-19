@@ -2315,7 +2315,7 @@
             }).format(price);
         }
         
-        // ✅ Función mejorada de logout con confirmación
+        // ✅ Función mejorada de logout con confirmación - AHORA SÍ FUNCIONA
         function logoutWithConfirmation() {
             if (confirm('¿Seguro que quieres cerrar sesión?')) {
                 removeAuthToken();
@@ -2789,29 +2789,29 @@
                 });
             }
             
-            // ✅ Dropdown de servicios en menú móvil - CORREGIDO
+            // ✅ Dropdown de servicios en menú móvil - VERSIÓN SIMPLE QUE FUNCIONA
             const mobileServicesToggle = document.getElementById('mobileServicesToggle');
             const mobileDropdown = document.getElementById('mobileDropdown');
             
             if (mobileServicesToggle && mobileDropdown) {
                 mobileServicesToggle.addEventListener('click', function(e) {
                     e.preventDefault();
-                    e.stopPropagation(); // ✅ Evita que el evento se propague
                     
-                    const isOpen = mobileDropdown.style.display === 'block';
-                    
-                    // ✅ Simplemente alternamos la visibilidad sin cambiar el scroll
-                    if (isOpen) {
+                    // Simplemente alternamos la visibilidad
+                    if (mobileDropdown.style.display === 'block') {
                         mobileDropdown.style.display = 'none';
+                        // Rotar icono hacia abajo
+                        const icon = this.querySelector('i');
+                        if (icon) {
+                            icon.style.transform = 'rotate(0deg)';
+                        }
                     } else {
                         mobileDropdown.style.display = 'block';
-                    }
-                    
-                    // Rotar el icono
-                    const icon = this.querySelector('i');
-                    if (icon) {
-                        icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-                        icon.style.transition = 'transform 0.3s';
+                        // Rotar icono hacia arriba
+                        const icon = this.querySelector('i');
+                        if (icon) {
+                            icon.style.transform = 'rotate(180deg)';
+                        }
                     }
                 });
             }

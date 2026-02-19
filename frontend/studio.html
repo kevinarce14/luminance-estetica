@@ -1300,6 +1300,7 @@
             text-decoration: none;
             border-bottom: 2px solid transparent;
             transition: var(--transicion);
+            cursor: pointer;
         }
         
         .mobile-nav a:hover {
@@ -1321,8 +1322,16 @@
         
         .mobile-dropdown a {
             font-size: 1rem;
-            padding: 8px 0;
+            padding: 10px 0;
             color: var(--texto-medio);
+            display: block;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .mobile-dropdown a:hover {
+            color: var(--rosa-fuerte);
+            padding-left: 10px;
         }
         
         .overlay {
@@ -2322,10 +2331,6 @@
             const existingBtn = document.getElementById('auth-buttons');
             if (existingBtn) existingBtn.remove();
             
-            // Eliminar cualquier botón de admin flotante que pueda existir
-            const existingAdminBtns = document.querySelectorAll('a[href="/admin-dashboard.html"]:not(#mobileAdminLink)');
-            existingAdminBtns.forEach(btn => btn.remove());
-            
             if (isAuth) {
                 // Usuario logueado: mostrar nombre + botón salir + botón admin (solo en desktop)
                 if (window.innerWidth > 768) {
@@ -2783,15 +2788,29 @@
                 });
             }
             
-            // ✅ Dropdown de servicios en menú móvil
+            // ✅ Dropdown de servicios en menú móvil - AHORA NO HACE SCROLL
             const mobileServicesToggle = document.getElementById('mobileServicesToggle');
             const mobileDropdown = document.getElementById('mobileDropdown');
             
             if (mobileServicesToggle && mobileDropdown) {
                 mobileServicesToggle.addEventListener('click', function(e) {
                     e.preventDefault();
+                    e.stopPropagation(); // ✅ Evita que el evento se propague
+                    
                     const isOpen = mobileDropdown.style.display === 'block';
-                    mobileDropdown.style.display = isOpen ? 'none' : 'block';
+                    
+                    if (!isOpen) {
+                        // Si va a abrir, guardamos la posición actual del scroll
+                        const scrollPosition = mobileMenu.scrollTop;
+                        
+                        mobileDropdown.style.display = 'block';
+                        
+                        // ✅ Mantenemos la misma posición de scroll
+                        mobileMenu.scrollTop = scrollPosition;
+                    } else {
+                        mobileDropdown.style.display = 'none';
+                    }
+                    
                     const icon = this.querySelector('i');
                     if (icon) {
                         icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
@@ -3017,9 +3036,6 @@
             window.addEventListener('resize', () => {
                 const existingBtn = document.getElementById('auth-buttons');
                 if (existingBtn) existingBtn.remove();
-                
-                const existingAdminBtns = document.querySelectorAll('a[href="/admin-dashboard.html"]:not(#mobileAdminLink)');
-                existingAdminBtns.forEach(btn => btn.remove());
                 
                 createFloatingButton();
             });

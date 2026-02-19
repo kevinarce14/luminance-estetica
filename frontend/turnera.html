@@ -512,73 +512,9 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* ============================================
-        📱 RESPONSIVE - MOBILE
-        ============================================ */
-
-        @media (max-width: 768px) {
-            /* Ajustar padding general */
-            .container {
-                padding: 20px 15px;
-                width: 100%;
-            }
-            
-            /* Hacer el header responsive */
-            header nav ul {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            header nav ul li {
-                width: 100%;
-                text-align: center;
-            }
-            
-            /* Botones más grandes en móvil */
-            .btn {
-                padding: 15px 20px;
-                font-size: 16px;
-                width: 100%;
-            }
-            
-            /* Grids a una columna en móvil */
-            .services-grid,
-            .services-grid-detailed,
-            .aparato-grid {
-                grid-template-columns: 1fr !important;
-                gap: 20px;
-            }
-            
-            /* Formularios más anchos */
-            input, select, textarea {
-                width: 100%;
-                font-size: 16px; /* Evita zoom en iOS */
-            }
-            
-            /* Tablas scrolleables */
-            table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-            }
-            
-            /* Texto más grande para lectura */
-            body {
-                font-size: 16px;
-            }
-            
-            h1 { font-size: 28px; }
-            h2 { font-size: 24px; }
-            h3 { font-size: 20px; }
-        }
-
-        /* Tablets (768px - 1024px) */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .services-grid-detailed {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
+        
     </style>
+    <link rel="stylesheet" href="responsive.css">
 </head>
 <body>
     <!-- ===== HEADER ===== -->
@@ -829,6 +765,28 @@
                                 ${arg.event.title}
                                </div>`
                     };
+                },
+
+                // ✅ AGREGAR ESTAS OPCIONES MÓVILES:
+                windowResize: function(view) {
+                    if (window.innerWidth < 768) {
+                        calendar.changeView('listWeek'); // Vista lista en móvil
+                    } else {
+                        calendar.changeView('dayGridMonth'); // Vista mes en desktop
+                    }
+                },
+                
+                // Responsive inicial
+                initialView: window.innerWidth < 768 ? 'listWeek' : 'dayGridMonth',
+                
+                // Altura adaptativa
+                height: window.innerWidth < 768 ? 'auto' : 650,
+                
+                // Botones según pantalla
+                headerToolbar: {
+                    left: window.innerWidth < 768 ? 'prev,next' : 'prev,next today',
+                    center: 'title',
+                    right: window.innerWidth < 768 ? '' : 'dayGridMonth,timeGridWeek'
                 }
             });
             

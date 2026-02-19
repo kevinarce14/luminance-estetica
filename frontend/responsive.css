@@ -1,0 +1,343 @@
+/* ============================================================
+   📱 LUMINANCE ESTÉTICA - CSS RESPONSIVE
+   ============================================================
+   Este archivo hace que TODAS las páginas se vean bien en móvil
+   ============================================================ */
+
+/* ── RESET BASE ────────────────────────────────────────── */
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    min-width: 320px;
+}
+
+/* ── IMÁGENES Y MEDIA ──────────────────────────────────── */
+img, video, iframe {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ── CONTENEDORES ──────────────────────────────────────── */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+}
+
+/* ============================================================
+   📱 MOBILE (max-width: 768px)
+   ============================================================ */
+
+@media (max-width: 768px) {
+    
+    /* ── HEADER Y NAVEGACIÓN ───────────────────────────── */
+    header {
+        padding: 15px !important;
+    }
+    
+    header .logo-text {
+        font-size: 1.5rem !important;
+    }
+    
+    /* Ocultar menú desktop */
+    header nav {
+        display: none !important;
+    }
+    
+    /* Mostrar botón hamburguesa */
+    .menu-toggle {
+        display: block !important;
+        font-size: 1.5rem;
+        cursor: pointer;
+        z-index: 1001;
+    }
+    
+    /* Menú móvil */
+    .mobile-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 85%;
+        max-width: 320px;
+        height: 100vh;
+        background: white;
+        transition: right 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    }
+    
+    .mobile-menu.active {
+        right: 0;
+    }
+    
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease;
+    }
+    
+    .overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* ── BOTONES ─────────────────────────────────────── */
+    .btn {
+        padding: 14px 24px !important;
+        font-size: 15px !important;
+        width: 100%;
+        display: block;
+        text-align: center;
+    }
+    
+    /* Botones en fila → columna */
+    .buttons,
+    .turno-actions {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+    
+    .buttons .btn,
+    .turno-actions .btn {
+        width: 100% !important;
+        margin: 0 !important;
+    }
+    
+    /* ── GRIDS Y LAYOUTS ─────────────────────────────── */
+    /* Todos los grids a 1 columna */
+    [class*="grid"],
+    .services-grid,
+    .services-grid-detailed,
+    .aparato-grid,
+    .courses-grid,
+    .turno-grid,
+    #turnos-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+    
+    /* Flex a columna */
+    [class*="flex"] {
+        flex-direction: column !important;
+    }
+    
+    /* ── FORMULARIOS ─────────────────────────────────── */
+    input,
+    select,
+    textarea,
+    .form-control {
+        width: 100% !important;
+        font-size: 16px !important; /* Evita zoom en iOS */
+        padding: 14px !important;
+    }
+    
+    /* Form groups en columna */
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-row {
+        flex-direction: column !important;
+        gap: 15px;
+    }
+    
+    /* ── TABLAS ──────────────────────────────────────── */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table th,
+    table td {
+        padding: 10px 8px !important;
+        font-size: 14px !important;
+    }
+    
+    /* ── CALENDARIO (FullCalendar) ───────────────────── */
+    #calendar {
+        font-size: 12px !important;
+    }
+    
+    .fc-toolbar {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    
+    .fc-toolbar-chunk {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .fc-button {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+    }
+    
+    /* Vista mes: hacer celdas más grandes */
+    .fc-daygrid-day {
+        min-height: 60px !important;
+    }
+    
+    /* ── CARDS Y SERVICIOS ───────────────────────────── */
+    .service-item,
+    .turno-card,
+    .aparato-card {
+        padding: 20px !important;
+    }
+    
+    .service-header {
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+    
+    .service-icon {
+        margin-bottom: 10px !important;
+    }
+    
+    /* ── SECCIONES ───────────────────────────────────── */
+    section {
+        padding: 40px 0 !important;
+    }
+    
+    .section-title h2 {
+        font-size: 1.8rem !important;
+    }
+    
+    /* ── MODALES ─────────────────────────────────────── */
+    .modal-content {
+        width: 95% !important;
+        max-width: 95% !important;
+        margin: 20px auto !important;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    /* ── PASOS/STEPS ─────────────────────────────────── */
+    .steps {
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+    
+    .step {
+        width: 100% !important;
+    }
+    
+    /* ── FILTROS ─────────────────────────────────────── */
+    .filter-tabs,
+    .tabs {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+    
+    .tab-btn,
+    .filter-btn {
+        flex: 1 1 auto !important;
+        min-width: fit-content !important;
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+    }
+    
+    /* ── TIPOGRAFÍA ──────────────────────────────────── */
+    h1 { font-size: 2rem !important; }
+    h2 { font-size: 1.6rem !important; }
+    h3 { font-size: 1.3rem !important; }
+    h4 { font-size: 1.1rem !important; }
+    
+    p, li {
+        font-size: 15px !important;
+        line-height: 1.6 !important;
+    }
+    
+    /* ── DASHBOARD ───────────────────────────────────── */
+    .dashboard-stats {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .stat-card {
+        padding: 20px !important;
+    }
+    
+    /* ── PAYMENT FORM ────────────────────────────────── */
+    #mercadopago-container {
+        padding: 15px !important;
+    }
+    
+    /* ── MISC ────────────────────────────────────────── */
+    /* Ocultar elementos no críticos en móvil */
+    .desktop-only {
+        display: none !important;
+    }
+    
+    /* Espaciado reducido */
+    .section-padding {
+        padding: 30px 0 !important;
+    }
+    
+    /* Links más grandes (mejor touch target) */
+    a {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
+}
+
+/* ============================================================
+   📱 TABLET (769px - 1024px)
+   ============================================================ */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        padding: 30px 20px;
+    }
+    
+    .services-grid-detailed,
+    .courses-grid,
+    #turnos-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* ============================================================
+   🖥️ DESKTOP (min-width: 1025px)
+   ============================================================ */
+
+@media (min-width: 1025px) {
+    /* Ocultar menú móvil en desktop */
+    .mobile-menu,
+    .menu-toggle,
+    .overlay {
+        display: none !important;
+    }
+}

@@ -1576,38 +1576,58 @@
                 visibility: visible !important;
             }
         }
+            
+            /* ✅ Stats en 2x2 en móvil */
+            .stats {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 15px !important;
+                padding: 30px 15px !important;
+            }
+            
+            .stat-item {
+                padding: 20px 10px !important;
+            }
+            
+            .stat-item .stat-number {
+                font-size: 2rem !important;
+            }
+            
+            .stat-item .stat-label {
+                font-size: 0.85rem !important;
+                line-height: 1.3 !important;
+            }
+            
+            /* ✅ Sobre Mí responsive */
+            .about-content {
+                grid-template-columns: 1fr !important;
+                gap: 30px !important;
+            }
+            
+            .about-image {
+                text-align: center !important;
+            }
+            
+            .about-image img {
+                max-width: 250px !important;
+                margin: 0 auto !important;
+            }
+            
+            .about-text {
+                text-align: left !important;
+            }
+            
+            .about-text h2 {
+                text-align: center !important;
+                font-size: 1.8rem !important;
+                margin-bottom: 20px !important;
+            }
+            
+            .about-text p {
+                font-size: 0.95rem !important;
+                line-height: 1.7 !important;
+                margin-bottom: 15px !important;
+            }
 
-        /* ============================================
-           🎨 ESTILOS BOTONES MENÚ MÓVIL
-           ============================================ */
-        .btn-violeta {
-            background: linear-gradient(135deg, var(--violeta), #8b6db8);
-            color: white;
-        }
-        
-        .btn-violeta:hover {
-            background: linear-gradient(135deg, #5a3d7a, var(--violeta));
-        }
-        
-        .btn-lila {
-            background: linear-gradient(135deg, #a78bca, #8b6db8);
-            color: white;
-        }
-        
-        .btn-lila:hover {
-            background: linear-gradient(135deg, #8b6db8, #7d5ba6);
-        }
-        
-        .mobile-auth-section .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
         }
 
 
@@ -1672,11 +1692,11 @@
             </div>
         </div>
         
-        <!-- Auth section (login/logout) -->
+        <!-- ✅ Auth section (login/logout) -->
         <div class="mobile-auth-section" style="padding: 20px 25px; border-bottom: 1px solid #f0f0f0;">
             <!-- Si NO está logueado -->
             <div id="mobileAuthGuest" style="display: none;">
-                <a href="/login.html" class="btn btn-rosa" style="width: 100%; margin-bottom: 10px;">
+                <a href="/login.html" class="btn btn-rosa" style="width: 100%; display: block; text-align: center; text-decoration: none; padding: 12px; border-radius: 12px;">
                     <i class="fas fa-sign-in-alt"></i> Iniciar sesión
                 </a>
             </div>
@@ -1688,28 +1708,27 @@
                         <p style="margin: 0; font-weight: 600; color: var(--violeta);" id="mobileUserName">Hola, Usuario</p>
                         <p style="margin: 0; font-size: 0.85rem; color: #636e72;" id="mobileUserEmail">email@example.com</p>
                     </div>
-                    <button onclick="logout()" class="btn" style="padding: 8px 16px; font-size: 0.9rem; background: #f0f0f0; color: #2d3436;">
+                    <button onclick="logoutWithConfirmation()" style="padding: 8px 16px; font-size: 0.9rem; background: #f0f0f0; color: #2d3436; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                         Salir
                     </button>
                 </div>
                 
-                <!-- Panel Admin (solo si es admin) -->
                 <a href="/admin-dashboard.html" 
                    id="mobileAdminLink" 
-                   class="btn btn-violeta" 
-                   style="width: 100%; display: none; margin-bottom: 10px;">
+                   class="btn" 
+                   style="display: none; width: 100%; padding: 12px; background: linear-gradient(135deg, var(--violeta), #8b6db8); color: white; text-decoration: none; border-radius: 12px; margin-bottom: 10px; text-align: center; font-weight: 600;">
                     <i class="fas fa-user-shield"></i> Panel Admin
                 </a>
                 
-                <!-- Mis Turnos (para usuarios normales) -->
                 <a href="/mis-turnos.html" 
                    id="mobileMisTurnosLink" 
-                   class="btn btn-lila" 
-                   style="width: 100%; display: none;">
+                   class="btn" 
+                   style="display: none; width: 100%; padding: 12px; background: linear-gradient(135deg, #a78bca, #8b6db8); color: white; text-decoration: none; border-radius: 12px; text-align: center; font-weight: 600;">
                     <i class="fas fa-calendar-check"></i> Mis Turnos
                 </a>
             </div>
         </div>
+
         
         <ul class="mobile-nav">
             <li><a href="#inicio">Inicio</a></li>
@@ -3017,7 +3036,7 @@ function updateMyAppointmentsButtons() {
 // Ejecutar al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
     updateMyAppointmentsButtons();
-    updateMobileMenuAuth(); // ✅ Actualizar menú móvil también
+    updateMobileMenuAuth();
 });
 
 // ✅ Actualizar sección de auth en menú móvil
@@ -3033,15 +3052,12 @@ function updateMobileMenuAuth() {
     const isAuth = isLoggedIn();
     
     if (!isAuth) {
-        // Usuario NO logueado → Mostrar botón "Iniciar sesión"
         if (mobileAuthGuest) mobileAuthGuest.style.display = 'block';
         if (mobileAuthUser) mobileAuthUser.style.display = 'none';
     } else {
-        // Usuario logueado → Mostrar info + botones
         if (mobileAuthGuest) mobileAuthGuest.style.display = 'none';
         if (mobileAuthUser) mobileAuthUser.style.display = 'block';
         
-        // Actualizar nombre y email
         if (mobileUserName) {
             mobileUserName.textContent = `Hola, ${userData.full_name || 'Usuario'}`;
         }
@@ -3049,17 +3065,16 @@ function updateMobileMenuAuth() {
             mobileUserEmail.textContent = userData.email || '';
         }
         
-        // Mostrar Panel Admin si es admin
         if (mobileAdminLink) {
             mobileAdminLink.style.display = userData.is_admin ? 'block' : 'none';
         }
         
-        // Mostrar Mis Turnos si NO es admin
         if (mobileMisTurnosLink) {
-            mobileMisTurnosLink.style.display = userData.is_admin ? 'none' : 'block';
+            mobileMisTurnosLink.style.display = 'block'; // Para TODOS los usuarios
         }
     }
 }
+
 
 
 // ✅ Smooth scroll para todos los links con #
@@ -3095,7 +3110,33 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 document.getElementById('menuToggle')?.addEventListener('click', () => {
     document.getElementById('mobileMenu').classList.toggle('active');
     document.getElementById('overlay').classList.toggle('active');
+    document.body.style.overflow = document.getElementById('mobileMenu').classList.contains('active') ? 'hidden' : '';
 });
+
+
+// ✅ Cerrar menú con botón X
+document.getElementById('mobileClose')?.addEventListener('click', () => {
+    document.getElementById('mobileMenu')?.classList.remove('active');
+    document.getElementById('overlay')?.classList.remove('active');
+    document.body.style.overflow = '';
+});
+
+// ✅ Dropdown de servicios en menú móvil
+document.querySelector('.mobile-dropdown-toggle')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    const dropdown = document.getElementById('mobileDropdown');
+    if (dropdown) {
+        const isOpen = dropdown.style.display === 'block';
+        dropdown.style.display = isOpen ? 'none' : 'block';
+        const icon = this.querySelector('i');
+        if (icon) {
+            icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+            icon.style.transition = 'transform 0.3s';
+        }
+    }
+});
+
+
 
 document.getElementById('overlay')?.addEventListener('click', () => {
     document.getElementById('mobileMenu').classList.remove('active');

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Luminance Studio by Cande | Especialista en Pestañas, Cejas & Estética</title>
     <meta name="description" content="Cande - Especialista en lifting de pestañas, diseño de cejas, depilación láser y estética corporal. 5 años de experiencia. Cursos profesionales de laminado.">
     <meta name="keywords" content="pestañas lifting, cejas laminado, henna cejas, depilación láser, estética corporal, aparatología, pedicuría, cursos belleza, Cande esteticista">
@@ -1247,74 +1247,6 @@
             font-size: 0.9rem;
         }
         
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 968px) {
-            .nav-menu {
-                display: none;
-            }
-            
-            .mobile-menu-btn,
-            .mobile-menu {
-                display: block;
-            }
-            
-            .hero-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-            
-            .hero-text h1 {
-                font-size: 2.5rem;
-            }
-            
-            .hero-cta {
-                justify-content: center;
-            }
-            
-            .hero-image {
-                order: -1;
-            }
-            
-            .contact-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .timeline-container::before {
-                left: 30px;
-            }
-            
-            .timeline-item:nth-child(odd),
-            .timeline-item:nth-child(even) {
-                padding-left: 80px;
-                padding-right: 0;
-                text-align: left;
-            }
-            
-            .timeline-item:nth-child(odd) .timeline-dot,
-            .timeline-item:nth-child(even) .timeline-dot {
-                left: 20px;
-                right: auto;
-            }
-        }
-        
-        @media (max-width: 600px) {
-            .section-title h2 {
-                font-size: 2rem;
-            }
-            
-            .services-grid-detailed {
-                grid-template-columns: 1fr;
-            }
-            
-            .hero-text h1 {
-                font-size: 2rem;
-            }
-            
-            .stat-number {
-                font-size: 2.5rem;
-            }
-        }
-
         /* ===== MOBILE MENU ===== */
         .mobile-menu {
             position: fixed;
@@ -1441,6 +1373,7 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(102, 51, 153, 0.3);
         }
+        
         /* Alineación perfecta de botones en header */
         header nav ul li a.btn {
             display: inline-flex;
@@ -1451,42 +1384,6 @@
 
         header nav ul li a.btn i {
             font-size: 14px;
-        }
-
-        /* Botón flotante */
-        .fab-button {
-            position: fixed;
-            bottom: 80px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--violeta) 0%, var(--rosa-oscuro) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            box-shadow: 0 4px 15px rgba(102, 51, 153, 0.4);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 999;
-            text-decoration: none;
-        }
-
-        .fab-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(102, 51, 153, 0.6);
-        }
-
-        @media (max-width: 768px) {
-            .fab-button {
-                bottom: 70px;
-                right: 20px;
-                width: 55px;
-                height: 55px;
-                font-size: 20px;
-            }
         }
         
         /* ===== WHATSAPP FLOAT BUTTON ===== */
@@ -1515,14 +1412,52 @@
             box-shadow: 0 12px 35px rgba(37, 211, 102, 0.4);
         }
 
-        /* 🔧 FIX: MENÚ MÓVIL */
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 968px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-buttons {
+                justify-content: center;
+            }
+            
+            .hero-image {
+                order: -1;
+            }
+            
+            .contact-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline-container::before {
+                left: 30px;
+            }
+            
+            .timeline-item:nth-child(odd),
+            .timeline-item:nth-child(even) {
+                padding-left: 80px;
+                padding-right: 0;
+                text-align: left;
+            }
+            
+            .timeline-item:nth-child(odd) .timeline-dot,
+            .timeline-item:nth-child(even) .timeline-dot {
+                left: 20px;
+                right: auto;
+            }
+        }
+        
         @media (max-width: 768px) {
             /* Mostrar botón hamburguesa */
             .menu-toggle {
                 display: block !important;
-                position: fixed;
-                top: 20px;
-                right: 20px;
+                position: relative;
                 z-index: 1001;
                 background: linear-gradient(135deg, var(--rosa-medio), var(--violeta));
                 color: white;
@@ -1535,102 +1470,109 @@
             }
             
             /* Ocultar navegación desktop */
-            header nav {
+            .nav-desktop {
                 display: none !important;
             }
             
-            /* Menú móvil funcional */
+            /* Ajustes para el menú móvil */
             .mobile-menu {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 85%;
-                max-width: 350px;
-                height: 100vh;
-                background: white;
-                transition: right 0.3s ease;
-                z-index: 1000;
-                overflow-y: auto;
-                box-shadow: -5px 0 25px rgba(0,0,0,0.2);
+                max-width: 300px;
             }
             
-            .mobile-menu.active {
-                right: 0 !important;
+            /* Ocultar el botón flotante de autenticación en móviles */
+            #auth-buttons {
+                display: none !important;
             }
             
-            .overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.6);
-                z-index: 999;
-                opacity: 0;
-                visibility: hidden;
-                transition: all 0.3s ease;
-            }
-            
-            .overlay.active {
-                opacity: 1 !important;
-                visibility: visible !important;
-            }
-        }
-            
-            /* ✅ Stats en 2x2 en móvil */
-            .stats {
+            /* Stats en 2x2 en móvil */
+            .hero-stats {
+                display: grid !important;
                 grid-template-columns: repeat(2, 1fr) !important;
-                gap: 15px !important;
-                padding: 30px 15px !important;
+                gap: 20px !important;
             }
             
             .stat-item {
-                padding: 20px 10px !important;
+                text-align: center;
+                padding: 15px 5px;
             }
             
-            .stat-item .stat-number {
+            .stat-number {
                 font-size: 2rem !important;
             }
             
-            .stat-item .stat-label {
+            .stat-label {
                 font-size: 0.85rem !important;
                 line-height: 1.3 !important;
             }
             
-            /* ✅ Sobre Mí responsive */
-            .about-content {
+            /* Sobre Mí responsive */
+            .bio-container {
                 grid-template-columns: 1fr !important;
-                gap: 30px !important;
+                gap: 40px !important;
             }
             
-            .about-image {
+            .bio-image {
                 text-align: center !important;
             }
             
-            .about-image img {
-                max-width: 250px !important;
+            .bio-image img {
+                max-width: 280px !important;
                 margin: 0 auto !important;
             }
             
-            .about-text {
+            .certificado-float {
+                right: 10px !important;
+                bottom: -20px !important;
+                width: 180px !important;
+                padding: 15px !important;
+            }
+            
+            .bio-text {
                 text-align: left !important;
             }
             
-            .about-text h2 {
+            .bio-text h2 {
                 text-align: center !important;
-                font-size: 1.8rem !important;
+                font-size: 2.2rem !important;
                 margin-bottom: 20px !important;
             }
             
-            .about-text p {
-                font-size: 0.95rem !important;
+            .bio-text p {
+                font-size: 1rem !important;
                 line-height: 1.7 !important;
                 margin-bottom: 15px !important;
             }
-
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .services-grid-detailed {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-text h1 {
+                font-size: 2rem;
+            }
         }
-
-
+        
+        @media (max-width: 600px) {
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .services-grid-detailed {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+            
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
     <link rel="stylesheet" href="responsive.css">
 </head>
@@ -1733,13 +1675,9 @@
         <ul class="mobile-nav">
             <li><a href="#inicio">Inicio</a></li>
             <li>
-                <a href="#servicios" class="mobile-dropdown-toggle">Servicios <i class="fas fa-chevron-down"></i></a>
+                <a href="#" class="mobile-dropdown-toggle" id="mobileServicesToggle">Servicios <i class="fas fa-chevron-down"></i></a>
                 <div class="mobile-dropdown" id="mobileDropdown">
-                    <a href="#pestanas">Pestañas</a>
-                    <a href="#cejas">Cejas</a>
-                    <a href="#depilacion">Depilación Láser</a>
-                    <a href="#aparato">Aparatología</a>
-                    <a href="#pies">Pedicuría</a>
+                    <!-- Se llenará dinámicamente con JS -->
                 </div>
             </li>
             <li><a href="#cursos">Cursos</a></li>
@@ -1811,133 +1749,6 @@
         </div>
     </section>
 
-    <script>
-    // ===== BOTÓN FLOTANTE DE LOGOUT/LOGIN =====
-    function createFloatingButton() {
-        const isAuth = isLoggedIn();
-        const userData = getUserData();
-        
-        if (isAuth) {
-            // Usuario logueado: mostrar nombre + botón salir
-            const container = document.createElement('div');
-            container.id = 'auth-buttons';
-            container.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                display: flex;
-                gap: 10px;
-                align-items: center;
-                z-index: 1000;
-            `;
-            
-            const userName = document.createElement('div');
-            userName.textContent = `Hola, ${userData?.full_name || 'Usuario'}`;
-            userName.style.cssText = `
-                padding: 12px 20px;
-                background: white;
-                color: #2d3436;
-                border-radius: 25px;
-                font-weight: 600;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            `;
-            
-            const logoutBtn = document.createElement('button');
-            logoutBtn.innerHTML = '🚪 Salir';
-            logoutBtn.style.cssText = `
-                padding: 12px 25px;
-                background: linear-gradient(135deg, #e75480, #9c89b8);
-                color: white;
-                border: none;
-                border-radius: 25px;
-                font-weight: 600;
-                cursor: pointer;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-                transition: all 0.3s;
-            `;
-            logoutBtn.onmouseover = () => logoutBtn.style.transform = 'scale(1.05)';
-            logoutBtn.onmouseout = () => logoutBtn.style.transform = 'scale(1)';
-            logoutBtn.addEventListener('click', async function() {
-                // Verificar que la función existe
-                if (typeof logoutWithConfirmation !== 'undefined') {
-                    await logoutWithConfirmation();
-                } else {
-                    // Si no existe, usar confirm simple
-                    if (confirm('¿Seguro que quieres salir?')) {
-                        removeAuthToken();
-                        window.location.href = '/index.html';
-                    }
-                }
-            });
-            
-            container.appendChild(userName);
-            container.appendChild(logoutBtn);
-            document.body.appendChild(container);
-
-            // Botón admin — solo si is_admin, aparece debajo del container original
-            if (userData?.is_admin === true) {
-                const adminBtn = document.createElement('a');
-                adminBtn.href = '/admin-dashboard.html';
-                adminBtn.innerHTML = '⚙️ Panel Admin';
-                adminBtn.style.cssText = `
-                    position: fixed;
-                    top: 70px;
-                    right: 115px;
-                    padding: 10px 22px;
-                    background: linear-gradient(135deg, #6a4c93, #9c89b8);
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 25px;
-                    font-weight: 600;
-                    font-size: 0.9rem;
-                    box-shadow: 0 5px 15px rgba(106,76,147,0.3);
-                    z-index: 1000;
-                    transition: all 0.3s;
-                `;
-                adminBtn.onmouseenter = () => {
-                    adminBtn.style.transform = 'translateY(-2px)';
-                    adminBtn.style.boxShadow = '0 8px 20px rgba(106,76,147,0.5)';
-                };
-                adminBtn.onmouseleave = () => {
-                    adminBtn.style.transform = 'translateY(0)';
-                    adminBtn.style.boxShadow = '0 5px 15px rgba(106,76,147,0.3)';
-                };
-                document.body.appendChild(adminBtn);
-            }
-            
-        } else {
-            // Botón flotante de login
-            const loginBtn = document.createElement('a');
-            loginBtn.href = 'login.html';
-            loginBtn.innerHTML = '👤 Iniciar Sesión';
-            loginBtn.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 30px;
-                background: linear-gradient(135deg, #e75480, #9c89b8);
-                color: white;
-                text-decoration: none;
-                border-radius: 30px;
-                font-weight: 600;
-                font-size: 1rem;
-                box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-                z-index: 1000;
-                transition: all 0.3s;
-            `;
-            loginBtn.onmouseenter = () => {
-                loginBtn.style.transform = 'translateY(-3px)';
-                loginBtn.style.boxShadow = '0 12px 30px rgba(0,0,0,0.3)';
-            };
-            loginBtn.onmouseleave = () => {
-                loginBtn.style.transform = 'translateY(0)';
-                loginBtn.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
-            };
-            document.body.appendChild(loginBtn);
-        }
-    }
-    </script>
-    
     <!-- ===== BIO SECTION ===== -->
     <section class="bio-section section-padding" id="sobremi">
         <div class="container">
@@ -1996,48 +1807,14 @@
     </section>
     
     <!-- ===== SERVICIOS ===== -->
-    <section id="servicios" class="services section-padding" id="servicios">
+    <section id="servicios" class="services section-padding">
         <div class="container">
             <div class="section-title">
                 <h2>Mis Servicios Especializados</h2>
                 <p>Tratamientos profesionales diseñados para realzar tu belleza natural</p>
             </div>
             
-            <!-- Cejas -->
-            <div class="service-category" id="cejas">
-                <h3><i class="fas fa-paint-brush"></i> Cejas</h3>
-                <div id="cejas-container" class="services-grid-detailed">
-                    <!-- Se llenará con JavaScript -->
-                </div>
-            </div>
-            
-            <!-- Pestañas -->
-            <div class="service-category" id="pestanas">
-                <h3><i class="fas fa-eye"></i> Pestañas & Lifting</h3>
-                <div id="pestanas-container" class="services-grid-detailed">
-                    <!-- Se llenará con JavaScript -->
-                </div>
-            </div>
-            
-            <!-- Depilación -->
-            <div class="service-category" id="depilacion">
-                <h3><i class="fas fa-spa"></i> Depilación Láser</h3>
-                <div id="depilacion-container" class="services-grid-detailed">
-                    <!-- Se llenará con JavaScript -->
-                </div>
-            </div>
-            
-            <!-- Pies & Pedicuría -->
-            <div class="service-category" id="pies">
-                <h3><i class="fas fa-shoe-prints"></i> Pies & Pedicuría</h3>
-                <div id="pies-container" class="services-grid-detailed">
-                    <!-- Se llenará con JavaScript -->
-                </div>
-            </div>
-
-            <div id="otros-container" class="services-grid-detailed"></div>
-
-            <!-- APARATOLOGÍA -->
+            <!-- APARATOLOGÍA (sección hardcoded que se preservará) -->
             <div class="service-category" id="aparato">
                 <h3><i class="fas fa-user-md"></i> Estética Corporal con Aparatología</h3>
                 <p style="text-align: center; color: var(--texto-medio); margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
@@ -2077,58 +1854,9 @@
                     </a>
                 </div>
             </div>
-            
 
         </div>
     </section>
-    
-    <!-- ===== APARATOLOGÍA ===== -->
-    <!-- <section id="aparatologia" class="aparatologia section-padding">
-        <div class="container">
-            <div class="section-title">
-                <h2>Tecnología de Vanguardia</h2>
-                <p>Equipamiento profesional para resultados garantizados</p>
-            </div>
-            
-            <div class="aparatos-grid">
-                <div class="aparato-card">
-                    <div class="aparato-icon">⚡</div>
-                    <h4>Radiofrecuencia</h4>
-                    <p>Tecnología avanzada para rejuvenecimiento y firmeza de la piel</p>
-                    <ul class="aparato-list">
-                        <li><i class="fas fa-check"></i> Lifting facial sin cirugía</li>
-                        <li><i class="fas fa-check"></i> Reducción de arrugas</li>
-                        <li><i class="fas fa-check"></i> Estimulación de colágeno</li>
-                        <li><i class="fas fa-check"></i> Resultados desde la 1ra sesión</li>
-                    </ul>
-                </div>
-                
-                <div class="aparato-card">
-                    <div class="aparato-icon">🔥</div>
-                    <h4>VelaShape III</h4>
-                    <p>El tratamiento más efectivo para moldear tu figura</p>
-                    <ul class="aparato-list">
-                        <li><i class="fas fa-check"></i> Reducción de celulitis</li>
-                        <li><i class="fas fa-check"></i> Contorneo corporal</li>
-                        <li><i class="fas fa-check"></i> Reducción de medidas</li>
-                        <li><i class="fas fa-check"></i> Aprobado por FDA</li>
-                    </ul>
-                </div>
-                
-                <div class="aparato-card">
-                    <div class="aparato-icon">💎</div>
-                    <h4>Láser Diodo</h4>
-                    <p>Depilación permanente con la última tecnología</p>
-                    <ul class="aparato-list">
-                        <li><i class="fas fa-check"></i> Todo tipo de piel</li>
-                        <li><i class="fas fa-check"></i> Indoloro y seguro</li>
-                        <li><i class="fas fa-check"></i> Resultados permanentes</li>
-                        <li><i class="fas fa-check"></i> Tecnología de punta</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section> -->
     
     <!-- ===== CURSOS SECTION ===== -->
     <section class="courses section-padding" id="cursos">
@@ -2537,116 +2265,667 @@
     </a>
     
     <!-- ===== SCRIPTS ===== -->
+    <script src="api.js"></script>
+
     <script>
-        // ===== MOBILE MENU =====
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-        const overlay = document.getElementById('overlay');
+        // ===== FUNCIONES DE AUTENTICACIÓN (deben estar definidas en api.js) =====
+        function isLoggedIn() {
+            return localStorage.getItem('auth_token') ? true : false;
+        }
         
-        mobileMenuBtn?.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            overlay.classList.toggle('active');
-            document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
-        });
+        function getUserData() {
+            const userStr = localStorage.getItem('user_data');
+            return userStr ? JSON.parse(userStr) : null;
+        }
         
-        overlay?.addEventListener('click', () => {
-            mobileMenu.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        // ===== STICKY HEADER =====
-        let lastScroll = 0;
-        const header = document.querySelector('header');
+        function removeAuthToken() {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user_data');
+        }
         
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            
-            if (currentScroll > 100) {
-                header.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.1)';
-            } else {
-                header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.05)';
+        function formatPrice(price) {
+            return new Intl.NumberFormat('es-AR', {
+                style: 'currency',
+                currency: 'ARS',
+                minimumFractionDigits: 0
+            }).format(price);
+        }
+        
+        function logoutWithConfirmation() {
+            if (confirm('¿Seguro que quieres cerrar sesión?')) {
+                removeAuthToken();
+                window.location.reload();
             }
+        }
+        
+        // ===== BOTÓN FLOTANTE DE LOGOUT/LOGIN (SOLO ESCRITORIO) =====
+        function createFloatingButton() {
+            const isAuth = isLoggedIn();
+            const userData = getUserData();
             
-            lastScroll = currentScroll;
-        });
+            // Eliminar botón existente si lo hay
+            const existingBtn = document.getElementById('auth-buttons');
+            if (existingBtn) existingBtn.remove();
+            
+            if (isAuth) {
+                // Usuario logueado: mostrar nombre + botón salir
+                const container = document.createElement('div');
+                container.id = 'auth-buttons';
+                container.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    display: flex;
+                    gap: 10px;
+                    align-items: center;
+                    z-index: 1000;
+                `;
+                
+                const userName = document.createElement('div');
+                userName.textContent = `Hola, ${userData?.full_name || 'Usuario'}`;
+                userName.style.cssText = `
+                    padding: 12px 20px;
+                    background: white;
+                    color: #2d3436;
+                    border-radius: 25px;
+                    font-weight: 600;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+                `;
+                
+                const logoutBtn = document.createElement('button');
+                logoutBtn.innerHTML = '🚪 Salir';
+                logoutBtn.style.cssText = `
+                    padding: 12px 25px;
+                    background: linear-gradient(135deg, #e75480, #9c89b8);
+                    color: white;
+                    border: none;
+                    border-radius: 25px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+                    transition: all 0.3s;
+                `;
+                logoutBtn.onmouseover = () => logoutBtn.style.transform = 'scale(1.05)';
+                logoutBtn.onmouseout = () => logoutBtn.style.transform = 'scale(1)';
+                logoutBtn.addEventListener('click', logoutWithConfirmation);
+                
+                container.appendChild(userName);
+                container.appendChild(logoutBtn);
+                document.body.appendChild(container);
 
-        // ===== FORM SUBMISSION =====
-        const contactForm = document.getElementById('contactForm');
-        contactForm?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            // Simulación de envío exitoso
-            const service = document.getElementById('service').value;
-            const name = document.getElementById('name').value;
-            
-            let whatsappMessage = `Hola Cande! Soy ${name}. Vi tu página y quisiera consultarte por: ${document.getElementById('service').options[document.getElementById('service').selectedIndex].text}`;
-            
-            // Redirigir a WhatsApp
-            window.open(`https://wa.me/541162815014?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
-            
-            // Resetear formulario
-            contactForm.reset();
-        });
-
-        // ===== ANIMATIONS ON SCROLL =====
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('fade-in');
+                // Botón admin — solo si is_admin, aparece debajo del container original
+                if (userData?.is_admin === true) {
+                    const adminBtn = document.createElement('a');
+                    adminBtn.href = '/admin-dashboard.html';
+                    adminBtn.innerHTML = '⚙️ Panel Admin';
+                    adminBtn.style.cssText = `
+                        position: fixed;
+                        top: 70px;
+                        right: 115px;
+                        padding: 10px 22px;
+                        background: linear-gradient(135deg, #6a4c93, #9c89b8);
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 25px;
+                        font-weight: 600;
+                        font-size: 0.9rem;
+                        box-shadow: 0 5px 15px rgba(106,76,147,0.3);
+                        z-index: 1000;
+                        transition: all 0.3s;
+                    `;
+                    adminBtn.onmouseenter = () => {
+                        adminBtn.style.transform = 'translateY(-2px)';
+                        adminBtn.style.boxShadow = '0 8px 20px rgba(106,76,147,0.5)';
+                    };
+                    adminBtn.onmouseleave = () => {
+                        adminBtn.style.transform = 'translateY(0)';
+                        adminBtn.style.boxShadow = '0 5px 15px rgba(106,76,147,0.3)';
+                    };
+                    document.body.appendChild(adminBtn);
                 }
-            });
-        }, observerOptions);
-
-        // Observar elementos para animar
-        document.querySelectorAll('.service-item, .course-card, .benefit-card, .testimonial-card, .aparato-card, .timeline-item').forEach(el => {
-            observer.observe(el);
-        });
-
-        // ===== COUNTER ANIMATION =====
-        const statNumbers = document.querySelectorAll('.stat-number');
-        statNumbers.forEach(stat => {
-            const target = parseInt(stat.textContent.replace('+', '').replace('%', ''));
-            let current = 0;
-            const increment = target / 30;
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
+                
+            } else {
+                // Botón flotante de login
+                const loginBtn = document.createElement('a');
+                loginBtn.href = 'login.html';
+                loginBtn.innerHTML = '👤 Iniciar Sesión';
+                loginBtn.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 30px;
+                    background: linear-gradient(135deg, #e75480, #9c89b8);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 30px;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+                    z-index: 1000;
+                    transition: all 0.3s;
+                `;
+                loginBtn.onmouseenter = () => {
+                    loginBtn.style.transform = 'translateY(-3px)';
+                    loginBtn.style.boxShadow = '0 12px 30px rgba(0,0,0,0.3)';
+                };
+                loginBtn.onmouseleave = () => {
+                    loginBtn.style.transform = 'translateY(0)';
+                    loginBtn.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
+                };
+                document.body.appendChild(loginBtn);
+            }
+        }
+        
+        // ===== MODAL AMIGABLE DE LOGIN =====
+        function showLoginModal() {
+            // Crear overlay
+            const overlay = document.createElement('div');
+            overlay.id = 'login-modal';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.7);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            // Crear modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: white;
+                border-radius: 25px;
+                padding: 50px;
+                max-width: 500px;
+                width: 90%;
+                text-align: center;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                animation: slideUp 0.3s ease;
+            `;
+            
+            modal.innerHTML = `
+                <div style="font-size: 4rem; margin-bottom: 20px;">🔐</div>
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: #2d3436; margin-bottom: 15px;">
+                    Inicio de Sesión Requerido
+                </h2>
+                <p style="color: #636e72; font-size: 1.1rem; margin-bottom: 30px; line-height: 1.6;">
+                    Para reservar un turno necesitas tener una cuenta. ¡Es gratis y toma solo un minuto!
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <a href="login.html" style="
+                        padding: 15px 35px;
+                        background: linear-gradient(135deg, #e75480, #9c89b8);
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 25px;
+                        font-weight: 600;
+                        font-size: 1.1rem;
+                        transition: all 0.3s;
+                    ">Iniciar Sesión</a>
+                    <button onclick="document.getElementById('login-modal').remove()" style="
+                        padding: 15px 35px;
+                        background: #e9ecef;
+                        color: #636e72;
+                        border: none;
+                        border-radius: 25px;
+                        font-weight: 600;
+                        font-size: 1.1rem;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    ">Cancelar</button>
+                </div>
+            `;
+            
+            // Agregar animaciones
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
                 }
-                stat.textContent = Math.floor(current) + (stat.textContent.includes('%') ? '%' : (stat.textContent.includes('+') ? '+' : ''));
-            }, 50);
-        });
-
-        // ===== SMOOTH SCROLL =====
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                if (this.getAttribute('href').startsWith('#') && this.getAttribute('href') !== '#') {
-                    e.preventDefault();
-                    
-                    const targetId = this.getAttribute('href');
-                    const targetElement = document.querySelector(targetId);
-                    
-                    if (targetElement) {
-                        // Cerrar menú móvil si está abierto
-                        mobileMenu.classList.remove('active');
-                        overlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                        
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
+                @keyframes slideUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(50px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
                     }
                 }
+            `;
+            document.head.appendChild(style);
+            
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            
+            // Cerrar al hacer click fuera
+            overlay.onclick = (e) => {
+                if (e.target === overlay) {
+                    overlay.remove();
+                }
+            };
+        }
+        
+        // ===== RESERVAR SERVICIO =====
+        function reserveService(serviceId) {
+            if (!isLoggedIn()) {
+                showLoginModal();
+                return;
+            }
+            localStorage.setItem('selected_service_id', serviceId);
+            window.location.href = '/turnera.html';
+        }
+        
+        // ===== CARGAR SERVICIOS REALES DESDE API =====
+        async function loadServices() {
+            try {
+                console.log('📄 Cargando servicios desde API...');
+                
+                // Verificar si la función getServices existe
+                if (typeof getServices !== 'function') {
+                    console.warn('⚠️ Función getServices no disponible, usando datos de ejemplo');
+                    // Datos de ejemplo para demostración
+                    const demoData = {
+                        'cejas': [
+                            { id: 1, name: 'Diseño de Cejas', description: 'Perfilado profesional', duration_minutes: 30, price: 1500 },
+                            { id: 2, name: 'Laminado de Cejas', description: 'Alisado y fijación', duration_minutes: 45, price: 2500 }
+                        ],
+                        'pestañas': [
+                            { id: 3, name: 'Lifting de Pestañas', description: 'Rizado y volumen', duration_minutes: 60, price: 3000 }
+                        ],
+                        'laser': [
+                            { id: 4, name: 'Depilación Láser Axilas', description: 'Sesión completa', duration_minutes: 20, price: 2000 }
+                        ],
+                        'corporal': [
+                            { id: 5, name: 'Masaje Reductor', description: 'Tratamiento corporal', duration_minutes: 60, price: 3500 }
+                        ]
+                    };
+                    
+                    renderServicesFromData(demoData);
+                    return;
+                }
+                
+                const services = await getServices();
+                console.log('✅ Servicios cargados:', services);
+                
+                // ✅ Agrupar por el campo 'category' de la BD
+                const byCategory = {};
+                
+                services.forEach(service => {
+                    const cat = service.category || 'otros';
+                    if (!byCategory[cat]) {
+                        byCategory[cat] = [];
+                    }
+                    byCategory[cat].push(service);
+                });
+                
+                renderServicesFromData(byCategory);
+                
+            } catch (error) {
+                console.error('❌ Error cargando servicios:', error);
+            }
+        }
+        
+        function renderServicesFromData(byCategory) {
+            console.log('📊 Categorías encontradas:', Object.keys(byCategory));
+            
+            // ✅ Definir orden y títulos de categorías
+            const categoryConfig = {
+                'cejas': { title: 'Cejas & Diseño', icon: '🎨' },
+                'pestañas': { title: 'Pestañas & Lifting', icon: '👁️' },
+                'laser': { title: 'Depilación Láser', icon: '✨' },
+                'facial': { title: 'Tratamientos Faciales', icon: '💆' },
+                'corporal': { title: 'Tratamientos Corporales', icon: '🌟' },
+                'pies': { title: 'Pies & Pedicuría', icon: '🦶' },
+                'otros': { title: 'Otros Servicios', icon: '💅' }
+            };
+            
+            // ✅ Buscar la sección de Aparatología
+            const aparatoSection = document.querySelector('#aparato');
+            
+            // ✅ Guardar temporalmente el HTML de Aparatología
+            const aparatoHTML = aparatoSection ? aparatoSection.outerHTML : '';
+            
+            // ✅ Limpiar contenido de servicios (pero preservar el título)
+            const servicesSection = document.querySelector('#servicios .container');
+            const sectionTitle = document.querySelector('#servicios .section-title');
+            
+            if (!servicesSection) {
+                console.error('❌ No se encontró el contenedor de servicios');
+                return;
+            }
+            
+            // Limpiar solo los elementos que no sean el título
+            const children = servicesSection.children;
+            for (let i = children.length - 1; i >= 0; i--) {
+                if (!children[i].classList.contains('section-title')) {
+                    children[i].remove();
+                }
+            }
+            
+            // ✅ Renderizar categorías dinámicas
+            Object.keys(categoryConfig).forEach(catKey => {
+                if (byCategory[catKey] && byCategory[catKey].length > 0) {
+                    const config = categoryConfig[catKey];
+                    renderCategorySection(config.title, config.icon, byCategory[catKey], catKey);
+                }
             });
-        });
+            
+            // ✅ RESTAURAR sección hardcoded de Aparatología AL FINAL
+            if (aparatoHTML) {
+                servicesSection.insertAdjacentHTML('beforeend', aparatoHTML);
+                console.log('✅ Sección de Aparatología preservada');
+            }
+
+            // ✅ Poblar menú desplegable
+            populateServicesMenu(categoryConfig, byCategory);
+            
+            console.log('✅ Servicios renderizados automáticamente');
+        }
+        
+        function renderCategorySection(categoryTitle, categoryIcon, services, categoryKey) {
+            const servicesSection = document.querySelector('#servicios .container');
+            
+            // ✅ AGREGAR ID basado en la categoría
+            const sectionHTML = `
+                <div class="service-category-section" id="categoria-${categoryKey}" style="margin-bottom: 60px; scroll-margin-top: 100px;">
+                    <div class="section-title" style="text-align: center; margin-bottom: 40px;">
+                        <span style="font-size: 3rem; display: block; margin-bottom: 10px;">${categoryIcon}</span>
+                        <h3 style="font-size: 2rem; color: var(--violeta); font-weight: 700; margin-bottom: 10px;">
+                            ${categoryTitle}
+                        </h3>
+                        <div style="width: 80px; height: 4px; background: linear-gradient(90deg, var(--rosa-medio), var(--violeta)); margin: 0 auto;"></div>
+                    </div>
+                    
+                    <div class="services-grid-detailed">
+                        ${services.map(service => `
+                            <div class="service-item fade-in">
+                                <div class="service-header">
+                                    <div class="service-icon">${categoryIcon}</div>
+                                    <div class="service-title">
+                                        <h4>${service.name}</h4>
+                                        <span class="service-duration">
+                                            <i class="far fa-clock"></i> ${service.duration_minutes} minutos
+                                        </span>
+                                    </div>
+                                </div>
+                                <p>${service.description || 'Tratamiento profesional de belleza'}</p>
+                                <ul class="service-features">
+                                    <li><i class="fas fa-check-circle"></i> Profesional certificada</li>
+                                    <li><i class="fas fa-check-circle"></i> Productos de primera calidad</li>
+                                    <li><i class="fas fa-check-circle"></i> Ambiente higienizado</li>
+                                </ul>
+                                <div class="service-price">${formatPrice(service.price)}</div>
+                                <button class="btn btn-rosa" onclick="reserveService(${service.id})" style="width: 100%; margin-top: 15px;">
+                                    <i class="fas fa-calendar-check"></i>
+                                    Reservar Turno
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            servicesSection.insertAdjacentHTML('beforeend', sectionHTML);
+        }
+        
+        function populateServicesMenu(categoryConfig, byCategory) {
+            // Iconos para cada categoría
+            const categoryIcons = {
+                'cejas': 'fas fa-paint-brush',
+                'pestañas': 'fas fa-eye',
+                'laser': 'fas fa-spa',
+                'facial': 'fas fa-user-md',
+                'corporal': 'fas fa-dumbbell',
+                'pies': 'fas fa-shoe-prints',
+                'otros': 'fas fa-spa'
+            };
+            
+            // ✅ POBLAR MENÚ DESKTOP
+            const desktopDropdown = document.querySelector('.dropdown .dropdown-content');
+            if (desktopDropdown) {
+                let menuHTML = '';
+                
+                // Agregar categorías que tienen servicios
+                Object.keys(categoryConfig).forEach(catKey => {
+                    if (byCategory[catKey] && byCategory[catKey].length > 0) {
+                        const config = categoryConfig[catKey];
+                        const icon = categoryIcons[catKey] || 'fas fa-spa';
+                        menuHTML += `<a href="#categoria-${catKey}"><i class="${icon}"></i> ${config.title}</a>\n`;
+                    }
+                });
+                
+                // ✅ Siempre agregar Aparatología al final
+                menuHTML += `<a href="#aparato"><i class="fas fa-user-md"></i> Aparatología</a>`;
+                
+                desktopDropdown.innerHTML = menuHTML;
+            }
+            
+            // ✅ POBLAR MENÚ MOBILE
+            const mobileDropdown = document.querySelector('#mobileDropdown');
+            if (mobileDropdown) {
+                let menuHTML = '';
+                
+                // Agregar categorías que tienen servicios
+                Object.keys(categoryConfig).forEach(catKey => {
+                    if (byCategory[catKey] && byCategory[catKey].length > 0) {
+                        const config = categoryConfig[catKey];
+                        menuHTML += `<a href="#categoria-${catKey}">${config.title}</a>\n`;
+                    }
+                });
+                
+                // ✅ Siempre agregar Aparatología al final
+                menuHTML += `<a href="#aparato">Aparatología</a>`;
+                
+                mobileDropdown.innerHTML = menuHTML;
+            }
+            
+            console.log('✅ Menús desplegables actualizados');
+        }
+        
+        // ===== MOBILE MENU FUNCIONALITY =====
+        function initMobileMenu() {
+            const menuToggle = document.getElementById('menuToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('overlay');
+            const mobileClose = document.getElementById('mobileClose');
+            
+            if (menuToggle) {
+                menuToggle.addEventListener('click', () => {
+                    mobileMenu.classList.add('active');
+                    overlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+            
+            if (mobileClose) {
+                mobileClose.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            // ✅ Dropdown de servicios en menú móvil
+            const mobileServicesToggle = document.getElementById('mobileServicesToggle');
+            const mobileDropdown = document.getElementById('mobileDropdown');
+            
+            if (mobileServicesToggle && mobileDropdown) {
+                mobileServicesToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const isOpen = mobileDropdown.style.display === 'block';
+                    mobileDropdown.style.display = isOpen ? 'none' : 'block';
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+                        icon.style.transition = 'transform 0.3s';
+                    }
+                });
+            }
+        }
+        
+        // ===== STICKY HEADER =====
+        function initStickyHeader() {
+            const header = document.querySelector('header');
+            
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                
+                if (currentScroll > 100) {
+                    header.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.1)';
+                } else {
+                    header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.05)';
+                }
+            });
+        }
+
+        // ===== FORM SUBMISSION =====
+        function initContactForm() {
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    const service = document.getElementById('service').value;
+                    const name = document.getElementById('name').value;
+                    
+                    let whatsappMessage = `Hola Cande! Soy ${name}. Vi tu página y quisiera consultarte por: ${document.getElementById('service').options[document.getElementById('service').selectedIndex].text}`;
+                    
+                    window.open(`https://wa.me/541162815014?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
+                    
+                    contactForm.reset();
+                });
+            }
+        }
+
+        // ===== ANIMATIONS ON SCROLL =====
+        function initScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.service-item, .course-card, .benefit-card, .testimonial-card, .aparato-card, .timeline-item').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // ===== COUNTER ANIMATION =====
+        function initCounterAnimation() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const target = parseInt(stat.textContent.replace('+', '').replace('%', ''));
+                let current = 0;
+                const increment = target / 30;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    stat.textContent = Math.floor(current) + (stat.textContent.includes('%') ? '%' : (stat.textContent.includes('+') ? '+' : ''));
+                }, 50);
+            });
+        }
+
+        // ===== SMOOTH SCROLL =====
+        function initSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    
+                    if (href && href !== '#') {
+                        e.preventDefault();
+                        
+                        const targetElement = document.querySelector(href);
+                        
+                        if (targetElement) {
+                            // Cerrar menú móvil si está abierto
+                            const mobileMenu = document.getElementById('mobileMenu');
+                            const overlay = document.getElementById('overlay');
+                            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                                mobileMenu.classList.remove('active');
+                                overlay.classList.remove('active');
+                                document.body.style.overflow = '';
+                            }
+                            
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+        }
+
+        // ===== UPDATE MOBILE MENU AUTH =====
+        function updateMobileMenuAuth() {
+            const mobileAuthGuest = document.getElementById('mobileAuthGuest');
+            const mobileAuthUser = document.getElementById('mobileAuthUser');
+            const mobileUserName = document.getElementById('mobileUserName');
+            const mobileUserEmail = document.getElementById('mobileUserEmail');
+            const mobileAdminLink = document.getElementById('mobileAdminLink');
+            const mobileMisTurnosLink = document.getElementById('mobileMisTurnosLink');
+            
+            const userData = getUserData();
+            const isAuth = isLoggedIn();
+            
+            if (!isAuth) {
+                if (mobileAuthGuest) mobileAuthGuest.style.display = 'block';
+                if (mobileAuthUser) mobileAuthUser.style.display = 'none';
+            } else {
+                if (mobileAuthGuest) mobileAuthGuest.style.display = 'none';
+                if (mobileAuthUser) mobileAuthUser.style.display = 'block';
+                
+                if (mobileUserName) {
+                    mobileUserName.textContent = `Hola, ${userData?.full_name || 'Usuario'}`;
+                }
+                if (mobileUserEmail) {
+                    mobileUserEmail.textContent = userData?.email || '';
+                }
+                
+                if (mobileAdminLink) {
+                    mobileAdminLink.style.display = userData?.is_admin ? 'block' : 'none';
+                }
+                
+                if (mobileMisTurnosLink) {
+                    mobileMisTurnosLink.style.display = 'block';
+                }
+            }
+        }
+
+        // ===== UPDATE MY APPOINTMENTS BUTTONS =====
+        function updateMyAppointmentsButtons() {
+            const navBtn = document.getElementById('my-appointments-nav');
+            const isAuth = isLoggedIn();
+            
+            if (navBtn) {
+                navBtn.style.display = isAuth ? 'block' : 'none';
+            }
+        }
 
         // ===== NOTIFICATION SYSTEM =====
         function showNotification(message, type = 'success') {
@@ -2674,474 +2953,33 @@
             }, 3000);
         }
 
-        // Agregar estilos para las animaciones de notificación
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
+        // ===== INICIALIZAR =====
+        document.addEventListener('DOMContentLoaded', () => {
+            createFloatingButton();
+            loadServices();
+            initMobileMenu();
+            initStickyHeader();
+            initContactForm();
+            initScrollAnimations();
+            initCounterAnimation();
+            initSmoothScroll();
+            updateMyAppointmentsButtons();
+            updateMobileMenuAuth();
+            
+            // Agregar estilos para las animaciones de notificación
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        });
     </script>
-<script src="api.js"></script>
-
-<script>
-// ===== CARGAR SERVICIOS REALES DESDE API =====
-async function loadServices() {
-    try {
-        console.log('📄 Cargando servicios desde API...');
-        const services = await getServices();
-        console.log('✅ Servicios cargados:', services);
-        
-        // ✅ Agrupar por el campo 'category' de la BD
-        const byCategory = {};
-        
-        services.forEach(service => {
-            const cat = service.category || 'otros';
-            if (!byCategory[cat]) {
-                byCategory[cat] = [];
-            }
-            byCategory[cat].push(service);
-        });
-        
-        console.log('📊 Categorías encontradas:', Object.keys(byCategory));
-        
-        // ✅ Definir orden y títulos de categorías
-        const categoryConfig = {
-            'cejas': { title: 'Cejas & Diseño', icon: '🎨' },
-            'pestañas': { title: 'Pestañas & Lifting', icon: '👁️' },
-            'laser': { title: 'Depilación Láser', icon: '✨' },
-            'facial': { title: 'Tratamientos Faciales', icon: '💆' },
-            'corporal': { title: 'Tratamientos Corporales', icon: '🌟' },
-            'pies': { title: 'Pies & Pedicuría', icon: '🦶' },
-            'otros': { title: 'Otros Servicios', icon: '💅' }
-        };
-        
-        // ✅ Buscar la sección hardcoded de Aparatología
-        const aparatoSection = document.querySelector('#aparato');
-        
-        // ✅ Guardar temporalmente el HTML de Aparatología
-        const aparatoHTML = aparatoSection ? aparatoSection.outerHTML : '';
-        
-        // ✅ Ahora sí, limpiar contenido
-        const servicesSection = document.querySelector('#servicios .container');
-        
-        if (!servicesSection) {
-            console.error('❌ No se encontró el contenedor de servicios');
-            return;
-        }
-        
-        servicesSection.innerHTML = '';
-        
-        // ✅ Renderizar categorías dinámicas
-        Object.keys(categoryConfig).forEach(catKey => {
-            if (byCategory[catKey] && byCategory[catKey].length > 0) {
-                const config = categoryConfig[catKey];
-                // ✅ PASAR catKey como 4to parámetro
-                renderCategorySection(config.title, config.icon, byCategory[catKey], catKey);
-            }
-        });
-        
-        // ✅ RESTAURAR sección hardcoded de Aparatología AL FINAL
-        if (aparatoHTML) {
-            servicesSection.insertAdjacentHTML('beforeend', aparatoHTML);
-            console.log('✅ Sección de Aparatología preservada');
-        }
-
-        // ✅ NUEVO: Poblar menú desplegable
-        populateServicesMenu(categoryConfig, byCategory);
-        
-        console.log('✅ Servicios renderizados automáticamente');
-        
-    } catch (error) {
-        console.error('❌ Error cargando servicios:', error);
-    }
-}
-
-function renderCategorySection(categoryTitle, categoryIcon, services, categoryKey) {
-    const servicesSection = document.querySelector('#servicios .container');
-    
-    // ✅ AGREGAR ID basado en la categoría
-    const sectionHTML = `
-        <div class="service-category-section" id="categoria-${categoryKey}" style="margin-bottom: 60px; scroll-margin-top: 100px;">
-            <div class="section-title" style="text-align: center; margin-bottom: 40px;">
-                <span style="font-size: 3rem; display: block; margin-bottom: 10px;">${categoryIcon}</span>
-                <h3 style="font-size: 2rem; color: var(--violeta); font-weight: 700; margin-bottom: 10px;">
-                    ${categoryTitle}
-                </h3>
-                <div style="width: 80px; height: 4px; background: linear-gradient(90deg, var(--rosa-medio), var(--violeta)); margin: 0 auto;"></div>
-            </div>
-            
-            <div class="services-grid-detailed">
-                ${services.map(service => `
-                    <div class="service-item fade-in">
-                        <div class="service-header">
-                            <div class="service-icon">${categoryIcon}</div>
-                            <div class="service-title">
-                                <h4>${service.name}</h4>
-                                <span class="service-duration">
-                                    <i class="far fa-clock"></i> ${service.duration_minutes} minutos
-                                </span>
-                            </div>
-                        </div>
-                        <p>${service.description || 'Tratamiento profesional de belleza'}</p>
-                        <ul class="service-features">
-                            <li><i class="fas fa-check-circle"></i> Profesional certificada</li>
-                            <li><i class="fas fa-check-circle"></i> Productos de primera calidad</li>
-                            <li><i class="fas fa-check-circle"></i> Ambiente higienizado</li>
-                        </ul>
-                        <div class="service-price">${formatPrice(service.price)}</div>
-                        <button class="btn btn-rosa" onclick="reserveService(${service.id})" style="width: 100%; margin-top: 15px;">
-                            <i class="fas fa-calendar-check"></i>
-                            Reservar Turno
-                        </button>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
-    
-    servicesSection.insertAdjacentHTML('beforeend', sectionHTML);
-}
-
-function populateServicesMenu(categoryConfig, byCategory) {
-    // Iconos para cada categoría
-    const categoryIcons = {
-        'cejas': 'fas fa-paint-brush',
-        'pestañas': 'fas fa-eye',
-        'laser': 'fas fa-spa',
-        'facial': 'fas fa-user-md',
-        'corporal': 'fas fa-dumbbell',
-        'pies': 'fas fa-shoe-prints',
-        'otros': 'fas fa-spa'
-    };
-    
-    // ✅ POBLAR MENÚ DESKTOP
-    const desktopDropdown = document.querySelector('.dropdown .dropdown-content');
-    if (desktopDropdown) {
-        let menuHTML = '';
-        
-        // Agregar categorías que tienen servicios
-        Object.keys(categoryConfig).forEach(catKey => {
-            if (byCategory[catKey] && byCategory[catKey].length > 0) {
-                const config = categoryConfig[catKey];
-                const icon = categoryIcons[catKey] || 'fas fa-spa';
-                menuHTML += `<a href="#categoria-${catKey}"><i class="${icon}"></i> ${config.title}</a>\n`;
-            }
-        });
-        
-        // ✅ Siempre agregar Aparatología al final
-        menuHTML += `<a href="#aparato"><i class="fas fa-user-md"></i> Aparatología</a>`;
-        
-        desktopDropdown.innerHTML = menuHTML;
-    }
-    
-    // ✅ POBLAR MENÚ MOBILE
-    const mobileDropdown = document.querySelector('#mobileDropdown');
-    if (mobileDropdown) {
-        let menuHTML = '';
-        
-        // Agregar categorías que tienen servicios
-        Object.keys(categoryConfig).forEach(catKey => {
-            if (byCategory[catKey] && byCategory[catKey].length > 0) {
-                const config = categoryConfig[catKey];
-                menuHTML += `<a href="#categoria-${catKey}">${config.title}</a>\n`;
-            }
-        });
-        
-        // ✅ Siempre agregar Aparatología al final
-        menuHTML += `<a href="#aparato">Aparatología</a>`;
-        
-        mobileDropdown.innerHTML = menuHTML;
-    }
-    
-    console.log('✅ Menús desplegables actualizados');
-}
-
-// ===== RENDERIZAR CATEGORÍA (MANTIENE TU DISEÑO EXACTO) =====
-function renderCategory(categoryName, services, containerSelector) {
-    const container = document.querySelector(containerSelector);
-    if (!container || services.length === 0) {
-        // Si no existe el contenedor o no hay servicios, salir
-        return;
-    }
-    
-    // IMPORTANTE: Usa exactamente tu estructura HTML
-    container.innerHTML = services.map(service => `
-        <div class="service-item fade-in">
-            <div class="service-header">
-                <div class="service-icon">
-                    💅
-                </div>
-                <div class="service-title">
-                    <h4>${service.name}</h4>
-                    <span class="service-duration">
-                        <i class="far fa-clock"></i> ${service.duration_minutes} minutos
-                    </span>
-                </div>
-            </div>
-            <p>${service.description || 'Tratamiento profesional de belleza'}</p>
-            <ul class="service-features">
-                <li><i class="fas fa-check-circle"></i> Profesional certificada</li>
-                <li><i class="fas fa-check-circle"></i> Productos de primera calidad</li>
-                <li><i class="fas fa-check-circle"></i> Ambiente higienizado</li>
-            </ul>
-            <div class="service-price">${formatPrice(service.price)}</div>
-            <button class="btn btn-rosa" onclick="reserveService(${service.id})" style="width: 100%; margin-top: 15px;">
-                <i class="fas fa-calendar-check"></i>
-                Reservar Turno
-            </button>
-        </div>
-    `).join('');
-}
-
-// ===== MODAL AMIGABLE DE LOGIN =====
-function showLoginModal() {
-    // Crear overlay
-    const overlay = document.createElement('div');
-    overlay.id = 'login-modal';
-    overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.7);
-        z-index: 10000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        animation: fadeIn 0.3s ease;
-    `;
-    
-    // Crear modal
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        background: white;
-        border-radius: 25px;
-        padding: 50px;
-        max-width: 500px;
-        width: 90%;
-        text-align: center;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        animation: slideUp 0.3s ease;
-    `;
-    
-    modal.innerHTML = `
-        <div style="font-size: 4rem; margin-bottom: 20px;">🔐</div>
-        <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: #2d3436; margin-bottom: 15px;">
-            Inicio de Sesión Requerido
-        </h2>
-        <p style="color: #636e72; font-size: 1.1rem; margin-bottom: 30px; line-height: 1.6;">
-            Para reservar un turno necesitas tener una cuenta. ¡Es gratis y toma solo un minuto!
-        </p>
-        <div style="display: flex; gap: 15px; justify-content: center;">
-            <a href="login.html" style="
-                padding: 15px 35px;
-                background: linear-gradient(135deg, #e75480, #9c89b8);
-                color: white;
-                text-decoration: none;
-                border-radius: 25px;
-                font-weight: 600;
-                font-size: 1.1rem;
-                transition: all 0.3s;
-            ">Iniciar Sesión</a>
-            <button onclick="document.getElementById('login-modal').remove()" style="
-                padding: 15px 35px;
-                background: #e9ecef;
-                color: #636e72;
-                border: none;
-                border-radius: 25px;
-                font-weight: 600;
-                font-size: 1.1rem;
-                cursor: pointer;
-                transition: all 0.3s;
-            ">Cancelar</button>
-        </div>
-    `;
-    
-    // Agregar animaciones
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    `;
-    document.head.appendChild(style);
-    
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-    
-    // Cerrar al hacer click fuera
-    overlay.onclick = (e) => {
-        if (e.target === overlay) {
-            overlay.remove();
-        }
-    };
-}
-
-// ===== RESERVAR SERVICIO =====
-function reserveService(serviceId) {
-    if (!isLoggedIn()) {
-        showLoginModal();
-        return;
-    }
-    localStorage.setItem('selected_service_id', serviceId);
-    window.location.href = '/turnera.html';
-}
-// ===== INICIALIZAR =====
-document.addEventListener('DOMContentLoaded', () => {
-    createFloatingButton();
-});
-// También intentar si el DOM ya está listo
-if (document.readyState !== 'loading') {
-    createFloatingButton();
-}
-// Cargar servicios
-document.addEventListener('DOMContentLoaded', loadServices);
-if (document.readyState !== 'loading') loadServices();
-
-// Mostrar/ocultar botones "Mis Turnos" según login
-function updateMyAppointmentsButtons() {
-    const navBtn = document.getElementById('my-appointments-nav');
-    const fabBtn = document.getElementById('fab-my-appointments');
-    
-    const isAuth = isLoggedIn();
-    
-    if (navBtn) {
-        navBtn.style.display = isAuth ? 'block' : 'none';
-    }
-    
-    if (fabBtn) {
-        fabBtn.style.display = isAuth ? 'flex' : 'none';
-    }
-}
-
-// Ejecutar al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    updateMyAppointmentsButtons();
-    updateMobileMenuAuth();
-});
-
-// ✅ Actualizar sección de auth en menú móvil
-function updateMobileMenuAuth() {
-    const mobileAuthGuest = document.getElementById('mobileAuthGuest');
-    const mobileAuthUser = document.getElementById('mobileAuthUser');
-    const mobileUserName = document.getElementById('mobileUserName');
-    const mobileUserEmail = document.getElementById('mobileUserEmail');
-    const mobileAdminLink = document.getElementById('mobileAdminLink');
-    const mobileMisTurnosLink = document.getElementById('mobileMisTurnosLink');
-    
-    const userData = getUserData();
-    const isAuth = isLoggedIn();
-    
-    if (!isAuth) {
-        if (mobileAuthGuest) mobileAuthGuest.style.display = 'block';
-        if (mobileAuthUser) mobileAuthUser.style.display = 'none';
-    } else {
-        if (mobileAuthGuest) mobileAuthGuest.style.display = 'none';
-        if (mobileAuthUser) mobileAuthUser.style.display = 'block';
-        
-        if (mobileUserName) {
-            mobileUserName.textContent = `Hola, ${userData.full_name || 'Usuario'}`;
-        }
-        if (mobileUserEmail) {
-            mobileUserEmail.textContent = userData.email || '';
-        }
-        
-        if (mobileAdminLink) {
-            mobileAdminLink.style.display = userData.is_admin ? 'block' : 'none';
-        }
-        
-        if (mobileMisTurnosLink) {
-            mobileMisTurnosLink.style.display = 'block'; // Para TODOS los usuarios
-        }
-    }
-}
-
-
-
-// ✅ Smooth scroll para todos los links con #
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        const href = this.getAttribute('href');
-        
-        // No hacer nada si es solo #
-        if (href === '#') return;
-        
-        e.preventDefault();
-        
-        const target = document.querySelector(href);
-        if (target) {
-            // Cerrar menú mobile si está abierto
-            const mobileMenu = document.getElementById('mobileMenu');
-            const overlay = document.getElementById('overlay');
-            if (mobileMenu && mobileMenu.classList.contains('active')) {
-                mobileMenu.classList.remove('active');
-                overlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-            
-            // Scroll suave
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-
-document.getElementById('menuToggle')?.addEventListener('click', () => {
-    document.getElementById('mobileMenu').classList.toggle('active');
-    document.getElementById('overlay').classList.toggle('active');
-    document.body.style.overflow = document.getElementById('mobileMenu').classList.contains('active') ? 'hidden' : '';
-});
-
-
-// ✅ Cerrar menú con botón X
-document.getElementById('mobileClose')?.addEventListener('click', () => {
-    document.getElementById('mobileMenu')?.classList.remove('active');
-    document.getElementById('overlay')?.classList.remove('active');
-    document.body.style.overflow = '';
-});
-
-// ✅ Dropdown de servicios en menú móvil
-document.querySelector('.mobile-dropdown-toggle')?.addEventListener('click', function(e) {
-    e.preventDefault();
-    const dropdown = document.getElementById('mobileDropdown');
-    if (dropdown) {
-        const isOpen = dropdown.style.display === 'block';
-        dropdown.style.display = isOpen ? 'none' : 'block';
-        const icon = this.querySelector('i');
-        if (icon) {
-            icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-            icon.style.transition = 'transform 0.3s';
-        }
-    }
-});
-
-
-
-document.getElementById('overlay')?.addEventListener('click', () => {
-    document.getElementById('mobileMenu').classList.remove('active');
-    document.getElementById('overlay').classList.remove('active');
-});
-</script>
 </body>
 </html>

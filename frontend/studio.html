@@ -1260,7 +1260,7 @@
             box-shadow: -5px 0 30px rgba(0, 0, 0, 0.15);
             z-index: 2000;
             transition: right 0.3s ease;
-            padding: 100px 30px 40px;
+            padding: 100px 30px 60px;
             overflow-y: auto;
         }
         
@@ -1484,11 +1484,6 @@
             
             /* Ocultar el botón flotante de autenticación en móviles */
             #auth-buttons {
-                display: none !important;
-            }
-            
-            /* Ocultar el botón flotante de admin en móviles */
-            a[href="/admin-dashboard.html"] {
                 display: none !important;
             }
             
@@ -2332,7 +2327,7 @@
             existingAdminBtns.forEach(btn => btn.remove());
             
             if (isAuth) {
-                // Usuario logueado: mostrar nombre + botón salir (solo en desktop)
+                // Usuario logueado: mostrar nombre + botón salir + botón admin (solo en desktop)
                 if (window.innerWidth > 768) {
                     const container = document.createElement('div');
                     container.id = 'auth-buttons';
@@ -2376,6 +2371,37 @@
                     
                     container.appendChild(userName);
                     container.appendChild(logoutBtn);
+                    
+                    // Botón admin para escritorio
+                    if (userData?.is_admin) {
+                        const adminBtn = document.createElement('a');
+                        adminBtn.href = '/admin-dashboard.html';
+                        adminBtn.innerHTML = '<i class="fas fa-user-shield"></i> Admin';
+                        adminBtn.style.cssText = `
+                            padding: 12px 25px;
+                            background: linear-gradient(135deg, #6a4c93, #9c89b8);
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 25px;
+                            font-weight: 600;
+                            font-size: 1rem;
+                            box-shadow: 0 5px 15px rgba(106,76,147,0.3);
+                            transition: all 0.3s;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 5px;
+                        `;
+                        adminBtn.onmouseenter = () => {
+                            adminBtn.style.transform = 'translateY(-2px)';
+                            adminBtn.style.boxShadow = '0 8px 20px rgba(106,76,147,0.5)';
+                        };
+                        adminBtn.onmouseleave = () => {
+                            adminBtn.style.transform = 'translateY(0)';
+                            adminBtn.style.boxShadow = '0 5px 15px rgba(106,76,147,0.3)';
+                        };
+                        container.appendChild(adminBtn);
+                    }
+                    
                     document.body.appendChild(container);
                 }
                 

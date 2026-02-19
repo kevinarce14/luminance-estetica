@@ -1515,6 +1515,68 @@
             box-shadow: 0 12px 35px rgba(37, 211, 102, 0.4);
         }
 
+        /* 🔧 FIX: MENÚ MÓVIL */
+        @media (max-width: 768px) {
+            /* Mostrar botón hamburguesa */
+            .menu-toggle {
+                display: block !important;
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1001;
+                background: linear-gradient(135deg, var(--rosa-medio), var(--violeta));
+                color: white;
+                border: none;
+                padding: 12px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 1.5rem;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+            
+            /* Ocultar navegación desktop */
+            header nav {
+                display: none !important;
+            }
+            
+            /* Menú móvil funcional */
+            .mobile-menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 85%;
+                max-width: 350px;
+                height: 100vh;
+                background: white;
+                transition: right 0.3s ease;
+                z-index: 1000;
+                overflow-y: auto;
+                box-shadow: -5px 0 25px rgba(0,0,0,0.2);
+            }
+            
+            .mobile-menu.active {
+                right: 0 !important;
+            }
+            
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.6);
+                z-index: 999;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+            
+            .overlay.active {
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+        }
+
 
     </style>
     <link rel="stylesheet" href="responsive.css">

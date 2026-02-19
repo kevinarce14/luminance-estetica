@@ -516,13 +516,13 @@
         
         .certificado-float {
             position: absolute;
-            bottom: -30px;
-            right: -30px;
+            bottom: -20px;
+            right: -20px;
             background: var(--blanco);
-            padding: 25px;
+            padding: 20px;
             border-radius: var(--border-radius);
             box-shadow: var(--sombra-hover);
-            width: 220px;
+            width: 200px;
             text-align: center;
             transition: var(--transicion);
             z-index: 2;
@@ -535,8 +535,8 @@
         
         .certificado-float i {
             color: var(--rosa-fuerte);
-            font-size: 32px;
-            margin-bottom: 10px;
+            font-size: 28px;
+            margin-bottom: 8px;
         }
         
         .certificado-float p {
@@ -548,6 +548,7 @@
         .certificado-float small {
             font-weight: 600;
             color: var(--lila-oscuro);
+            font-size: 0.8rem;
         }
         
         .bio-text h2 {
@@ -1252,14 +1253,14 @@
             position: fixed;
             top: 0;
             right: -100%;
-            width: 100%;
-            max-width: 400px;
+            width: 85%;
+            max-width: 350px;
             height: 100vh;
             background-color: var(--blanco);
-            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.15);
             z-index: 2000;
-            transition: var(--transicion);
-            padding: 100px 40px 40px;
+            transition: right 0.3s ease;
+            padding: 100px 30px 40px;
             overflow-y: auto;
         }
         
@@ -1287,13 +1288,13 @@
         }
         
         .mobile-nav li {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .mobile-nav a {
             display: block;
-            padding: 15px 0;
-            font-size: 1.2rem;
+            padding: 12px 0;
+            font-size: 1.1rem;
             font-weight: 600;
             color: var(--texto-oscuro);
             text-decoration: none;
@@ -1309,7 +1310,8 @@
         
         .mobile-dropdown {
             padding-left: 20px;
-            margin-top: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
             display: none;
         }
         
@@ -1319,7 +1321,7 @@
         
         .mobile-dropdown a {
             font-size: 1rem;
-            padding: 10px 0;
+            padding: 8px 0;
             color: var(--texto-medio);
         }
         
@@ -1333,7 +1335,7 @@
             z-index: 1999;
             opacity: 0;
             visibility: hidden;
-            transition: var(--transicion);
+            transition: all 0.3s ease;
         }
         
         .overlay.active {
@@ -1476,11 +1478,17 @@
             
             /* Ajustes para el menú móvil */
             .mobile-menu {
-                max-width: 300px;
+                max-width: 320px;
+                padding-bottom: 60px;
             }
             
             /* Ocultar el botón flotante de autenticación en móviles */
             #auth-buttons {
+                display: none !important;
+            }
+            
+            /* Ocultar el botón flotante de admin en móviles */
+            a[href="/admin-dashboard.html"] {
                 display: none !important;
             }
             
@@ -1521,10 +1529,22 @@
             }
             
             .certificado-float {
-                right: 10px !important;
+                right: 0 !important;
                 bottom: -20px !important;
-                width: 180px !important;
-                padding: 15px !important;
+                width: 160px !important;
+                padding: 12px !important;
+            }
+            
+            .certificado-float i {
+                font-size: 22px !important;
+            }
+            
+            .certificado-float p {
+                font-size: 0.8rem !important;
+            }
+            
+            .certificado-float small {
+                font-size: 0.7rem !important;
             }
             
             .bio-text {
@@ -1687,7 +1707,7 @@
             <li><a href="#contacto">Contacto</a></li>
         </ul>
         
-        <div style="margin-top: 40px;">
+        <div style="margin-top: 40px; margin-bottom: 30px;">
             <a href="https://wa.me/541162815014?text=Hola%20Cande!%20Vi%20tu%20página%20y%20quisiera%20consultarte%20por..." 
                class="btn btn-rosa" 
                style="width: 100%;"
@@ -2307,112 +2327,89 @@
             const existingBtn = document.getElementById('auth-buttons');
             if (existingBtn) existingBtn.remove();
             
+            // Eliminar cualquier botón de admin flotante que pueda existir
+            const existingAdminBtns = document.querySelectorAll('a[href="/admin-dashboard.html"]:not(#mobileAdminLink)');
+            existingAdminBtns.forEach(btn => btn.remove());
+            
             if (isAuth) {
-                // Usuario logueado: mostrar nombre + botón salir
-                const container = document.createElement('div');
-                container.id = 'auth-buttons';
-                container.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    display: flex;
-                    gap: 10px;
-                    align-items: center;
-                    z-index: 1000;
-                `;
-                
-                const userName = document.createElement('div');
-                userName.textContent = `Hola, ${userData?.full_name || 'Usuario'}`;
-                userName.style.cssText = `
-                    padding: 12px 20px;
-                    background: white;
-                    color: #2d3436;
-                    border-radius: 25px;
-                    font-weight: 600;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-                `;
-                
-                const logoutBtn = document.createElement('button');
-                logoutBtn.innerHTML = '🚪 Salir';
-                logoutBtn.style.cssText = `
-                    padding: 12px 25px;
-                    background: linear-gradient(135deg, #e75480, #9c89b8);
-                    color: white;
-                    border: none;
-                    border-radius: 25px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-                    transition: all 0.3s;
-                `;
-                logoutBtn.onmouseover = () => logoutBtn.style.transform = 'scale(1.05)';
-                logoutBtn.onmouseout = () => logoutBtn.style.transform = 'scale(1)';
-                logoutBtn.addEventListener('click', logoutWithConfirmation);
-                
-                container.appendChild(userName);
-                container.appendChild(logoutBtn);
-                document.body.appendChild(container);
-
-                // Botón admin — solo si is_admin, aparece debajo del container original
-                if (userData?.is_admin === true) {
-                    const adminBtn = document.createElement('a');
-                    adminBtn.href = '/admin-dashboard.html';
-                    adminBtn.innerHTML = '⚙️ Panel Admin';
-                    adminBtn.style.cssText = `
+                // Usuario logueado: mostrar nombre + botón salir (solo en desktop)
+                if (window.innerWidth > 768) {
+                    const container = document.createElement('div');
+                    container.id = 'auth-buttons';
+                    container.style.cssText = `
                         position: fixed;
-                        top: 70px;
-                        right: 115px;
-                        padding: 10px 22px;
-                        background: linear-gradient(135deg, #6a4c93, #9c89b8);
-                        color: white;
-                        text-decoration: none;
+                        top: 20px;
+                        right: 20px;
+                        display: flex;
+                        gap: 10px;
+                        align-items: center;
+                        z-index: 1000;
+                    `;
+                    
+                    const userName = document.createElement('div');
+                    userName.textContent = `Hola, ${userData?.full_name || 'Usuario'}`;
+                    userName.style.cssText = `
+                        padding: 12px 20px;
+                        background: white;
+                        color: #2d3436;
                         border-radius: 25px;
                         font-weight: 600;
-                        font-size: 0.9rem;
-                        box-shadow: 0 5px 15px rgba(106,76,147,0.3);
-                        z-index: 1000;
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+                    `;
+                    
+                    const logoutBtn = document.createElement('button');
+                    logoutBtn.innerHTML = '🚪 Salir';
+                    logoutBtn.style.cssText = `
+                        padding: 12px 25px;
+                        background: linear-gradient(135deg, #e75480, #9c89b8);
+                        color: white;
+                        border: none;
+                        border-radius: 25px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
                         transition: all 0.3s;
                     `;
-                    adminBtn.onmouseenter = () => {
-                        adminBtn.style.transform = 'translateY(-2px)';
-                        adminBtn.style.boxShadow = '0 8px 20px rgba(106,76,147,0.5)';
-                    };
-                    adminBtn.onmouseleave = () => {
-                        adminBtn.style.transform = 'translateY(0)';
-                        adminBtn.style.boxShadow = '0 5px 15px rgba(106,76,147,0.3)';
-                    };
-                    document.body.appendChild(adminBtn);
+                    logoutBtn.onmouseover = () => logoutBtn.style.transform = 'scale(1.05)';
+                    logoutBtn.onmouseout = () => logoutBtn.style.transform = 'scale(1)';
+                    logoutBtn.addEventListener('click', logoutWithConfirmation);
+                    
+                    container.appendChild(userName);
+                    container.appendChild(logoutBtn);
+                    document.body.appendChild(container);
                 }
                 
             } else {
-                // Botón flotante de login
-                const loginBtn = document.createElement('a');
-                loginBtn.href = 'login.html';
-                loginBtn.innerHTML = '👤 Iniciar Sesión';
-                loginBtn.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    padding: 15px 30px;
-                    background: linear-gradient(135deg, #e75480, #9c89b8);
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 30px;
-                    font-weight: 600;
-                    font-size: 1rem;
-                    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-                    z-index: 1000;
-                    transition: all 0.3s;
-                `;
-                loginBtn.onmouseenter = () => {
-                    loginBtn.style.transform = 'translateY(-3px)';
-                    loginBtn.style.boxShadow = '0 12px 30px rgba(0,0,0,0.3)';
-                };
-                loginBtn.onmouseleave = () => {
-                    loginBtn.style.transform = 'translateY(0)';
-                    loginBtn.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
-                };
-                document.body.appendChild(loginBtn);
+                // Botón flotante de login (solo en desktop)
+                if (window.innerWidth > 768) {
+                    const loginBtn = document.createElement('a');
+                    loginBtn.href = 'login.html';
+                    loginBtn.innerHTML = '👤 Iniciar Sesión';
+                    loginBtn.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        padding: 15px 30px;
+                        background: linear-gradient(135deg, #e75480, #9c89b8);
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 30px;
+                        font-weight: 600;
+                        font-size: 1rem;
+                        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+                        z-index: 1000;
+                        transition: all 0.3s;
+                    `;
+                    loginBtn.onmouseenter = () => {
+                        loginBtn.style.transform = 'translateY(-3px)';
+                        loginBtn.style.boxShadow = '0 12px 30px rgba(0,0,0,0.3)';
+                    };
+                    loginBtn.onmouseleave = () => {
+                        loginBtn.style.transform = 'translateY(0)';
+                        loginBtn.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
+                    };
+                    document.body.appendChild(loginBtn);
+                }
             }
         }
         
@@ -2776,6 +2773,16 @@
                     }
                 });
             }
+            
+            // Cerrar menú al hacer clic en un enlace
+            const mobileLinks = document.querySelectorAll('.mobile-nav a, .mobile-dropdown a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            });
         }
         
         // ===== STICKY HEADER =====
@@ -2979,6 +2986,17 @@
                 }
             `;
             document.head.appendChild(style);
+            
+            // Reaccionar a cambios de tamaño de ventana para ocultar/mostrar botones flotantes
+            window.addEventListener('resize', () => {
+                const existingBtn = document.getElementById('auth-buttons');
+                if (existingBtn) existingBtn.remove();
+                
+                const existingAdminBtns = document.querySelectorAll('a[href="/admin-dashboard.html"]:not(#mobileAdminLink)');
+                existingAdminBtns.forEach(btn => btn.remove());
+                
+                createFloatingButton();
+            });
         });
     </script>
 </body>

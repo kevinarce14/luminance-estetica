@@ -2315,6 +2315,7 @@
             }).format(price);
         }
         
+        // ✅ Función mejorada de logout con confirmación
         function logoutWithConfirmation() {
             if (confirm('¿Seguro que quieres cerrar sesión?')) {
                 removeAuthToken();
@@ -2788,7 +2789,7 @@
                 });
             }
             
-            // ✅ Dropdown de servicios en menú móvil - AHORA NO HACE SCROLL
+            // ✅ Dropdown de servicios en menú móvil - CORREGIDO
             const mobileServicesToggle = document.getElementById('mobileServicesToggle');
             const mobileDropdown = document.getElementById('mobileDropdown');
             
@@ -2799,18 +2800,14 @@
                     
                     const isOpen = mobileDropdown.style.display === 'block';
                     
-                    if (!isOpen) {
-                        // Si va a abrir, guardamos la posición actual del scroll
-                        const scrollPosition = mobileMenu.scrollTop;
-                        
-                        mobileDropdown.style.display = 'block';
-                        
-                        // ✅ Mantenemos la misma posición de scroll
-                        mobileMenu.scrollTop = scrollPosition;
-                    } else {
+                    // ✅ Simplemente alternamos la visibilidad sin cambiar el scroll
+                    if (isOpen) {
                         mobileDropdown.style.display = 'none';
+                    } else {
+                        mobileDropdown.style.display = 'block';
                     }
                     
+                    // Rotar el icono
                     const icon = this.querySelector('i');
                     if (icon) {
                         icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';

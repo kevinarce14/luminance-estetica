@@ -1581,6 +1581,41 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        /* Menú móvil */
+        @media (max-width: 768px) {
+            /* Ocultar menú desktop */
+            header nav {
+                display: none;
+            }
+            
+            /* Mostrar botón hamburguesa */
+            .menu-toggle {
+                display: block !important;
+            }
+            
+            /* Menú móvil cuando está abierto */
+            .mobile-menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 80%;
+                height: 100vh;
+                background: white;
+                transition: right 0.3s ease;
+                z-index: 1000;
+            }
+            
+            .mobile-menu.active {
+                right: 0;
+            }
+        }
+
+        /* Imágenes responsive */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
     </style>
 </head>
 <body>

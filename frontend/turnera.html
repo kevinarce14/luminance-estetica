@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Turnera Online | Luminance Studio by Cande</title>
     <meta name="description" content="Sistema de reserva de turnos online - Luminance Studio by Cande. Reserva tu tratamiento de belleza en línea.">
     
@@ -55,6 +55,7 @@
             background-color: var(--gris-claro);
             color: var(--texto-oscuro);
             line-height: 1.6;
+            overflow-x: hidden;
         }
         
         h1, h2, h3, h4 {
@@ -271,8 +272,14 @@
         }
 
         /* ===== CALENDARIO ===== */
+        #calendar-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         #calendar {
-            margin-bottom: 20px;
+            min-width: 300px;
         }
 
         /* Customización de FullCalendar */
@@ -302,6 +309,32 @@
         .fc-daygrid-day:hover {
             background-color: rgba(231, 84, 128, 0.1);
             cursor: pointer;
+        }
+        
+        /* Mejorar área táctil en móvil */
+        .fc-daygrid-day {
+            cursor: pointer;
+            -webkit-tap-highlight-color: rgba(231, 84, 128, 0.2);
+        }
+        
+        /* Vista lista más legible en móvil */
+        .fc-list-event {
+            cursor: pointer;
+            padding: 10px !important;
+        }
+        
+        .fc-list-event:hover {
+            background-color: rgba(231, 84, 128, 0.1) !important;
+        }
+
+        /* Fecha seleccionada en móvil */
+        #selected-date-mobile {
+            margin-top: 20px;
+            background: rgba(231,84,128,0.1);
+            border: 2px solid var(--rosa-medio);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
         }
 
         /* ===== SELECTOR DE SERVICIO ===== */
@@ -471,50 +504,189 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
+            /* Container más angosto en móvil */
+            .container {
+                padding: 0 15px;
+                max-width: 100%;
+            }
+            
+            /* Header adaptado */
+            .header-turnera {
+                padding: 15px 0;
+            }
+            
+            .logo-turnera {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 15px;
+            }
+            
+            .logo-text {
+                font-size: 1.8rem;
+            }
+            
+            .btn-volver {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+            
+            /* Título principal */
+            .turnera-title h1 {
+                font-size: 1.8rem;
+            }
+            
+            .turnera-title p {
+                font-size: 0.95rem;
+                padding: 0 10px;
+            }
+            
+            /* Stepper compacto en móvil */
             .stepper {
                 flex-wrap: wrap;
                 gap: 10px;
+                padding: 15px 10px;
             }
 
             .step-arrow {
                 display: none;
             }
+            
+            .step {
+                flex: 1 1 calc(50% - 10px);
+                justify-content: center;
+            }
+            
+            .step-number {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+            
+            .step-label {
+                font-size: 0.85rem;
+            }
+            
+            /* Secciones */
+            .section-box {
+                padding: 20px 15px;
+            }
+            
+            .section-header h2 {
+                font-size: 1.3rem;
+            }
+            
+            .section-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            /* ===== CALENDARIO MÓVIL ===== */
 
-            .turnera-title h1 {
-                font-size: 2rem;
+            /* Forzar que el calendario ocupe todo el ancho y sea visible */
+            #calendar {
+                width: 100% !important;
+                min-width: 0 !important;
             }
 
-            .time-slots {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            /* Crítico: el scroll container de FullCalendar v6 oculta la grilla en móvil */
+            .fc .fc-scroller {
+                overflow: visible !important;
+                height: auto !important;
+            }
+            .fc .fc-scroller-liquid-absolute {
+                position: relative !important;
+                inset: auto !important;
+            }
+            .fc-scrollgrid {
+                width: 100% !important;
+            }
+            .fc-scrollgrid td {
+                border-right: none !important;
+            }
+            
+            .fc {
+                font-size: 0.8rem !important;
+            }
+
+            .fc-toolbar {
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                gap: 6px !important;
+                padding: 6px 2px !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+            }
+            
+            .fc-toolbar-chunk {
+                display: flex;
+                align-items: center;
+            }
+            
+            .fc-button {
+                padding: 7px 10px !important;
+                font-size: 0.82rem !important;
+            }
+            
+            .fc-toolbar-title {
+                font-size: 0.9rem !important;
+                white-space: nowrap;
+            }
+            
+            .fc-col-header-cell {
+                padding: 6px 1px !important;
+                font-size: 0.7rem !important;
+                font-weight: 700 !important;
+            }
+            
+            .fc-daygrid-day {
+                min-height: 42px !important;
+            }
+            
+            .fc-daygrid-day-number {
+                padding: 4px 5px !important;
+                font-size: 0.8rem !important;
+                font-weight: 600;
+            }
+
+            /* Ocultar eventos para no romper el layout en móvil */
+            .fc-event,
+            .fc-daygrid-event-harness {
+                display: none !important;
+            }
+            
+            /* ===== SERVICIOS ===== */
+            .service-option {
+                padding: 15px;
+                flex-direction: column;
+                align-items: flex-start;
                 gap: 10px;
             }
+            
+            .service-price {
+                align-self: flex-end;
+            }
+            
+            /* ===== TIME SLOTS ===== */
+            .time-slots {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .time-slot {
+                padding: 12px 5px;
+                font-size: 0.9rem;
+            }
+            
+            /* ===== RESUMEN ===== */
+            .summary-item {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 5px;
+            }
         }
-
-        /* ===== LOADING ===== */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--texto-medio);
-        }
-
-        .spinner {
-            border: 4px solid var(--gris-claro);
-            border-top: 4px solid var(--rosa-medio);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        
     </style>
-    <link rel="stylesheet" href="responsive.css">
+
 </head>
 <body>
     <!-- ===== HEADER ===== -->
@@ -574,17 +746,17 @@
                     <i class="fas fa-info-circle"></i>
                     <span>Hacé click en el día que prefieras para tu turno. Los días con turnos confirmados se muestran en rojo.</span>
                 </div>
-                <!-- <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 12px; height: 12px; background: #dc3545; border-radius: 50%;"></div>
-                        <span style="font-size: 0.9rem; color: var(--texto-medio);">Turno Confirmado</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 12px; height: 12px; background: rgba(231, 84, 128, 0.3); border: 2px solid var(--rosa-medio); border-radius: 50%;"></div>
-                        <span style="font-size: 0.9rem; color: var(--texto-medio);">Disponible</span>
-                    </div> -->
+
+                <!-- Calendario para todos los dispositivos (responsive) -->
+                <div id="calendar-container">
+                    <div id="calendar"></div>
                 </div>
-                <div id="calendar"></div>
+
+                <!-- Mensaje de fecha seleccionada para móvil -->
+                <div id="selected-date-mobile" style="display: none;">
+                    <i class="fas fa-check-circle" style="color: var(--rosa-medio); margin-right: 8px;"></i>
+                    <span id="selected-date-mobile-text" style="font-weight: 600; color: var(--violeta);"></span>
+                </div>
             </div>
 
             <!-- ===== PASO 2: SELECCIONAR SERVICIO ===== -->
@@ -675,12 +847,35 @@
             // Cargar servicios
             await loadServices();
             
-            // Inicializar calendario (ahora es async)
+            // Inicializar calendario
             await initCalendar();
+            
+            // Agregar listener para resize de ventana
+            window.addEventListener('resize', handleWindowResize);
 
             // Configurar botón de confirmación
             document.getElementById('btn-confirm').addEventListener('click', confirmReservation);
         });
+
+        // ===== MANEJAR CAMBIO DE TAMAÑO DE VENTANA =====
+        function handleWindowResize() {
+            if (calendar) {
+                if (window.innerWidth < 768) {
+                    calendar.setOption('headerToolbar', {
+                        left: 'prev,next',
+                        center: 'title',
+                        right: 'today'
+                    });
+                } else {
+                    calendar.setOption('headerToolbar', {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,listWeek'
+                    });
+                }
+                calendar.updateSize();
+            }
+        }
 
         // ===== CARGAR SERVICIOS =====
         async function loadServices() {
@@ -740,57 +935,54 @@
             } catch (error) {
                 console.error('⚠️ No se pudieron cargar turnos existentes:', error);
             }
-            
-            calendar = new FullCalendar.Calendar(calendarEl, {
+
+            // Determinar configuración según tamaño de pantalla
+            const isMobile = window.innerWidth < 768;
+
+            // Configuración del calendario
+            const calendarConfig = {
                 initialView: 'dayGridMonth',
                 locale: 'es',
                 hiddenDays: [0],
-                headerToolbar: {
-                    left: 'prev,next today',
+                headerToolbar: isMobile ? {
+                    left: 'prev,next',
                     center: 'title',
                     right: ''
+                } : {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,listWeek'
                 },
+                height: 'auto',
+                expandRows: false,
+                handleWindowResize: true,
                 validRange: {
-                    start: new Date().toISOString().split('T')[0] // Solo fechas futuras
+                    start: new Date().toISOString().split('T')[0]
                 },
-                events: existingAppointments, // Mostrar turnos existentes
+                events: existingAppointments,
                 dateClick: function(info) {
                     handleDateClick(info);
                 },
                 eventContent: function(arg) {
-                    // Personalizar cómo se muestran los eventos
                     return {
                         html: `<div style="font-size: 0.7rem; padding: 2px;">
                                 <i class="fas fa-circle" style="font-size: 0.5rem;"></i> 
                                 ${arg.event.title}
                                </div>`
                     };
-                },
-
-                // ✅ AGREGAR ESTAS OPCIONES MÓVILES:
-                windowResize: function(view) {
-                    if (window.innerWidth < 768) {
-                        calendar.changeView('listWeek'); // Vista lista en móvil
-                    } else {
-                        calendar.changeView('dayGridMonth'); // Vista mes en desktop
-                    }
-                },
-                
-                // Responsive inicial
-                initialView: window.innerWidth < 768 ? 'listWeek' : 'dayGridMonth',
-                
-                // Altura adaptativa
-                height: window.innerWidth < 768 ? 'auto' : 650,
-                
-                // Botones según pantalla
-                headerToolbar: {
-                    left: window.innerWidth < 768 ? 'prev,next' : 'prev,next today',
-                    center: 'title',
-                    right: window.innerWidth < 768 ? '' : 'dayGridMonth,timeGridWeek'
                 }
-            });
+            };
             
+            // Crear y renderizar el calendario
+            calendar = new FullCalendar.Calendar(calendarEl, calendarConfig);
             calendar.render();
+
+            // Forzar recálculo de tamaño después del paint inicial
+            requestAnimationFrame(() => {
+                calendar.updateSize();
+                setTimeout(() => calendar.updateSize(), 300);
+            });
+
             console.log('📅 Calendario inicializado con', existingAppointments.length, 'turnos');
         }
 
@@ -856,7 +1048,6 @@
                     });
             } catch (error) {
                 console.error('❌ Error cargando turnos existentes:', error);
-                // No lanzar error, simplemente retornar array vacío
                 return [];
             }
         }
@@ -883,6 +1074,21 @@
             
             selectedDate = info.dateStr;
             console.log('📅 Fecha seleccionada:', selectedDate);
+
+            // Mostrar mensaje de fecha seleccionada en móvil
+            const mobileDateDisplay = document.getElementById('selected-date-mobile');
+            const mobileDateText = document.getElementById('selected-date-mobile-text');
+            
+            if (mobileDateDisplay && mobileDateText) {
+                const dateObj = new Date(selectedDate + 'T00:00:00');
+                const formattedDate = dateObj.toLocaleDateString('es-AR', { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long'
+                });
+                mobileDateText.textContent = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+                mobileDateDisplay.style.display = 'block';
+            }
 
             // Activar paso 2
             activateStep(2);
@@ -1158,17 +1364,18 @@
                 appointmentCreatedId = appointment.id;
                 console.log('✅ Appointment creado:', appointment);
 
-                // Actualizar calendario
-                if (calendar && selectedService) {
+                // Actualizar calendarios
+                if (selectedService) {
                     const appointmentDate = new Date(appointment.appointment_date);
-                    calendar.addEvent({
+                    const eventData = {
                         id: appointment.id,
                         title: selectedService.name.substring(0, 15) + '...',
                         start: appointmentDate.toISOString(),
                         backgroundColor: '#ffc107',
                         borderColor: '#e0a800',
                         textColor: '#ffffff'
-                    });
+                    };
+                    if (calendar) calendar.addEvent(eventData);
                 }
 
                 // ✅ VERIFICAR SI ES ADMIN
@@ -1349,7 +1556,7 @@
                         </div>
                     </div>
 
-                    <button id="btn-confirm" class="btn-primary" disabled onclick="confirmReservation()">
+                    <button id="btn-confirm" class="btn-primary" disabled>
                         <i class="fas fa-calendar-check"></i>
                         Confirmar Reserva
                     </button>
@@ -1381,14 +1588,14 @@
                 }
             }
             
-            // ===== HABILITAR SECCIÓN DE FECHA =====
-            const dateSection = document.getElementById('section-date');
-            if (dateSection) {
-                dateSection.classList.remove('disabled');
+            // ===== OCULTAR MENSAJE DE FECHA SELECCIONADA EN MÓVIL =====
+            const mobileDateDisplay = document.getElementById('selected-date-mobile');
+            if (mobileDateDisplay) {
+                mobileDateDisplay.style.display = 'none';
             }
             
             // ===== LIMPIAR SELECCIONES DE SERVICIOS =====
-            document.querySelectorAll('.service-card').forEach(card => {
+            document.querySelectorAll('.service-option').forEach(card => {
                 card.classList.remove('selected');
             });
             
@@ -1410,7 +1617,9 @@
                 calendar.refetchEvents();
                 
                 // Limpiar selección visual
-                calendar.unselect();
+                document.querySelectorAll('.fc-daygrid-day').forEach(day => {
+                    day.classList.remove('selected-date');
+                });
             }
             
             // ===== SCROLL AL INICIO =====
@@ -1437,7 +1646,9 @@
         function resetStepsFrom(stepNumber) {
             for (let i = stepNumber; i <= 4; i++) {
                 const step = document.getElementById(`step-${i}`);
-                step.classList.remove('active', 'completed');
+                if (step) {
+                    step.classList.remove('active', 'completed');
+                }
             }
 
             if (stepNumber <= 3) {
@@ -1452,9 +1663,6 @@
         }
 
         // ===== FUNCIÓN: fecha local con timezone offset =====
-        // Convierte un Date a ISO string con el offset local del navegador
-        // Ej (UTC-3): "2026-02-12T11:00:00-03:00"
-        // El backend Pydantic lo parsea correctamente con timezone.utc
         function toLocalISOString(date) {
             const pad = n => String(n).padStart(2, '0');
             
@@ -1465,8 +1673,7 @@
             const mins   = pad(date.getMinutes());
             const secs   = pad(date.getSeconds());
             
-            // Calcular offset (ej: -180 min → "-03:00")
-            const offsetMin = date.getTimezoneOffset(); // positivo = atrás de UTC
+            const offsetMin = date.getTimezoneOffset();
             const sign      = offsetMin <= 0 ? '+' : '-';
             const absOffset = Math.abs(offsetMin);
             const offH      = pad(Math.floor(absOffset / 60));
@@ -1475,14 +1682,16 @@
             return `${year}-${month}-${day}T${hours}:${mins}:${secs}${sign}${offH}:${offM}`;
         }
 
-        // ===== FUNCIONES DE FORMATO (si no están en api.js) =====
-        if (typeof formatPrice === 'undefined') {
-            function formatPrice(price) {
-                return `$${price.toLocaleString('es-AR')}`;
-            }
+        // ===== FUNCIONES DE FORMATO =====
+        function formatPrice(price) {
+            if (typeof price !== 'number') price = parseFloat(price);
+            return new Intl.NumberFormat('es-AR', {
+                style: 'currency',
+                currency: 'ARS',
+                minimumFractionDigits: 0
+            }).format(price);
         }
 
-        // Sobreescribimos siempre para garantizar "HH:MM hs" con 2 dígitos (no depender de api.js)
         function formatTime(dateTimeString) {
             const date = new Date(dateTimeString);
             const h = String(date.getHours()).padStart(2, '0');
@@ -1490,11 +1699,13 @@
             return `${h}:${m} hs`;
         }
 
-        if (typeof formatDate === 'undefined') {
-            function formatDate(dateTimeString) {
-                const date = new Date(dateTimeString);
-                return date.toLocaleDateString('es-ES');
-            }
+        function formatDate(dateTimeString) {
+            const date = new Date(dateTimeString);
+            return date.toLocaleDateString('es-ES', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
         }
     </script>
 </body>

@@ -1819,8 +1819,15 @@
                 <a href="/mis-turnos.html" 
                    id="mobileMisTurnosLink" 
                    class="btn" 
-                   style="display: none; width: 100%; padding: 12px; background: linear-gradient(135deg, #a78bca, #8b6db8); color: white; text-decoration: none; border-radius: 12px; text-align: center; font-weight: 600;">
+                   style="display: none; width: 100%; padding: 12px; background: linear-gradient(135deg, #a78bca, #8b6db8); color: white; text-decoration: none; border-radius: 12px; margin-bottom: 10px; text-align: center; font-weight: 600;">
                     <i class="fas fa-calendar-check"></i> Mis Turnos
+                </a>
+                
+                <a href="/turnera.html" 
+                   id="mobileReservarLink" 
+                   class="btn" 
+                   style="display: none; width: 100%; padding: 12px; background: linear-gradient(135deg, #e75480, #d81b60); color: white; text-decoration: none; border-radius: 12px; text-align: center; font-weight: 600;">
+                    <i class="fas fa-calendar-plus"></i> Reservar Turno
                 </a>
             </div>
         </div>
@@ -3097,6 +3104,7 @@
             const mobileUserEmail = document.getElementById('mobileUserEmail');
             const mobileAdminLink = document.getElementById('mobileAdminLink');
             const mobileMisTurnosLink = document.getElementById('mobileMisTurnosLink');
+            const mobileReservarLink = document.getElementById('mobileReservarLink');
             
             const userData = getUserData();
             const isAuth = isLoggedIn();
@@ -3121,6 +3129,10 @@
                 
                 if (mobileMisTurnosLink) {
                     mobileMisTurnosLink.style.display = 'block';
+                }
+                
+                if (mobileReservarLink) {
+                    mobileReservarLink.style.display = 'block';
                 }
             }
         }

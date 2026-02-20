@@ -452,6 +452,202 @@
         }
     }
         
+
+        
+        /* ============================================
+           📱 MENÚ MÓVIL
+           ============================================ */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: linear-gradient(135deg, #6a4c93, #8b6db8);
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        
+        .menu-toggle:hover {
+            transform: scale(1.05);
+        }
+        
+        .overlay-mobile {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .overlay-mobile.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .mobile-menu-admin {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 85%;
+            max-width: 350px;
+            height: 100vh;
+            background: white;
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            transition: left 0.3s ease;
+            padding: 30px 25px;
+            overflow-y: auto;
+            border-radius: 0 20px 20px 0;
+        }
+        
+        .mobile-menu-admin.active {
+            left: 0;
+        }
+        
+        .mobile-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .mobile-close-admin {
+            font-size: 24px;
+            cursor: pointer;
+            color: #6a4c93;
+            padding: 5px;
+        }
+        
+        .mobile-nav-admin {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .mobile-nav-admin li {
+            margin-bottom: 8px;
+        }
+        
+        .mobile-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2d3436;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .mobile-nav-link:hover,
+        .mobile-nav-link.active {
+            background: linear-gradient(135deg, #6a4c93, #8b6db8);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .mobile-nav-link i {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .btn-logout-mobile {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #e75480, #d81b60);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-logout-mobile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 84, 128, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block !important;
+            }
+            
+            .sidebar {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                padding: 15px !important;
+            }
+            
+            .top-bar {
+                padding: 15px 15px 15px 70px !important; /* Espacio para el botón hamburguesa */
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .welcome h1 {
+                font-size: 1.3rem !important;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .modal-content {
+                width: 95% !important;
+                max-width: 95% !important;
+            }            
+            
+            /* Card headers responsive */
+            .card-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 15px;
+            }
+            
+            .card-header .btn {
+                width: 100%;
+            }
+            /* Reportes responsive */
+            .report-tab .form-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            /* Gráficos en 1 columna en móvil */
+            #reports .card > div[style*="grid-template-columns"] {
+                grid-template-columns: 1fr !important;
+            }
+
+        }
+
     </style>
     <link rel="stylesheet" href="responsive.css">
 </head>
@@ -509,10 +705,57 @@
         </ul>
     </aside>
     
+    <!-- ===== OVERLAY MÓVIL ===== -->
+    <div class="overlay-mobile" id="overlayMobile"></div>
+    
+    <!-- ===== MENÚ MÓVIL ===== -->
+    <div class="mobile-menu-admin" id="mobileMenuAdmin">
+        <div class="mobile-menu-header">
+            <div>
+                <h3 style="margin: 0; font-size: 1.3rem; color: #6a4c93;">💅 Luminance</h3>
+                <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: #636e72;">Panel de Administración</p>
+            </div>
+            <div class="mobile-close-admin" id="mobileCloseAdmin">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+        
+        <div style="padding: 15px 0; margin-bottom: 20px; border-bottom: 1px solid #f0f0f0;">
+            <p style="margin: 0 0 5px 0; font-weight: 600; color: #6a4c93;">
+                Hola, <span id="mobileAdminName">Admin</span> 👋
+            </p>
+            <p style="margin: 0; font-size: 0.85rem; color: #636e72;" id="mobileAdminDate"></p>
+        </div>
+        
+        <ul class="mobile-nav-admin">
+            <li><a class="mobile-nav-link active" data-section="dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></a></li>
+            <li><a class="mobile-nav-link" data-section="appointments"><i class="fas fa-calendar-alt"></i><span>Turnos</span></a></li>
+            <li><a class="mobile-nav-link" data-section="services"><i class="fas fa-spa"></i><span>Servicios</span></a></li>
+            <li><a class="mobile-nav-link" data-section="payments"><i class="fas fa-dollar-sign"></i><span>Pagos</span></a></li>
+            <li><a class="mobile-nav-link" data-section="clients"><i class="fas fa-users"></i><span>Clientes</span></a></li>
+            <li><a class="mobile-nav-link" data-section="availability"><i class="fas fa-clock"></i><span>Disponibilidad</span></a></li>
+            <li><a class="mobile-nav-link" data-section="reports"><i class="fas fa-file-alt"></i><span>Reportes</span></a></li>
+        </ul>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
+            <button class="btn-logout-mobile" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+            <a href="/studio.html" style="display: block; margin-top: 10px; padding: 12px; background: #f8f9fa; color: #6a4c93; text-decoration: none; border-radius: 8px; text-align: center; font-weight: 600;">
+                <i class="fas fa-home"></i> Volver al Inicio
+            </a>
+        </div>
+    </div>
+
+    
     <!-- Main Content -->
     <div class="main-content">
         <!-- Top Bar -->
         <div class="top-bar">
+            <button class="menu-toggle" id="menuToggleAdmin" style="display: none;">
+                <i class="fas fa-bars"></i>
+            </button>
+
             <div class="welcome">
                 <h1>Bienvenida, <span id="admin-name">Admin</span> 👋</h1>
                 <p id="current-date"></p>
@@ -667,28 +910,28 @@
                     </button>
                 </div>
                 <div id="regular-schedule-container">
-                <div class="table-responsive"></div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Día</th>
-                                <th>Horario</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="regular-schedule-body">
-                            <tr>
-                                <td colspan="4" style="text-align: center; padding: 30px;">
-                                    <div class="loading">
-                                        <div class="spinner"></div>
-                                        <p>Cargando horarios...</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Día</th>
+                                    <th>Horario</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="regular-schedule-body">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 30px;">
+                                        <div class="loading">
+                                            <div class="spinner"></div>
+                                            <p>Cargando horarios...</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             
@@ -696,7 +939,7 @@
             <div class="card">
                 <div class="card-header">
                     <h2>🚫 Excepciones y Bloqueos</h2>
-                    <button class="btn btn-primary" onclick="openExceptionModal()">
+                    <button class="btn btn-primary exception-btn" onclick="openExceptionModal()">
                         <i class="fas fa-plus"></i> Agregar Excepción
                     </button>
                 </div>
@@ -2330,5 +2573,123 @@
 
     </script>
     
+
+    <script>
+        // ============================================
+        // 📱 MENÚ MÓVIL
+        // ============================================
+        (function() {
+            const menuToggle = document.getElementById('menuToggleAdmin');
+            const mobileMenu = document.getElementById('mobileMenuAdmin');
+            const overlay = document.getElementById('overlayMobile');
+            const closeBtn = document.getElementById('mobileCloseAdmin');
+            
+            function openMenu() {
+                if (mobileMenu && overlay) {
+                    mobileMenu.classList.add('active');
+                    overlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+            
+            function closeMenu() {
+                if (mobileMenu && overlay) {
+                    mobileMenu.classList.remove('active');
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+            
+            // Abrir menú
+            if (menuToggle) {
+                menuToggle.addEventListener('click', openMenu);
+            }
+            
+            // Cerrar con X
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeMenu);
+            }
+            
+            // Cerrar con overlay
+            if (overlay) {
+                overlay.addEventListener('click', closeMenu);
+            }
+            
+            // ✅ Navegación móvil - Usando la MISMA lógica que el sidebar desktop
+            document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.dataset.section;
+                    
+                    console.log('📱 Mobile nav clicked:', section);
+                    
+                    // Actualizar activo en menú móvil
+                    document.querySelectorAll('.mobile-nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Actualizar activo en sidebar desktop
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    const desktopLink = document.querySelector(`.nav-link[data-section="${section}"]`);
+                    if (desktopLink) desktopLink.classList.add('active');
+                    
+                    // ✅ Mostrar sección (igual que en setupNavigation)
+                    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                    const sectionElement = document.getElementById(section);
+                    if (sectionElement) {
+                        sectionElement.classList.add('active');
+                    }
+                    
+                    // ✅ Cargar datos según sección (igual que en setupNavigation)
+                    switch(section) {
+                        case 'appointments':
+                            if (typeof loadUpcomingAppointments === 'function') loadUpcomingAppointments();
+                            break;
+                        case 'services':
+                            if (typeof loadServices === 'function') loadServices();
+                            break;
+                        case 'payments':
+                            if (typeof loadPayments === 'function') loadPayments();
+                            break;
+                        case 'clients':
+                            if (typeof loadClients === 'function') loadClients();
+                            break;
+                        case 'availability':
+                            if (typeof loadRegularSchedule === 'function') loadRegularSchedule();
+                            if (typeof loadExceptions === 'function') loadExceptions();
+                            break;
+                    }
+                    
+                    // Cerrar menú
+                    closeMenu();
+                });
+            });
+            
+            // Actualizar info del admin
+            function updateMobileInfo() {
+                const adminNameEl = document.getElementById('admin-name');
+                const mobileAdminName = document.getElementById('mobileAdminName');
+                if (adminNameEl && mobileAdminName) {
+                    mobileAdminName.textContent = adminNameEl.textContent;
+                }
+                
+                const mobileDate = document.getElementById('mobileAdminDate');
+                if (mobileDate) {
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    mobileDate.textContent = new Date().toLocaleDateString('es-ES', options);
+                }
+            }
+            
+            // Llamar cuando la página esté lista
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', updateMobileInfo);
+            } else {
+                updateMobileInfo();
+            }
+            
+            // También después de un delay para asegurar que el nombre del admin se cargó
+            setTimeout(updateMobileInfo, 1000);
+        })();
+    </script>
+
 </body>
 </html>

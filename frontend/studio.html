@@ -1262,10 +1262,18 @@
             transition: right 0.3s ease;
             padding: 100px 30px 60px;
             overflow-y: auto;
+            overflow-x: hidden;
+            border-radius: 20px 0 0 20px;  /* ✅ Bordes redondeados a la izquierda */
+        }
+        
+        /* ✅ Asegurar que todo el contenido del menú móvil respete el ancho */
+        .mobile-menu * {
+            max-width: 100%;
+            box-sizing: border-box;
         }
         
         .mobile-menu.active {
-            right: 0;
+            right: 15px;  /* ✅ Deja un pequeño espacio a la derecha */
         }
         
         .mobile-menu-header {
@@ -1301,6 +1309,8 @@
             border-bottom: 2px solid transparent;
             transition: var(--transicion);
             cursor: pointer;
+            word-wrap: break-word;  /* ✅ Evita desbordamiento de texto largo */
+            overflow-wrap: break-word;
         }
         
         .mobile-nav a:hover {
@@ -1789,14 +1799,14 @@
             
             <!-- Si está logueado -->
             <div id="mobileAuthUser" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <div>
-                        <p style="margin: 0; font-weight: 600; color: var(--violeta);" id="mobileUserName">Hola, Usuario</p>
-                        <p style="margin: 0; font-size: 0.85rem; color: #636e72;" id="mobileUserEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2e4b434f47426e4b564f435e424b004d4143">[email&#160;protected]</a></p>
+                <div style="margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <p style="margin: 0 0 4px 0; font-weight: 600; color: var(--violeta);" id="mobileUserName">Hola, Usuario</p>
+                        <button onclick="logoutWithConfirmation()" style="padding: 4px 12px; font-size: 0.8rem; background: #f0f0f0; color: #2d3436; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; white-space: nowrap; margin-left: 10px; flex-shrink: 0;">
+                            Salir
+                        </button>
                     </div>
-                    <button onclick="logoutWithConfirmation()" style="padding: 8px 16px; font-size: 0.9rem; background: #f0f0f0; color: #2d3436; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                        Salir
-                    </button>
+                    <p style="margin: 0; font-size: 0.85rem; color: #636e72; word-break: break-all;" id="mobileUserEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2e4b434f47426e4b564f435e424b004d4143">[email&#160;protected]</a></p>
                 </div>
                 
                 <a href="/admin-dashboard.html" 
@@ -3180,7 +3190,8 @@
             
             // Reaccionar a cambios de tamaño de ventana para ocultar/mostrar botones flotantes
             createFloatingButton();
-        });
+            });
+
     </script>
 </body>
 </html>

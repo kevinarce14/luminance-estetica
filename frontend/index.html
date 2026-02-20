@@ -1014,21 +1014,26 @@
     // Botón flotante de login
     const loginBtn = document.createElement('a');
     loginBtn.href = 'login.html';
-    loginBtn.innerHTML = '👤 Iniciar Sesión';
+    loginBtn.id = 'login-float-btn';
+    loginBtn.innerHTML = '<i class="fas fa-user"></i><span> Iniciar Sesión</span>';
     loginBtn.style.cssText = `
         position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 30px;
+        top: 15px;
+        right: 15px;
+        padding: 10px 20px;
         background: linear-gradient(135deg, #e75480, #9c89b8);
         color: white;
         text-decoration: none;
         border-radius: 30px;
         font-weight: 600;
-        font-size: 1rem;
+        font-size: 0.9rem;
         box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         z-index: 1000;
         transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        max-width: calc(100vw - 30px);
     `;
     loginBtn.onmouseenter = () => {
         loginBtn.style.transform = 'translateY(-3px)';
@@ -1039,6 +1044,35 @@
         loginBtn.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
     };
     document.body.appendChild(loginBtn);
+
+    // Ajuste responsive del botón de login
+    function adjustLoginBtn() {
+        if (window.innerWidth < 480) {
+            loginBtn.style.padding = '9px 14px';
+            loginBtn.style.fontSize = '0.8rem';
+            loginBtn.querySelector('span').style.display = 'none'; // solo ícono en muy pequeño
+            loginBtn.style.borderRadius = '50%';
+            loginBtn.style.width = '42px';
+            loginBtn.style.height = '42px';
+            loginBtn.style.justifyContent = 'center';
+        } else if (window.innerWidth < 768) {
+            loginBtn.style.padding = '9px 16px';
+            loginBtn.style.fontSize = '0.85rem';
+            loginBtn.querySelector('span').style.display = 'inline';
+            loginBtn.style.borderRadius = '30px';
+            loginBtn.style.width = 'auto';
+            loginBtn.style.height = 'auto';
+        } else {
+            loginBtn.style.padding = '10px 20px';
+            loginBtn.style.fontSize = '0.9rem';
+            loginBtn.querySelector('span').style.display = 'inline';
+            loginBtn.style.borderRadius = '30px';
+            loginBtn.style.width = 'auto';
+            loginBtn.style.height = 'auto';
+        }
+    }
+    adjustLoginBtn();
+    window.addEventListener('resize', adjustLoginBtn);
 </script>
 
 <script src="api.js"></script>

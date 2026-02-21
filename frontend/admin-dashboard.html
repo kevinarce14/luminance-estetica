@@ -1277,9 +1277,6 @@
                 });
             }
         });
-        console.log('📅 Fecha seleccionada:', date);
-        console.log('✅ Slots disponibles:', availableSlots.length);
-        console.log('❌ Slots ocupados:', response.available_slots.length - availableSlots.length);
         // Navegación
         function setupNavigation() {
             document.querySelectorAll('.nav-link').forEach(link => {
@@ -1751,9 +1748,12 @@
             if (!confirm('¿Aprobar este pago?')) return;
             
             try {
-                await apiRequest(`/payments/${id}/status`, 'PUT', {
-                    status: 'approved',
-                    notes: 'Aprobado manualmente por admin'
+                await apiRequest(`/payments/${id}/status`, {
+                    method: 'PUT',
+                    body: {
+                        status: 'approved',
+                        notes: 'Aprobado manualmente por admin'
+                    }
                 });
                 
                 alert('✅ Pago aprobado');

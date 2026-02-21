@@ -603,8 +603,9 @@
                             <div class="alert alert-info" style="margin: 0;">
                                 <i class="fas fa-info-circle"></i>
                                 <div>
-                                    Podrás abonar en efectivo cuando llegues al turno. 
-                                    Tu turno quedará confirmado igualmente.
+                                    <strong>💬 Serás redirigido a WhatsApp</strong><br>
+                                    Enviarás un mensaje a Cande con los detalles de tu turno.
+                                    Ella confirmará tu reserva y coordinarás el pago en efectivo cuando llegues al estudio.
                                 </div>
                             </div>
                         </div>
@@ -966,8 +967,48 @@
                 });
                 
                 document.getElementById('loadingOverlay').classList.remove('active');
-                alert('¡Datos recibidos! Una vez que verifiquemos tu transferencia, confirmaremos el turno y recibirás un email.');
-                window.location.href = '/mis-turnos.html';
+                
+                // Mensaje con instrucciones claras
+                const message = `✅ ¡Datos bancarios guardados!
+
+📋 PRÓXIMOS PASOS:
+
+1️⃣ Realizá la transferencia al CBU/Alias indicado arriba
+2️⃣ Guardá el comprobante de pago
+3️⃣ Cande verificará tu transferencia
+4️⃣ Recibirás un email cuando se confirme tu turno
+
+💰 Monto a transferir: $${amount.toFixed(2)}
+
+📌 Tu turno aparecerá en "Mis Turnos" como PENDIENTE hasta que se verifique el pago.
+
+¿Querés enviar el comprobante ahora por WhatsApp para una confirmación más rápida?`;
+                
+                if (confirm(message)) {
+                    // Redirigir a WhatsApp para enviar comprobante
+                    const userData = getUserData();
+                    const userName = userData?.full_name || 'Cliente';
+                    const serviceName = appointmentData?.service?.name || 'Servicio';
+                    
+                    const whatsappMessage = `Hola Cande! 👋
+
+Acabo de realizar una transferencia para mi turno:
+
+👤 Cliente: ${userName}
+💅 Servicio: ${serviceName}
+💰 Monto: $${amount.toFixed(2)}
+🆔 Turno #${appointmentId}
+
+Te envío el comprobante para que lo verifiques. ¡Gracias!`;
+                    
+                    const phoneNumber = '5491162815014';
+                    const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+                    window.open(whatsappURL, '_blank');
+                }
+                
+                setTimeout(() => {
+                    window.location.href = '/mis-turnos.html';
+                }, 1000);
                 
             } catch (error) {
                 console.error('❌ Error registrando transferencia:', error);
@@ -975,38 +1016,77 @@
             }
         }
         
-        // ===== PROCESAR PAGO EN EFECTIVO =====
+        // ===== PROCESAR PAGO EN EFECTIVO (REDIRIGE A WHATSAPP) =====
         async function handleCashPayment() {
             try {
-                // El backend no tiene endpoint específico de cash.
-                // Creamos el Payment con method=cash (queda en PENDING hasta que admin lo apruebe)
-                // y confirmamos el appointment directamente via PATCH.
-                const amount = appointmentData?.service?.price ?? appointmentData?.price ?? 0;
-                
-                console.log('🔍 POST /payments/create-preference/ (cash)');
-                await apiRequest('/payments/create-preference/', {
-                    method: 'POST',
-                    body: {
-                        appointment_id: parseInt(appointmentId),
-                        amount: parseFloat(amount),
-                        currency: 'ARS',
-                        payment_method: 'cash'
-                    }
-                });
-                
-                // Confirmar el appointment directamente
-                console.log('🔍 PATCH /appointments/' + appointmentId + '/');
-                await apiRequest(`/appointments/${appointmentId}/`, {
-                    method: 'PATCH',
-                    body: { status: 'confirmed' }
-                });
-                
                 document.getElementById('loadingOverlay').classList.remove('active');
-                alert('¡Turno confirmado! Podrás abonar en efectivo cuando llegues. Te esperamos 😊');
-                window.location.href = '/mis-turnos.html';
+                
+                // Preparar datos del turno para WhatsApp
+                const userData = getUserData();
+                const userName = userData?.full_name || 'Cliente';
+                const userEmail = userData?.email || '';
+                
+                const appointmentDate = new Date(appointmentData.appointment_date);
+                const formattedDate = appointmentDate.toLocaleDateString('es-ES', { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long',
+                    year: 'numeric'
+                });
+                const formattedTime = appointmentDate.toLocaleTimeString('es-ES', { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                });
+                
+                const serviceName = appointmentData?.service?.name || 'Servicio';
+                const servicePrice = appointmentData?.service?.price || appointmentData?.price || 0;
+                
+                // Mensaje para WhatsApp
+                const whatsappMessage = `¡Hola Cande! 👋
+
+Quiero reservar un turno con pago en efectivo:
+
+👤 *Cliente:* ${userName}
+📧 *Email:* ${userEmail}
+
+📅 *Fecha:* ${formattedDate}
+🕐 *Hora:* ${formattedTime}
+💅 *Servicio:* ${serviceName}
+💰 *Precio:* $${servicePrice.toFixed(2)}
+
+💵 *Método de pago:* Efectivo en persona
+🆔 *Turno ID:* #${appointmentId}
+
+¿Podés confirmarme este turno? ¡Gracias!`;
+                
+                // Número de WhatsApp del estudio
+                const phoneNumber = '5491162815014'; // +54 9 11 6281-5014
+                
+                // Crear URL de WhatsApp
+                const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+                
+                // Mostrar mensaje de confirmación
+                const confirmRedirect = confirm(
+                    '💬 Serás redirigido a WhatsApp para confirmar tu reserva con Cande.\n\n' +
+                    '📱 Desde allí podrás coordinar todos los detalles de tu turno y confirmar el pago en efectivo.\n\n' +
+                    '¿Deseas continuar?'
+                );
+                
+                if (confirmRedirect) {
+                    console.log('✅ Redirigiendo a WhatsApp...');
+                    window.open(whatsappURL, '_blank');
+                    
+                    // Mostrar mensaje antes de volver
+                    setTimeout(() => {
+                        alert('✅ ¡Abriendo WhatsApp!\n\nCande te responderá para confirmar tu turno. Una vez confirmado por ella, aparecerá en "Mis Turnos".');
+                        window.location.href = '/turnera.html';
+                    }, 1000);
+                } else {
+                    console.log('❌ Usuario canceló redirección a WhatsApp');
+                }
                 
             } catch (error) {
-                console.error('❌ Error confirmando turno en efectivo:', error);
+                console.error('❌ Error preparando mensaje de WhatsApp:', error);
                 throw error;
             }
         }

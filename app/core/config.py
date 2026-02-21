@@ -48,15 +48,28 @@ class Settings(BaseSettings):
     # ========== MERCADOPAGO ==========
     MERCADOPAGO_ACCESS_TOKEN: str
     MERCADOPAGO_PUBLIC_KEY: str | None = None
+    
+    # URLs del frontend (configurar en producción)
     FRONTEND_URL: str = "http://localhost:5000"
-    PAYMENT_SUCCESS_URL: str = "http://localhost:3000/pago-exitoso"
-    PAYMENT_FAILURE_URL: str = "http://localhost:3000/pago-fallido"
-    PAYMENT_PENDING_URL: str = "http://localhost:3000/pago-pendiente"
+    
+    # URLs de retorno de MercadoPago (se construyen dinámicamente)
+    @property
+    def PAYMENT_SUCCESS_URL(self) -> str:
+        return f"{self.FRONTEND_URL}/pago-exitoso.html"
+    
+    @property
+    def PAYMENT_FAILURE_URL(self) -> str:
+        return f"{self.FRONTEND_URL}/pago-fallido.html"
+    
+    @property
+    def PAYMENT_PENDING_URL(self) -> str:
+        return f"{self.FRONTEND_URL}/pago.html"
+    
+    # URL del backend (para webhook)
+    BACKEND_URL: str = "http://localhost:8000"
     
     # ========== CORS ==========
-    CORS_ORIGINS: str = "https://luminance-estetica.vercel.app"
-    # DESPUÉS (agregá tu dominio de Vercel):
-    #CORS_ORIGINS: str = "https://tu-proyecto.vercel.app,http://localhost:5000,http://localhost:3000
+    CORS_ORIGINS: str = "https://luminance-estetica.vercel.app,http://localhost:5000"
     
     @property
     def cors_origins_list(self) -> List[str]:

@@ -45,12 +45,6 @@ class PaymentService:
         Raises:
             Exception: Si hay error creando la preferencia
         """
-        
-        # Construir URLs completas con query params
-        success_url = f"{settings.PAYMENT_SUCCESS_URL}?external_reference={appointment_id}"
-        failure_url = f"{settings.PAYMENT_FAILURE_URL}?external_reference={appointment_id}"
-        pending_url = f"{settings.PAYMENT_PENDING_URL}?external_reference={appointment_id}"
-        
         preference_data = {
             "items": [
                 {
@@ -62,60 +56,42 @@ class PaymentService:
                 }
             ],
             "payer": {
-                "email": "cliente@example.com",
+                "email": "cliente@example.com",  # Opcional
             },
             "back_urls": {
-                "success": success_url,
-                "failure": failure_url,
-                "pending": pending_url,
+                "success": settings.PAYMENT_SUCCESS_URL,
+                "failure": settings.PAYMENT_FAILURE_URL,
+                "pending": settings.PAYMENT_PENDING_URL,
             },
-            # ✅ SOLUCIÓN: NO usar auto_return en localhost
-            # MercadoPago lo rechaza en modo test con localhost
-            # El usuario debe hacer click en "Volver al sitio"
-            # "auto_return": "approved",  ← COMENTADO / ELIMINADO
-            
+            "auto_return": "approved",
             "external_reference": str(appointment_id),
             "statement_descriptor": "LUMINANCE STUDIO",
-            "notification_url": None,
-            "expires": False,
-            "payment_methods": {
-                "excluded_payment_types": [],
-                "installments": 12,
-            },
-            "metadata": {
-                "appointment_id": appointment_id
-            }
+            "notification_url": f"{settings.BACKEND_URL}/api/payments/webhook",
+            "expires": False,  # La preferencia no expira
         }
 
         try:
-            print(f"🔍 Creando preferencia MP para appointment {appointment_id}")
-            print(f"   Amount: ${amount}")
-            print(f"   Success URL: {success_url}")
-            
             preference_response = self.sdk.preference().create(preference_data)
 
             http_status = preference_response.get("status")
             preference  = preference_response.get("response", {}) or {}
 
             print(f"📡 MP http_status: {http_status}")
+            print(f"📡 MP response: {preference}")
 
             if http_status != 201:
                 error_msg = preference.get("message", "Error desconocido de MercadoPago")
-                error_detail = preference.get("error", "")
-                full_error = f"{error_msg} ({error_detail})" if error_detail else error_msg
-                print(f"❌ Error MP: {full_error}")
-                raise Exception(f"MercadoPago error {http_status}: {full_error}")
+                raise Exception(f"MercadoPago error {http_status}: {error_msg}")
 
             if not preference.get("id"):
                 raise Exception("MercadoPago no devolvió un ID de preferencia válido")
 
             print(f"✅ Preferencia creada: {preference.get('id')}")
-            print(f"🔗 Sandbox init_point: {preference.get('sandbox_init_point')}")
 
             return preference
 
         except Exception as e:
-            print(f"❌ Error creando preferencia: {str(e)}")
+            print(f"❌ Error creando preferencia de MercadoPago: {str(e)}")
             raise Exception(f"Error creando preferencia de pago: {str(e)}")
 
     def get_payment_info(self, payment_id: str) -> Dict[str, Any]:
@@ -126,7 +102,13 @@ class PaymentService:
             payment_id: ID del pago en MercadoPago
 
         Returns:
-            Dict con la información del pago
+            Dict con la información del pago:
+            - id: ID del pago
+            - status: Estado (approved, rejected, etc.)
+            - status_detail: Detalle del estado
+            - external_reference: Referencia externa (appointment_id)
+            - transaction_amount: Monto
+            - date_approved: Fecha de aprobación
 
         Raises:
             Exception: Si hay error consultando el pago
@@ -140,7 +122,7 @@ class PaymentService:
             return payment
 
         except Exception as e:
-            print(f"❌ Error consultando pago: {str(e)}")
+            print(f"❌ Error consultando pago de MercadoPago: {str(e)}")
             raise Exception(f"Error consultando pago: {str(e)}")
 
     def refund_payment(self, payment_id: str) -> Dict[str, Any]:

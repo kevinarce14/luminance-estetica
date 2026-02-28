@@ -247,24 +247,6 @@
             display: block;
         }
         
-        .transfer-info {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .transfer-info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed var(--gris-medio);
-        }
-        
-        .transfer-info-item:last-child {
-            border-bottom: none;
-        }
-        
         .copy-button {
             background: var(--lila-medio);
             color: white;
@@ -278,42 +260,6 @@
         
         .copy-button:hover {
             background: var(--lila-oscuro);
-        }
-        
-        .file-upload {
-            margin-top: 15px;
-        }
-        
-        .file-upload label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--texto-oscuro);
-        }
-        
-        .file-input-wrapper {
-            position: relative;
-            border: 2px dashed var(--gris-medio);
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transicion);
-        }
-        
-        .file-input-wrapper:hover {
-            border-color: var(--rosa-medio);
-            background: var(--lila-claro);
-        }
-        
-        .file-input-wrapper input[type="file"] {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
         }
         
         .file-preview {
@@ -521,70 +467,14 @@
                             </div>
                             <div class="payment-option-title">
                                 <h3>Mercado Pago</h3>
-                                <p>Pago online con tarjeta o transferencia</p>
+                                <p>Tarjeta, transferencia bancaria o saldo MP</p>
                             </div>
                             <span class="payment-option-badge">Recomendado</span>
                         </div>
                         <div class="payment-details">
                             <p style="margin-bottom: 15px; color: var(--texto-medio);">
-                                Serás redirigido a Mercado Pago para completar el pago de forma segura.
+                                Serás redirigido a Mercado Pago para completar el pago. Podés pagar con tarjeta de crédito/débito, saldo de Mercado Pago o <strong>transferencia bancaria (CBU/CVU)</strong>. El turno se confirma automáticamente.
                             </p>
-                        </div>
-                    </div>
-                    
-                    <!-- TRANSFERENCIA BANCARIA -->
-                    <div class="payment-option" id="option-transfer" onclick="selectPaymentMethod('transfer')">
-                        <div class="payment-option-header">
-                            <div class="payment-icon">
-                                <i class="fas fa-university"></i>
-                            </div>
-                            <div class="payment-option-title">
-                                <h3>Transferencia Bancaria</h3>
-                                <p>Transferencia o depósito directo</p>
-                            </div>
-                        </div>
-                        <div class="payment-details">
-                            <div class="transfer-info">
-                                <div class="transfer-info-item">
-                                    <span><strong>Banco:</strong></span>
-                                    <span>Banco Galicia</span>
-                                </div>
-                                <div class="transfer-info-item">
-                                    <span><strong>Titular:</strong></span>
-                                    <span>Candelaria López</span>
-                                </div>
-                                <div class="transfer-info-item">
-                                    <span><strong>CBU:</strong></span>
-                                    <div style="display: flex; gap: 10px; align-items: center;">
-                                        <span id="cbu-text">0070156030004017654321</span>
-                                        <button class="copy-button" onclick="copyToClipboard('cbu-text', event)">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="transfer-info-item">
-                                    <span><strong>Alias:</strong></span>
-                                    <div style="display: flex; gap: 10px; align-items: center;">
-                                        <span id="alias-text">LUMINANCE.CANDE</span>
-                                        <button class="copy-button" onclick="copyToClipboard('alias-text', event)">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="file-upload">
-                                <label>Subir comprobante de pago:</label>
-                                <div class="file-input-wrapper">
-                                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--rosa-medio);"></i>
-                                    <p style="margin-top: 10px;">Hacé click o arrastrá tu comprobante aquí</p>
-                                    <input type="file" id="file-input" accept="image/*,.pdf" onchange="handleFileUpload(event)">
-                                </div>
-                                <div class="file-preview" id="file-preview">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span id="file-name"></span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     
@@ -645,7 +535,6 @@
         let appointmentId = null;
         let appointmentData = null;
         let selectedPaymentMethod = null;
-        let uploadedFile = null;
         
         // ===== INICIALIZAR =====
         document.addEventListener('DOMContentLoaded', async () => {
@@ -835,12 +724,7 @@
             // Habilitar botón de confirmación
             const btnConfirm = document.getElementById('btn-confirm-payment');
             
-            // Para transferencia, requerir comprobante
-            if (method === 'transfer') {
-                btnConfirm.disabled = !uploadedFile;
-            } else {
-                btnConfirm.disabled = false;
-            }
+            btnConfirm.disabled = false;
         }
         
         // ===== COPIAR AL PORTAPAPELES =====
@@ -861,26 +745,6 @@
         }
         
         // ===== MANEJAR SUBIDA DE ARCHIVO =====
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            
-            if (file) {
-                uploadedFile = file;
-                
-                // Mostrar preview
-                const preview = document.getElementById('file-preview');
-                const fileName = document.getElementById('file-name');
-                
-                fileName.textContent = file.name;
-                preview.style.display = 'flex';
-                
-                // Habilitar botón si transferencia está seleccionada
-                if (selectedPaymentMethod === 'transfer') {
-                    document.getElementById('btn-confirm-payment').disabled = false;
-                }
-                
-                console.log('📎 Archivo seleccionado:', file.name);
-            }
         }
         
         // ===== CONFIRMAR PAGO =====
@@ -899,10 +763,6 @@
                 if (selectedPaymentMethod === 'mercadopago') {
                     // MERCADO PAGO
                     await handleMercadoPagoPayment();
-                    
-                } else if (selectedPaymentMethod === 'transfer') {
-                    // TRANSFERENCIA
-                    await handleTransferPayment();
                     
                 } else if (selectedPaymentMethod === 'cash') {
                     // EFECTIVO
@@ -944,74 +804,6 @@
                 
             } catch (error) {
                 console.error('❌ Error con Mercado Pago:', error);
-                throw error;
-            }
-        }
-        
-        // ===== PROCESAR TRANSFERENCIA =====
-        async function handleTransferPayment() {
-            try {
-                // Registrar el pago como transferencia pendiente
-                // El admin lo aprueba luego via PUT /payments/{id}/status
-                const amount = appointmentData?.service?.price ?? appointmentData?.price ?? 0;
-                
-                console.log('🔍 POST /payments/create-preference/ (transfer)');
-                await apiRequest('/payments/create-preference/', {
-                    method: 'POST',
-                    body: {
-                        appointment_id: parseInt(appointmentId),
-                        amount: parseFloat(amount),
-                        currency: 'ARS',
-                        payment_method: 'transfer'
-                    }
-                });
-                
-                document.getElementById('loadingOverlay').classList.remove('active');
-                
-                // Mensaje con instrucciones claras
-                const message = `✅ ¡Datos bancarios guardados!
-
-📋 PRÓXIMOS PASOS:
-
-1️⃣ Realizá la transferencia al CBU/Alias indicado arriba
-2️⃣ Guardá el comprobante de pago
-3️⃣ Cande verificará tu transferencia
-4️⃣ Recibirás un email cuando se confirme tu turno
-
-💰 Monto a transferir: $${amount.toFixed(2)}
-
-📌 Tu turno aparecerá en "Mis Turnos" como PENDIENTE hasta que se verifique el pago.
-
-¿Querés enviar el comprobante ahora por WhatsApp para una confirmación más rápida?`;
-                
-                if (confirm(message)) {
-                    // Redirigir a WhatsApp para enviar comprobante
-                    const userData = getUserData();
-                    const userName = userData?.full_name || 'Cliente';
-                    const serviceName = appointmentData?.service?.name || 'Servicio';
-                    
-                    const whatsappMessage = `Hola Cande! 👋
-
-Acabo de realizar una transferencia para mi turno:
-
-👤 Cliente: ${userName}
-💅 Servicio: ${serviceName}
-💰 Monto: $${amount.toFixed(2)}
-🆔 Turno #${appointmentId}
-
-Te envío el comprobante para que lo verifiques. ¡Gracias!`;
-                    
-                    const phoneNumber = '5491162815014';
-                    const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
-                    window.open(whatsappURL, '_blank');
-                }
-                
-                setTimeout(() => {
-                    window.location.href = '/mis-turnos.html';
-                }, 1000);
-                
-            } catch (error) {
-                console.error('❌ Error registrando transferencia:', error);
                 throw error;
             }
         }
@@ -1138,7 +930,6 @@ Quiero reservar un turno con pago en efectivo:
         }
         
         // uploadPaymentProof: endpoint no implementado en el backend todavía.
-        // La transferencia se registra via POST /payments/create-preference/ con method=transfer.
         
         async function confirmAppointmentCash(id) {
             // Wrapper — ya no se llama directamente, handleCashPayment lo reemplazó

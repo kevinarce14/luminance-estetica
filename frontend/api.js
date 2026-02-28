@@ -212,6 +212,42 @@ async function login(email, password) {
 }
 
 /**
+ * Login / Registro con Google
+ * Recibe el id_token de Google Identity Services y lo intercambia por un JWT propio.
+ */
+async function loginWithGoogle(credential) {
+    try {
+        const url = getApiUrl('/auth/google');
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ credential })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw {
+                status: response.status,
+                message: data.detail || 'Error al iniciar sesión con Google'
+            };
+        }
+
+        if (data.access_token) {
+            saveAuthToken(data.access_token);
+            const userData = await getCurrentUser();
+            saveUserData(userData);
+        }
+
+        return data;
+
+    } catch (error) {
+        console.error('Error en loginWithGoogle:', error);
+        throw error;
+    }
+}
+
+/**
  * Cerrar sesión
  */
 function logout() {

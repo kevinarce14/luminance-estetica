@@ -51,11 +51,31 @@ def update_appointments_status():
     finally:
         db.close()
 
+
+
+def send_reminders():
+    """
+    Envía recordatorios de turnos que son mañana.
+    Se ejecuta diariamente.
+    """
+    db = SessionLocal()
+    try:
+        from app.services.notification_service import notification_service
+        
+        print(f"📧 Enviando recordatorios - {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}")
+        sent_count = notification_service.send_appointment_reminders(db)
+        print(f"✅ Recordatorios enviados: {sent_count}")
+        
+    except Exception as e:
+        print(f"❌ Error enviando recordatorios: {str(e)}")
+    finally:
+        db.close()
+
 def init_scheduler():
     """Inicializa el scheduler para que corra cada hora"""
     scheduler = BackgroundScheduler(timezone=timezone.utc)
     
-    # Ejecutar cada hora
+    # 1. Actualizar estados cada hora
     scheduler.add_job(
         update_appointments_status,
         CronTrigger(minute=0),  # Cada hora en punto
@@ -63,7 +83,15 @@ def init_scheduler():
         replace_existing=True
     )
     
-    # También ejecutar al inicio
+    # 2. ✅ Enviar recordatorios diariamente a las 10:00 AM
+    scheduler.add_job(
+        send_reminders,
+        CronTrigger(hour=10, minute=0),  # Todos los días a las 10am
+        id="send_appointment_reminders",
+        replace_existing=True
+    )
+    
+    # Ejecutar al inicio
     scheduler.add_job(
         update_appointments_status,
         trigger='date',
@@ -72,5 +100,7 @@ def init_scheduler():
     )
     
     scheduler.start()
-    print("⏰ Scheduler iniciado - Actualizará turnos cada hora")
+    print("⏰ Scheduler iniciado")
+    print("  - Actualizará turnos cada hora")
+    print("  - Enviará recordatorios todos los días a las 10:00 AM")
     return scheduler

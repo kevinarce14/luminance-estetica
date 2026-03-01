@@ -360,6 +360,9 @@ def update_appointment(
         # Guardar como naive en la BD
         appointment.appointment_date = new_date.replace(tzinfo=None)
     
+    # Guardar fecha anterior para email
+    old_date = appointment.appointment_date
+    
     # Actualizar otros campos
     if appointment_data.notes is not None:
         appointment.notes = appointment_data.notes
@@ -370,6 +373,25 @@ def update_appointment(
     
     db.commit()
     db.refresh(appointment)
+    
+    # ✅ Si cambió la fecha, enviar email
+    if appointment_data.appointment_date and old_date != appointment.appointment_date:
+        try:
+            user = db.query(User).filter(User.id == appointment.user_id).first()
+            service = db.query(Service).filter(Service.id == appointment.service_id).first()
+            
+            if user and service:
+                from app.services.email_service import email_service
+                email_service.send_appointment_rescheduled(
+                    to_email=user.email,
+                    user_name=user.full_name,
+                    service_name=service.name,
+                    old_date=old_date,
+                    new_date=appointment.appointment_date
+                )
+                print(f"✅ Email de reprogramación enviado a {user.email}")
+        except Exception as e:
+            print(f"⚠️ Error enviando email de reprogramación: {str(e)}")
     
     return appointment
 

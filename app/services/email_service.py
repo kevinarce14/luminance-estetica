@@ -391,6 +391,50 @@ class EmailService:
         html = self._get_base_template(content, "Turno cancelado")
         return self._send_email(to_email, f"Turno Cancelado - {service_name}", html)
 
+
+    def send_appointment_rescheduled(
+        self,
+        to_email: str,
+        user_name: str,
+        service_name: str,
+        old_date: datetime,
+        new_date: datetime
+    ) -> bool:
+        """Envía email cuando un turno es reprogramado."""
+        old_date_str = old_date.strftime("%d/%m/%Y a las %H:%M")
+        new_date_str = new_date.strftime("%d/%m/%Y a las %H:%M")
+        
+        content = f"""
+        <div class="content-box">
+            <h2>📅 Turno Reprogramado</h2>
+            <p>Hola <strong>{user_name}</strong>,</p>
+            <p>Tu turno de <strong>{service_name}</strong> ha sido reprogramado.</p>
+            
+            <div style="background: #f8d7e6; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #e75480;">
+                <p><strong>Fecha anterior:</strong><br>
+                <span style="text-decoration: line-through; color: #999;">{old_date_str}</span></p>
+                
+                <p><strong>Nueva fecha:</strong><br>
+                <span style="color: #6a4c93; font-weight: bold; font-size: 1.1em;">📅 {new_date_str}</span></p>
+            </div>
+            
+            <p>✅ Tu turno está confirmado para la nueva fecha.</p>
+            <p>Si tenés alguna duda o necesitás modificarlo nuevamente, no dudes en contactarnos.</p>
+            
+            <div class="button-container">
+                <a href="https://luminance-estetica.vercel.app/mis-turnos.html" class="button">Ver Mis Turnos</a>
+            </div>
+        </div>
+        """
+        
+        html = self._get_base_template(content, "Turno Reprogramado")
+        return self._send_email(
+            to_email=to_email,
+            subject=f"📅 Turno Reprogramado - {service_name}",
+            html_content=html
+        )
+
+
     def send_payment_confirmation(
         self,
         to_email: str,

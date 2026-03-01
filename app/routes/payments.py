@@ -400,6 +400,21 @@ def create_cash_payment(
         
         appointment.status = AppointmentStatus.CONFIRMED
         
+        # ✅ Enviar email de confirmación
+        try:
+            user = db.query(User).filter(User.id == appointment.user_id).first()
+            if user and appointment:
+                email_service.send_payment_confirmation(
+                    to_email=user.email,
+                    user_name=user.full_name,
+                    service_name=appointment.service.name,
+                    amount=existing_payment.amount,
+                    appointment_date=appointment.appointment_date
+                )
+                print(f"✅ Email de confirmación enviado a {user.email}")
+        except Exception as e:
+            print(f"⚠️ Error enviando email de confirmación: {str(e)}")
+        
         db.commit()
         db.refresh(existing_payment)
         return existing_payment
@@ -419,6 +434,21 @@ def create_cash_payment(
     
     # Confirmar el turno
     appointment.status = AppointmentStatus.CONFIRMED
+    
+    # ✅ Enviar email de confirmación
+    try:
+        user = db.query(User).filter(User.id == appointment.user_id).first()
+        if user and appointment:
+            email_service.send_payment_confirmation(
+                to_email=user.email,
+                user_name=user.full_name,
+                service_name=appointment.service.name,
+                amount=db_payment.amount,
+                appointment_date=appointment.appointment_date
+            )
+            print(f"✅ Email de confirmación enviado a {user.email}")
+    except Exception as e:
+        print(f"⚠️ Error enviando email de confirmación: {str(e)}")
     
     db.commit()
     db.refresh(db_payment)

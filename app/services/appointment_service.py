@@ -104,7 +104,7 @@ class AppointmentService:
 
         # Buscar turnos que se solapen con este horario
         query = db.query(Appointment).filter(
-            Appointment.status.in_([AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED]),
+            Appointment.status.in_([AppointmentStatus.CONFIRMED]),  # Solo CONFIRMED bloquea el horario
             or_(
                 # Caso 1: Turno existente empieza durante nuestro slot
                 and_(

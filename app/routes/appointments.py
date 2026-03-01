@@ -103,7 +103,7 @@ def check_slot_availability(
     # Buscar turnos conflictivos (que se solapen)
     query = db.query(Appointment).filter(
         Appointment.service_id == service_id,
-        Appointment.status.in_([AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED]),
+        Appointment.status.in_([AppointmentStatus.CONFIRMED]),  # Solo CONFIRMED bloquea el horario
         or_(
             # Caso 1: El nuevo turno empieza durante un turno existente
             and_(

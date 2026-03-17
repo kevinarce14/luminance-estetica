@@ -16,27 +16,38 @@ Backend profesional para el sistema de gestión de turnos, pagos y administraci�
 - 💳 Integración con MercadoPago
 - 💰 Pagos online y offline
 - 📊 Registro de transacciones
-- 🎁 Sistema de descuentos y cupones
+- 🎁 Sistema de descuentos y cupones (falta implementar, a pedido del cliente)
 - 📈 Reportes de facturación
 
 ### Gestión de Clientes
 - 👤 Perfiles de clientes
 - 📝 Historial de servicios
 - 💌 Preferencias de contacto
-- 🎂 Recordatorios de cumpleaños
-- ⭐ Sistema de puntos de fidelidad
+- ⭐ Sistema de puntos de fidelidad (a implementar a futuro?)
 
 ### Administración
 - 📊 Dashboard con métricas en tiempo real
-- 📅 Gestión de agenda del staff
+- 📅 Gestión de agenda de disponibilidad
 - 💼 Gestión de servicios y precios
-- 📧 Envío de newsletters
+- 📧 Envío de notificaciones
 - 📈 Reportes y analytics
 
 ## 🏗️ Estructura del Proyecto
 
 ```
-luminance-estetica-backend/
+luminance-estetica/
+├──frontend/
+│         ├──admin-dashboard.html
+│         ├──api.js
+│         ├──index.html
+│         ├──login.html
+│         ├──mis-turnos.html
+│         ├──pago-exitoso.html
+│         ├──pago-fallido.html
+│         ├──pago.html
+│         ├──responsive.css
+│         ├──studio.html
+│         └──turnera.html
 ├── app/
 │   ├── __init__.py
 │   ├── main.py                      # FastAPI app principal
@@ -62,53 +73,40 @@ luminance-estetica-backend/
 │   │   ├── appointment.py
 │   │   ├── service.py
 │   │   ├── payment.py
+│   │   ├──availabity.py
+│   │   ├──coupon.py
 │   │   └── auth.py
 │   │
-│   ├── api/                         # Endpoints
+│   ├── routes/                         # Endpoints
 │   │   ├── __init__.py
 │   │   ├── deps.py                  # Dependencias (get_db, get_current_user)
-│   │   └── v1/
-│   │       ├── __init__.py
-│   │       ├── auth.py              # Login, register, password reset
-│   │       ├── appointments.py      # CRUD de turnos
-│   │       ├── services.py          # CRUD de servicios
-│   │       ├── payments.py          # MercadoPago webhooks
-│   │       ├── users.py             # Gestión de clientes
-│   │       ├── availability.py      # Horarios disponibles
-│   │       └── admin.py             # Endpoints de administración
+│   │   ├── auth.py              # Login, register, password reset
+│   │   ├── appointments.py      # CRUD de turnos
+│   │   ├── services.py          # CRUD de servicios
+│   │   ├── payments.py          # MercadoPago webhooks
+│   │   ├── users.py             # Gestión de clientes
+│   │   ├── availability.py      # Horarios disponibles
+│   │   └── admin.py             # Endpoints de administración
 │   │
-│   ├── services/                    # Lógica de negocio
-│   │   ├── __init__.py
-│   │   ├── email_service.py         # SendGrid/Resend
-│   │   ├── whatsapp_service.py      # Twilio WhatsApp
-│   │   ├── payment_service.py       # MercadoPago
-│   │   ├── appointment_service.py   # Lógica de reservas
-│   │   └── notification_service.py  # Recordatorios automáticos
-│   │
-│   ├── utils/                       # Utilidades
-│   │   ├── __init__.py
-│   │   ├── timezone.py              # Manejo de zonas horarias Argentina
-│   │   └── validators.py            # Validaciones custom
-│   │
-│   └── middleware/                  # Middlewares
+│   └── services/                    # Lógica de negocio
 │       ├── __init__.py
-│       └── rate_limiter.py          # Rate limiting
-│
-├── alembic/                         # Migraciones de BD
-│   └── versions/
-│
-├── tests/                           # Tests
-│   ├── __init__.py
-│   ├── test_appointments.py
-│   ├── test_payments.py
-│   └── test_auth.py
-│
-├── .env.example                     # Template de variables
+│       ├── email_service.py         # SendGrid/Resend
+│       ├── whatsapp_service.py      # Twilio WhatsApp
+│       ├── payment_service.py       # MercadoPago
+│       ├── appointment_service.py   # Lógica de reservas
+│       ├──scheduler_service.py   # actualizacion automatica estados de los turnos
+│       └── notification_service.py  # Recordatorios automáticos
+│   
+├── .dockerignore
+├── .env                    # Template de variables
 ├── .gitignore
+├── .vercelignore (creo que no se usa y se puede eliminar)
+├── arquitectura.txt
+├── DEPLOY_GRATUITO_VERCEL_RENDER.md
+├── Dockerfile
 ├── requirements.txt
-├── requirements-dev.txt
 ├── runtime.txt                      # Python version para Render
-├── alembic.ini
+├── render.yaml
 └── README.md
 ```
 
@@ -117,7 +115,7 @@ luminance-estetica-backend/
 - **Framework**: FastAPI 0.104+
 - **Database**: PostgreSQL 15
 - **ORM**: SQLAlchemy 2.0
-- **Email**: SendGrid / Resend
+- **Email**: SendGrid
 - **WhatsApp**: Twilio API
 - **Pagos**: MercadoPago SDK
 - **Auth**: JWT (python-jose)

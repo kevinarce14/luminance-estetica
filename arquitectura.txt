@@ -8,6 +8,7 @@ luminance-estetica/
 │         ├──pago-exitoso.html
 │         ├──pago-fallido.html
 │         ├──pago.html
+│         ├──responsive.css
 │         ├──studio.html
 │         └──turnera.html
 ├── app/
@@ -59,14 +60,15 @@ luminance-estetica/
 │       ├──scheduler_service.py   # actualizacion automatica estados de los turnos
 │       └── notification_service.py  # Recordatorios automáticos
 │   
+├── .dockerignore
 ├── .env                    # Template de variables
 ├── .gitignore
-├── requirements.txt
-├── requirements-dev.txt
-├── runtime.txt                      # Python version para Render
-├── alembic.ini
-├── dockerignore
+├── .vercelignore (creo que no se usa y se puede eliminar)
+├── arquitectura.txt
+├── DEPLOY_GRATUITO_VERCEL_RENDER.md
 ├── Dockerfile
+├── requirements.txt
+├── runtime.txt                      # Python version para Render
 ├── render.yaml
 └── README.md
 

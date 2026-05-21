@@ -74,5 +74,5 @@ luminance-estetica/
 
 
 
-Yo levanto el front con "fronted/ python -m http.server 5000" 
+Yo levanto el front con "frontend/ python -m http.server 5000" 
 Y el backend con "python -m uvicorn app.main:app --reload"

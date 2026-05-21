@@ -4,7 +4,8 @@ Servicio de notificaciones automáticas.
 Maneja recordatorios de turnos y otras notificaciones programadas.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
+from zoneinfo import ZoneInfo
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -32,19 +33,19 @@ class NotificationService:
         Returns:
             Cantidad de recordatorios enviados
         """
-        # Calcular rango de tiempo (próximas 24 horas)
-        now = datetime.now()
-        reminder_time = now + timedelta(hours=settings.REMINDER_HOURS_BEFORE)
-        time_window_start = reminder_time - timedelta(minutes=30)
-        time_window_end = reminder_time + timedelta(minutes=30)
+        # Turnos de mañana (día calendario en zona horaria del negocio)
+        tz = ZoneInfo(settings.TIMEZONE)
+        now_local = datetime.now(tz)
+        tomorrow = (now_local + timedelta(days=1)).date()
+        tomorrow_start = datetime.combine(tomorrow, time.min)
+        tomorrow_end = datetime.combine(tomorrow, time.max)
 
-        # Buscar turnos que necesitan recordatorio
         appointments = (
             db.query(Appointment)
             .filter(
                 Appointment.status.in_([AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED]),
-                Appointment.appointment_date >= time_window_start,
-                Appointment.appointment_date <= time_window_end,
+                Appointment.appointment_date >= tomorrow_start,
+                Appointment.appointment_date <= tomorrow_end,
                 Appointment.reminder_sent == False,
             )
             .all()

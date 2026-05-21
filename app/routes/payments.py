@@ -31,6 +31,26 @@ class CashPaymentRequest(BaseModel):
 router = APIRouter(prefix="/payments", tags=["Pagos"])
 
 
+def _send_payment_confirmation_email(db: Session, appointment: Appointment, payment: Payment) -> None:
+    """Envía email de confirmación de pago/turno al cliente."""
+    user = db.query(User).filter(User.id == appointment.user_id).first()
+    if not user:
+        print(f"⚠️ No se encontró usuario para appointment_id={appointment.id}")
+        return
+    service_name = appointment.service.name if appointment.service else "Servicio"
+    sent = email_service.send_payment_confirmation(
+        to_email=user.email,
+        user_name=user.full_name,
+        service_name=service_name,
+        amount=payment.amount,
+        appointment_date=appointment.appointment_date,
+    )
+    if sent:
+        print(f"✅ Email de confirmación enviado a {user.email}")
+    else:
+        print(f"❌ Email de confirmación NO enviado a {user.email} (revisar EMAIL_SERVICE / API key)")
+
+
 @router.post("/create-preference", response_model=MercadoPagoPreference)
 def create_payment_preference(
     payment_data: PaymentCreate,
@@ -189,15 +209,8 @@ async def mercadopago_webhook(
         
         # Enviar email de confirmación
         try:
-            user = db.query(User).filter(User.id == db_payment.user_id).first()
-            if user and appointment:
-                email_service.send_payment_confirmation(
-                    to_email=user.email,
-                    user_name=user.full_name,
-                    service_name=appointment.service.name,
-                    amount=db_payment.amount,
-                    appointment_date=appointment.appointment_date
-                )
+            if appointment:
+                _send_payment_confirmation_email(db, appointment, db_payment)
         except Exception as e:
             print(f"⚠️ Error enviando email de confirmación: {str(e)}")
     
@@ -334,16 +347,22 @@ def update_payment_status(
             detail="Pago no encontrado"
         )
     
-    # Actualizar estado
+    was_already_approved = payment.status == PaymentStatus.APPROVED
     payment.status = status_update.status
-    
-    # Si se aprueba, confirmar el turno
+
+    # Si se aprueba, confirmar el turno y notificar al cliente
     if status_update.status == PaymentStatus.APPROVED:
+        payment.approved_at = payment.approved_at or datetime.now()
         appointment = db.query(Appointment).filter(
             Appointment.id == payment.appointment_id
         ).first()
         if appointment:
             appointment.status = AppointmentStatus.CONFIRMED
+            if not was_already_approved:
+                try:
+                    _send_payment_confirmation_email(db, appointment, payment)
+                except Exception as e:
+                    print(f"⚠️ Error enviando email de confirmación: {str(e)}")
     
     db.commit()
     db.refresh(payment)
@@ -384,12 +403,21 @@ def create_cash_payment(
     ).first()
     
     if existing_payment:
-        # Si ya existe un pago APPROVED, no hacer nada
-        if existing_payment.status == PaymentStatus.APPROVED:
-            # Ya está pagado, solo confirmar el turno si no lo está
+        was_approved = existing_payment.status == PaymentStatus.APPROVED
+        needs_confirmation_email = not was_approved or appointment.status == AppointmentStatus.PENDING
+
+        # Si ya existe un pago APPROVED, confirmar turno y reenviar email si aún estaba pending
+        if was_approved:
             if appointment.status != AppointmentStatus.CONFIRMED:
                 appointment.status = AppointmentStatus.CONFIRMED
-                db.commit()
+                needs_confirmation_email = True
+            if needs_confirmation_email:
+                try:
+                    _send_payment_confirmation_email(db, appointment, existing_payment)
+                except Exception as e:
+                    print(f"⚠️ Error enviando email de confirmación: {str(e)}")
+            db.commit()
+            db.refresh(existing_payment)
             return existing_payment
         
         # Si existe un pago en otro estado (PENDING, CANCELLED, etc.)
@@ -400,18 +428,8 @@ def create_cash_payment(
         
         appointment.status = AppointmentStatus.CONFIRMED
         
-        # ✅ Enviar email de confirmación
         try:
-            user = db.query(User).filter(User.id == appointment.user_id).first()
-            if user and appointment:
-                email_service.send_payment_confirmation(
-                    to_email=user.email,
-                    user_name=user.full_name,
-                    service_name=appointment.service.name,
-                    amount=existing_payment.amount,
-                    appointment_date=appointment.appointment_date
-                )
-                print(f"✅ Email de confirmación enviado a {user.email}")
+            _send_payment_confirmation_email(db, appointment, existing_payment)
         except Exception as e:
             print(f"⚠️ Error enviando email de confirmación: {str(e)}")
         
@@ -435,18 +453,8 @@ def create_cash_payment(
     # Confirmar el turno
     appointment.status = AppointmentStatus.CONFIRMED
     
-    # ✅ Enviar email de confirmación
     try:
-        user = db.query(User).filter(User.id == appointment.user_id).first()
-        if user and appointment:
-            email_service.send_payment_confirmation(
-                to_email=user.email,
-                user_name=user.full_name,
-                service_name=appointment.service.name,
-                amount=db_payment.amount,
-                appointment_date=appointment.appointment_date
-            )
-            print(f"✅ Email de confirmación enviado a {user.email}")
+        _send_payment_confirmation_email(db, appointment, db_payment)
     except Exception as e:
         print(f"⚠️ Error enviando email de confirmación: {str(e)}")
     

@@ -337,6 +337,9 @@ def update_appointment(
             detail="No se puede modificar un turno que está completado o cancelado"
         )
     
+    # Guardar fecha anterior ANTES de actualizar (para email de reprogramación)
+    old_date = appointment.appointment_date
+
     # Si cambia la fecha, verificar disponibilidad
     if appointment_data.appointment_date:
         # ✅ Normalizar la nueva fecha
@@ -359,9 +362,6 @@ def update_appointment(
         
         # Guardar como naive en la BD
         appointment.appointment_date = new_date.replace(tzinfo=None)
-    
-    # Guardar fecha anterior para email
-    old_date = appointment.appointment_date
     
     # Actualizar otros campos
     if appointment_data.notes is not None:
@@ -438,15 +438,18 @@ def cancel_appointment(
     db.commit()
     db.refresh(appointment)
     
-    # Enviar email de cancelación
+    # Enviar email de cancelación al cliente dueño del turno
     try:
+        client = db.query(User).filter(User.id == appointment.user_id).first()
         service = db.query(Service).filter(Service.id == appointment.service_id).first()
-        email_service.send_appointment_cancellation(
-            to_email=current_user.email,
-            user_name=current_user.full_name,
-            service_name=service.name,
-            appointment_date=appointment.appointment_date
-        )
+        if client and service:
+            email_service.send_appointment_cancellation(
+                to_email=client.email,
+                user_name=client.full_name,
+                service_name=service.name,
+                appointment_date=appointment.appointment_date
+            )
+            print(f"✅ Email de cancelación enviado a {client.email}")
     except Exception as e:
         print(f"⚠️ Error enviando email de cancelación: {str(e)}")
     

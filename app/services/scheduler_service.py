@@ -2,6 +2,8 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+from app.core.config import settings
 from sqlalchemy.orm import Session
 from app.models.appointment import Appointment, AppointmentStatus
 from app.core.database import SessionLocal
@@ -83,10 +85,11 @@ def init_scheduler():
         replace_existing=True
     )
     
-    # 2. ✅ Enviar recordatorios diariamente a las 10:00 AM
+    # 2. Recordatorios: todos los turnos de mañana (10:00 hora Argentina)
+    business_tz = ZoneInfo(settings.TIMEZONE)
     scheduler.add_job(
         send_reminders,
-        CronTrigger(hour=10, minute=0),  # Todos los días a las 10am
+        CronTrigger(hour=10, minute=0, timezone=business_tz),
         id="send_appointment_reminders",
         replace_existing=True
     )
@@ -102,5 +105,5 @@ def init_scheduler():
     scheduler.start()
     print("⏰ Scheduler iniciado")
     print("  - Actualizará turnos cada hora")
-    print("  - Enviará recordatorios todos los días a las 10:00 AM")
+    print(f"  - Enviará recordatorios todos los días a las 10:00 ({settings.TIMEZONE})")
     return scheduler

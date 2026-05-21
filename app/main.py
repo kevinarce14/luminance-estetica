@@ -80,7 +80,7 @@ app = FastAPI(
     ### Stack Tecnológico:
     
     * FastAPI + SQLAlchemy + PostgreSQL
-    * SendGrid/Resend (emails)
+    * SendGrid / Resend / Mailjet (emails)
     * Twilio (WhatsApp)
     * MercadoPago (pagos)
     

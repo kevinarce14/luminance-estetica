@@ -31,9 +31,11 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 horas
     
     # ========== EMAIL ==========
-    EMAIL_SERVICE: str = "sendgrid"  # "sendgrid" o "resend"
+    EMAIL_SERVICE: str = "sendgrid"  # "sendgrid", "resend" o "mailjet"
     SENDGRID_API_KEY: str | None = None
     RESEND_API_KEY: str | None = None
+    MAILJET_API_KEY_PUBLIC: str | None = None
+    MAILJET_API_KEY_PRIVATE: str | None = None
     FROM_EMAIL: str = "noreply@luminancestudio.com"
     FROM_NAME: str = "Luminance Studio by Cande"
     STUDIO_EMAIL: str = "info@luminancestudio.com"

@@ -1,6 +1,6 @@
 # app/services/email_service.py
 """
-Servicio de emails usando SendGrid o Resend.
+Servicio de emails usando SendGrid, Resend o Mailjet.
 Maneja todos los emails transaccionales del sistema.
 """
 
@@ -14,7 +14,7 @@ from app.core.config import settings
 class EmailService:
     """
     Servicio para enviar emails.
-    Soporta SendGrid y Resend.
+    Soporta SendGrid, Resend y Mailjet.
     """
 
     def __init__(self):
@@ -32,8 +32,13 @@ class EmailService:
             self.resend_key = settings.RESEND_API_KEY
             if not self.resend_key:
                 print("⚠️  RESEND_API_KEY no configurada")
+        elif self.email_service == "mailjet":
+            self.mailjet_public_key = settings.MAILJET_API_KEY_PUBLIC
+            self.mailjet_private_key = settings.MAILJET_API_KEY_PRIVATE
+            if not self.mailjet_public_key or not self.mailjet_private_key:
+                print("⚠️  MAILJET_API_KEY_PUBLIC / MAILJET_API_KEY_PRIVATE no configuradas")
         else:
-            print(f"⚠️  EMAIL_SERVICE '{self.email_service}' no reconocido")
+            print(f"⚠️  EMAIL_SERVICE '{self.email_service}' no reconocido (use: sendgrid, resend, mailjet)")
 
     # ========== TEMPLATES HTML ==========
 
@@ -353,12 +358,59 @@ class EmailService:
             print(f"❌ Error enviando email con Resend: {str(e)}")
             return False
 
+    def _send_with_mailjet(self, to_email: str, subject: str, html_content: str) -> bool:
+        """Envía email usando Mailjet (API v3.1)"""
+        try:
+            from mailjet_rest import Client
+
+            print(f"📡 [Mailjet] Enviando a: {to_email}")
+            print(f"📡 [Mailjet] Asunto: {subject}")
+            print(f"📡 [Mailjet] From: {self.from_email}")
+
+            mailjet = Client(
+                auth=(self.mailjet_public_key, self.mailjet_private_key),
+                version="v3.1",
+            )
+            data = {
+                "Messages": [
+                    {
+                        "From": {"Email": self.from_email, "Name": self.from_name},
+                        "To": [{"Email": to_email}],
+                        "Subject": subject,
+                        "HTMLPart": html_content,
+                    }
+                ]
+            }
+            result = mailjet.send.create(data=data)
+            status_code = result.status_code
+            body = result.json() if hasattr(result, "json") else {}
+
+            messages = body.get("Messages", [])
+            if messages and messages[0].get("Status") == "error":
+                errors = messages[0].get("Errors", [])
+                print(f"❌ [Mailjet] Error API: {errors}")
+                return False
+
+            if status_code in (200, 201):
+                msg_id = messages[0].get("To", [{}])[0].get("MessageID") if messages else None
+                print(f"✅ Email enviado a {to_email} (Mailjet: {msg_id or status_code})")
+                return True
+
+            print(f"❌ [Mailjet] HTTP {status_code}: {body}")
+            return False
+
+        except Exception as e:
+            print(f"❌ [Mailjet] {type(e).__name__}: {str(e)}")
+            return False
+
     def _send_email(self, to_email: str, subject: str, html_content: str) -> bool:
         """Método genérico para enviar email"""
         if self.email_service == "sendgrid":
             return self._send_with_sendgrid(to_email, subject, html_content)
         elif self.email_service == "resend":
             return self._send_with_resend(to_email, subject, html_content)
+        elif self.email_service == "mailjet":
+            return self._send_with_mailjet(to_email, subject, html_content)
         else:
             print(f"❌ Servicio de email '{self.email_service}' no configurado")
             return False

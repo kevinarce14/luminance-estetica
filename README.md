@@ -369,9 +369,9 @@ Proyecto privado - Todos los derechos reservados © 2024 Luminance Studio by Can
 ## 👤 Contacto
 
 - **Cliente**: Cande - Luminance Studio
-- **Desarrollador**: [Tu Nombre]
-- **Email**: [tu-email]
-- **GitHub**: [tu-github]
+- **Desarrollador**: Kevin Arce
+- **Email**: kevindamianarce@gmail.com
+- **GitHub**: kevinarce14
 
 ## 🗺️ Roadmap
 

@@ -208,6 +208,3 @@ Para conocer el procedimiento exacto de cómo desplegar este proyecto a producci
 * **Desarrollador:** Kevin Arce
 * **GitHub:** [@kevinarce14](https://github.com/kevinarce14)
 * **Proyecto desarrollado para:** Luminance Studio by Cande
-
-
-

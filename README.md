@@ -1,401 +1,213 @@
-# 💅 Luminance Estética - Backend API
-
-Backend profesional para el sistema de gestión de turnos, pagos y administración del estudio de estética **Luminance Studio by Cande**.
-
-## 🎯 Características
-
-### Sistema de Turnos
-- ✅ Calendario interactivo con disponibilidad en tiempo real
-- ✅ Reserva de citas con múltiples servicios
-- ✅ Confirmación automática por email/WhatsApp
-- ✅ Recordatorios automáticos 24h antes
-- ✅ Cancelación y reprogramación
-- ✅ Bloqueo de horarios no disponibles
-
-### Sistema de Pagos
-- 💳 Integración con MercadoPago
-- 💰 Pagos online y offline
-- 📊 Registro de transacciones
-- 🎁 Sistema de descuentos y cupones (falta implementar, a pedido del cliente)
-- 📈 Reportes de facturación
-
-### Gestión de Clientes
-- 👤 Perfiles de clientes
-- 📝 Historial de servicios
-- 💌 Preferencias de contacto
-- ⭐ Sistema de puntos de fidelidad (a implementar a futuro?)
-
-### Administración
-- 📊 Dashboard con métricas en tiempo real
-- 📅 Gestión de agenda de disponibilidad
-- 💼 Gestión de servicios y precios
-- 📧 Envío de notificaciones
-- 📈 Reportes y analytics
-
-## 🏗️ Estructura del Proyecto
-
-```
-luminance-estetica/
-├──frontend/
-│         ├──admin-dashboard.html
-│         ├──api.js
-│         ├──index.html
-│         ├──login.html
-│         ├──mis-turnos.html
-│         ├──pago-exitoso.html
-│         ├──pago-fallido.html
-│         ├──pago.html
-│         ├──responsive.css
-│         ├──studio.html
-│         └──turnera.html
-├── app/
-│   ├── __init__.py
-│   ├── main.py                      # FastAPI app principal
-│   │
-│   ├── core/                        # Configuración central
-│   │   ├── __init__.py
-│   │   ├── config.py                # Settings y env vars
-│   │   ├── security.py              # JWT, hashing, etc.
-│   │   └── database.py              # Conexión PostgreSQL
-│   │
-│   ├── models/                      # Modelos SQLAlchemy
-│   │   ├── __init__.py
-│   │   ├── user.py                  # Usuarios (clientes + admin)
-│   │   ├── appointment.py           # Citas/Turnos
-│   │   ├── service.py               # Servicios del studio
-│   │   ├── payment.py               # Pagos y transacciones
-│   │   ├── availability.py          # Horarios disponibles
-│   │   └── coupon.py                # Cupones de descuento
-│   │
-│   ├── schemas/                     # Pydantic schemas
-│   │   ├── __init__.py
-│   │   ├── user.py
-│   │   ├── appointment.py
-│   │   ├── service.py
-│   │   ├── payment.py
-│   │   ├──availabity.py
-│   │   ├──coupon.py
-│   │   └── auth.py
-│   │
-│   ├── routes/                         # Endpoints
-│   │   ├── __init__.py
-│   │   ├── deps.py                  # Dependencias (get_db, get_current_user)
-│   │   ├── auth.py              # Login, register, password reset
-│   │   ├── appointments.py      # CRUD de turnos
-│   │   ├── services.py          # CRUD de servicios
-│   │   ├── payments.py          # MercadoPago webhooks
-│   │   ├── users.py             # Gestión de clientes
-│   │   ├── availability.py      # Horarios disponibles
-│   │   └── admin.py             # Endpoints de administración
-│   │
-│   └── services/                    # Lógica de negocio
-│       ├── __init__.py
-│       ├── email_service.py         # SendGrid/Resend
-│       ├── whatsapp_service.py      # Twilio WhatsApp
-│       ├── payment_service.py       # MercadoPago
-│       ├── appointment_service.py   # Lógica de reservas
-│       ├──scheduler_service.py   # actualizacion automatica estados de los turnos
-│       └── notification_service.py  # Recordatorios automáticos
-│   
-├── .dockerignore
-├── .env                    # Template de variables
-├── .gitignore
-├── .vercelignore (creo que no se usa y se puede eliminar)
-├── arquitectura.txt
-├── DEPLOY_GRATUITO_VERCEL_RENDER.md
-├── Dockerfile
-├── requirements.txt
-├── runtime.txt                      # Python version para Render
-├── render.yaml
-└── README.md
-```
-
-## 🚀 Stack Tecnológico
-
-- **Framework**: FastAPI 0.104+
-- **Database**: PostgreSQL 15
-- **ORM**: SQLAlchemy 2.0
-- **Email**: SendGrid
-- **WhatsApp**: Twilio API
-- **Pagos**: MercadoPago SDK
-- **Auth**: JWT (python-jose)
-- **Validation**: Pydantic v2
-- **Migrations**: Alembic
-- **Testing**: Pytest
-
-## 📦 Instalación Local
-
-### Prerrequisitos
-- Python 3.11+
-- PostgreSQL 15+
-- Git
-
-### 1. Clonar el repositorio
-```bash
-git clone https://github.com/tu-usuario/luminance-estetica-backend.git
-cd luminance-estetica-backend
-```
-
-### 2. Crear entorno virtual
-```bash
-python -m venv venv
-
-# Linux/Mac
-source venv/bin/activate
-
-# Windows
-venv\Scripts\activate
-```
-
-### 3. Instalar dependencias
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configurar variables de entorno
-```bash
-cp .env.example .env
-# Editar .env con tus credenciales
-```
-
-### 5. Crear base de datos
-```bash
-# Crear BD en PostgreSQL
-createdb luminance_estetica
-
-# Ejecutar migraciones
-alembic upgrade head
-```
-
-### 6. Correr el servidor
-```bash
-uvicorn app.main:app --reload
-```
-
-API disponible en: http://localhost:8000
-Docs: http://localhost:8000/docs
-
-## 🔑 Variables de Entorno
-
-Ver archivo `.env.example` para la lista completa.
-
-### Esenciales:
-```env
-DATABASE_URL=postgresql://user:pass@localhost/luminance_estetica
-SECRET_KEY=tu-secret-key-super-segura
-SENDGRID_API_KEY=SG.xxx
-MERCADOPAGO_ACCESS_TOKEN=APP_USR-xxx
-TWILIO_ACCOUNT_SID=ACxxx
-```
-
-## 📡 API Endpoints
-
-### Autenticación
-```
-POST   /api/v1/auth/register          # Registro de cliente
-POST   /api/v1/auth/login              # Login
-POST   /api/v1/auth/password-reset     # Resetear contraseña
-```
-
-### Turnos/Citas
-```
-GET    /api/v1/appointments            # Listar turnos
-POST   /api/v1/appointments            # Crear turno
-GET    /api/v1/appointments/{id}       # Ver turno
-PUT    /api/v1/appointments/{id}       # Modificar turno
-DELETE /api/v1/appointments/{id}       # Cancelar turno
-GET    /api/v1/appointments/available  # Horarios disponibles
-```
-
-### Servicios
-```
-GET    /api/v1/services                # Listar servicios
-GET    /api/v1/services/{id}           # Ver servicio
-POST   /api/v1/services                # Crear servicio (admin)
-PUT    /api/v1/services/{id}           # Editar servicio (admin)
-```
-
-### Pagos
-```
-POST   /api/v1/payments/create         # Crear preferencia MP
-POST   /api/v1/payments/webhook        # Webhook MercadoPago
-GET    /api/v1/payments/{id}           # Ver pago
-```
-
-### Admin
-```
-GET    /api/v1/admin/dashboard         # Métricas del dashboard
-GET    /api/v1/admin/clients           # Listar clientes
-GET    /api/v1/admin/reports           # Reportes
-```
-
-Documentación interactiva completa: `/docs`
-
-## 🚀 Deployment
-
-### Opción 1: Render (Recomendado)
-
-1. Conectar repositorio de GitHub
-2. Crear PostgreSQL database
-3. Crear Web Service
-4. Configurar variables de entorno
-5. Deploy automático
-
-Ver `DEPLOYMENT.md` para guía detallada.
-
-### Opción 2: Railway
-
-```bash
-railway login
-railway init
-railway up
-```
-
-### Opción 3: Fly.io
-
-```bash
-fly launch
-fly deploy
-```
-
-## 🧪 Testing
-
-```bash
-# Instalar dependencias de desarrollo
-pip install -r requirements-dev.txt
-
-# Correr tests
-pytest
-
-# Con coverage
-pytest --cov=app tests/
-
-# Test específico
-pytest tests/test_appointments.py
-```
-
-## 📊 Base de Datos
-
-### Modelos Principales
-
-**User** (Clientes y Administradores)
-- id, email, phone, full_name
-- hashed_password, is_active, is_admin
-- created_at, updated_at
-
-**Appointment** (Turnos)
-- id, user_id, service_id
-- appointment_date, start_time, end_time
-- status (pending, confirmed, completed, cancelled)
-- notes, reminder_sent
-
-**Service** (Servicios del Studio)
-- id, name, description
-- duration_minutes, price
-- category (pestañas, cejas, corporal, etc.)
-- is_active
-
-**Payment** (Pagos)
-- id, appointment_id, user_id
-- amount, currency (ARS)
-- payment_method, status
-- mercadopago_id, transaction_id
-
-**Availability** (Disponibilidad)
-- id, day_of_week
-- start_time, end_time
-- is_available
-
-## 🔐 Seguridad
-
-- ✅ JWT para autenticación
-- ✅ Bcrypt para hash de contraseñas
-- ✅ Rate limiting (100 req/min)
-- ✅ CORS configurado
-- ✅ Validación de inputs con Pydantic
-- ✅ SQL injection protection (SQLAlchemy)
-- ✅ Variables sensibles en .env
-
-## 📧 Notificaciones
-
-### Email (SendGrid)
-- Confirmación de turno
-- Recordatorio 24h antes
-- Cancelación de turno
-- Bienvenida al registrarse
-
-### WhatsApp (Twilio)
-- Confirmación inmediata
-- Recordatorio 1h antes (opcional)
-
-## 💳 MercadoPago
-
-### Flujo de pago:
-1. Cliente reserva turno
-2. Backend crea preferencia en MP
-3. Cliente paga en checkout de MP
-4. Webhook confirma pago
-5. Turno se marca como confirmado
-6. Email de confirmación
-
-## 🛠️ Comandos Útiles
-
-```bash
-# Crear migración
-alembic revision -m "descripcion"
-
-# Aplicar migraciones
-alembic upgrade head
-
-# Rollback
-alembic downgrade -1
-
-# Poblar BD con datos de prueba
-python scripts/seed_database.py
-
-# Formatear código
-black app/
-isort app/
-
-# Linting
-flake8 app/
-mypy app/
-```
-
-## 📝 Licencia
-
-Proyecto privado - Todos los derechos reservados © 2024 Luminance Studio by Cande
-
-## 👤 Contacto
-
-- **Cliente**: Cande - Luminance Studio
-- **Desarrollador**: Kevin Arce
-- **Email**: kevindamianarce@gmail.com
-- **GitHub**: kevinarce14
-
-## 🗺️ Roadmap
-
-### v1.0 (MVP) ✅
-- [x] Autenticación básica
-- [x] Sistema de turnos
-- [x] Integración MercadoPago
-- [x] Emails automáticos
-- [x] Panel de admin básico
-
-### v1.1 (Próximo)
-- [ ] WhatsApp notifications
-- [ ] Sistema de cupones
-- [ ] Puntos de fidelidad
-- [ ] Recordatorios automáticos
-- [ ] Multi-staff scheduling
-
-### v2.0 (Futuro)
-- [ ] App móvil
-- [ ] Video consultas
-- [ ] Programa de referidos
-- [ ] Analytics avanzados
-- [ ] Integración con Instagram
+# 💅 Luminance Estética — Sistema Web de Gestión de Turnos & Pagos
+
+> **Plataforma Web Full Stack** para la reserva automatizada de citas, procesamiento de señas/pagos online y administración integral del centro de estética **Luminance Studio by Cande**.
+
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white)
+![Render](https://img.shields.io/badge/Render-Deployed-46E3B7?style=for-the-badge&logo=render&logoColor=white)
 
 ---
 
-**Hecho con 💅 para Luminance Studio by Cande**
+## 🎯 ¿De qué trata el proyecto?
+
+El sistema soluciona de forma punta a punta la agenda y recaudación de un estudio de estética, eliminando el manejo manual de mensajes para coordinar turnos. Permite a las clientas reservar su cita de forma autónoma con validación de horarios en tiempo real, pagar la seña a través de MercadoPago y recibir confirmaciones automáticas.
+
+---
+
+## 🌟 Características Principales
+
+### 📅 Cliente & Reserva de Turnos
+- **Calendario dinámico:** Selección de fecha y hora con cálculo de disponibilidad en tiempo real.
+- **Reserva multi-servicio:** Selección de tratamientos (Pestañas, Cejas, Limpieza facial, etc.).
+- **Gestión de Mis Turnos:** Vista para que la clienta consulte, controle o cancele sus reservas.
+- **Notificaciones automáticas:** Confirmaciones inmediatas vía Email (SendGrid / Resend) y WhatsApp (Twilio API).
+
+### 💳 Pagos & Pasarela Online
+- **Integración con MercadoPago:** Generación automática de preferencia de pago/seña y sincronización mediante **Webhooks** asíncronos.
+- **Control de estados:** Registro de transacciones (Aprobado, Pendiente, Fallido).
+
+### ⚙️ Administración & Automatización
+- **Admin Dashboard:** Panel privado para consultar turnos del día, cambiar estados y visualizar métricas principales.
+- **Gestión de Agenda:** Configuración flexible de días u horarios no laborables y bloqueo de agenda.
+- **Tareas Programadas (APScheduler):** Proceso en segundo plano que libera turnos impagos o vencidos automáticamente.
+
+---
+
+## 🏗️ Arquitectura de Deploy (Cloud)
+
+El proyecto está diseñado bajo una arquitectura distribuida sin costo operativo:
+
+
+```
+
+┌─────────────────────────────────────────────────────────┐
+│                                                         │
+│  VERCEL (Frontend)              RENDER (Backend + BD)  │
+│  ┌──────────────┐               ┌──────────────────┐   │
+│  │ HTML5 + JS   │───────────────│  Docker Container│   │
+│  │ Vanilla      │   API REST    │  - FastAPI       │   │
+│  └──────────────┘               │  - PostgreSQL    │   │
+│                                 └──────────────────┘   │
+└─────────────────────────────────────────────────────────┘
+
+```
+
+- **Frontend:** Estojado y servido de forma ultra rápida en **Vercel**.
+- **Backend API:** Contenedorized con **Docker** e instanciado en **Render**.
+- **Base de Datos:** **PostgreSQL 15** relacional alojado en Render.
+
+---
+
+## 🛠️ Stack Tecnológico
+
+### Backend
+- **Lenguaje:** Python 3.12
+- **Framework Web:** FastAPI (API REST con OpenAPI/Swagger interactivo)
+- **Base de Datos & ORM:** PostgreSQL + SQLAlchemy 2.0 (Relacional, `cascade="all, delete-orphan"`)
+- **Validación de Datos:** Pydantic v2
+- **Seguridad & Auth:** JWT (`python-jose`) + Hashing de contraseñas con `Bcrypt`
+- **Tareas Background:** APScheduler
+
+### Frontend
+- **Arquitectura:** Single Page Logic / Asíncrono
+- **Lenguajes:** HTML5 Semantic, CSS3 (Diseño Responsive) y JavaScript Vanilla (ES6+ Fetch API)
+
+### Servicios Integrados
+- **Pagos:** MercadoPago SDK
+- **Email Transaccional:** SendGrid / Resend
+- **Notificaciones SMS/WhatsApp:** Twilio API
+
+---
+
+## 📁 Estructura del Repositorio
+
+```text
+luminance-estetica/
+├── frontend/                     # Interfaz de usuario y panel administrativo
+│   ├── admin-dashboard.html      # Panel de administración
+│   ├── api.js                    # Cliente de conexión API (Fetch)
+│   ├── index.html                # Página principal / Landing
+│   ├── login.html                # Autenticación de usuarios/admin
+│   ├── mis-turnos.html           # Gestión de turnos del cliente
+│   ├── turnera.html              # Flujo interactivo de reserva
+│   └── ...                       # Pantallas de pago y estilos
+├── app/                          # Código fuente del Backend (FastAPI)
+│   ├── main.py                   # Punto de entrada de la aplicación
+│   ├── core/                     # Configuración central, DB y Seguridad JWT
+│   ├── models/                   # Modelos SQLAlchemy (User, Appointment, Service, etc.)
+│   ├── schemas/                  # Validaciones y DTOs con Pydantic
+│   ├── routes/                   # Endpoints de la API REST
+│   └── services/                 # Lógica de negocio (MercadoPago, Emails, Scheduler)
+├── Dockerfile                    # Configuración de imagen Docker para Backend
+├── render.yaml                   # Configuración de despliegue Infrastructure-as-Code
+├── requirements.txt              # Dependencias de Python
+└── DEPLOY_GRATUITO_VERCEL_RENDER.md # Guía paso a paso de deploy
+
+```
+
+---
+
+## 💻 Instalación y Ejecución Local
+
+### Prerrequisitos
+
+* Python 3.11+
+* PostgreSQL corriendo localmente (o un string de conexión remoto)
+* Git
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/kevinarce14/luminance-estetica.git
+cd luminance-estetica
+
+```
+
+### 2. Configurar el Entorno Virtual de Python
+
+```bash
+# Crear entorno virtual
+python -m venv venv
+
+# Activar en Windows:
+venv\Scripts\activate
+
+# Activar en Linux/Mac:
+source venv/bin/activate
+
+# Instalar dependencias
+pip install -r requirements.txt
+
+```
+
+### 3. Configurar Variables de Entorno (`.env`)
+
+Crea un archivo `.env` en la raíz del proyecto basándote en la siguiente estructura:
+
+```env
+DATABASE_URL=postgresql://tu_usuario:tu_password@localhost:5432/luminance_db
+SECRET_KEY=tu_clave_secreta_jwt
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=10080
+
+MERCADOPAGO_ACCESS_TOKEN=APP_USR-xxx
+SENDGRID_API_KEY=SG.xxx
+TWILIO_ACCOUNT_SID=ACxxx
+TWILIO_AUTH_TOKEN=xxx
+
+```
+
+### 4. Iniciar el Backend (Servidor API)
+
+```bash
+python -m uvicorn app.main:app --reload
+
+```
+
+> La API quedará escuchando en `http://localhost:8000`.
+> Puedes ver la **documentación interactiva** en `http://localhost:8000/docs`.
+
+### 5. Iniciar el Frontend
+
+En otra terminal, navega a la carpeta `frontend` y levanta un servidor HTTP simple:
+
+```bash
+cd frontend
+python -m http.server 5000
+
+```
+
+> Accede a la aplicación desde tu navegador en `http://localhost:5000`.
+
+---
+
+## 📡 Endpoints Destacados de la API
+
+* `POST /api/v1/auth/login` — Autenticación y emisión de JWT.
+* `GET /api/v1/appointments/available` — Consulta de horarios disponibles en tiempo real.
+* `POST /api/v1/appointments` — Creación de reservas.
+* `POST /api/v1/payments/webhook` — Recepción de eventos de pago MercadoPago.
+* `GET /api/v1/admin/dashboard` — Métricas generales para el administrador.
+
+---
+
+## 🚀 Despliegue en Producción
+
+Para conocer el procedimiento exacto de cómo desplegar este proyecto a producción sin costos (usando **Docker + Render + Vercel**), consulta nuestra guía paso a paso:
+
+📄 **[Manual Completo de Deploy Gratis (./DEPLOY_GRATUITO_VERCEL_RENDER.md)]
+
+---
+
+## 👤 Autor & Contacto
+
+* **Desarrollador:** Kevin Arce
+* **GitHub:** [@kevinarce14](https://github.com/kevinarce14)
+* **Proyecto desarrollado para:** Luminance Studio by Cande
+
+```
+

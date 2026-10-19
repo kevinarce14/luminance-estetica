@@ -7,11 +7,11 @@ import {
 } from '../components/appointments/StatusBadge.tsx'
 import { MessageBox, Spinner } from '../components/common/Feedback.tsx'
 import { buildWhatsappUrl } from '../constants/contact.ts'
-import { useAuth } from '../context/AuthContext.tsx'
+import { useAuth } from '../hooks/useAuth.ts'
 import { useAsyncResource } from '../hooks/useAsyncResource.ts'
 import { cancelAppointment, getMyAppointments } from '../services/appointmentsApi.ts'
 import { isApiError } from '../types/api.ts'
-import { AppointmentStatus, type AppointmentHistoryItem } from '../types/appointment.ts'
+import { AppointmentStatus, type AppointmentWithDetails } from '../types/appointment.ts'
 import { canBeCancelled, splitUpcomingAndHistory } from '../utils/appointments.ts'
 import { formatPrice } from '../utils/formatters.ts'
 import { formatStudioLongDate, formatStudioTime } from '../utils/studioTime.ts'
@@ -24,19 +24,18 @@ interface Feedback {
   message: string
 }
 
-function describeAppointment(appointment: AppointmentHistoryItem): string {
-  const serviceName = appointment.service?.name ?? `Turno #${appointment.id}`
-  return `${serviceName} — ${formatStudioLongDate(appointment.appointment_date)}, ${formatStudioTime(appointment.appointment_date)}`
+function describeAppointment(appointment: AppointmentWithDetails): string {
+  return `${appointment.service.name} — ${formatStudioLongDate(appointment.appointment_date)}, ${formatStudioTime(appointment.appointment_date)}`
 }
 
-function buildRescheduleMessage(appointment: AppointmentHistoryItem, clientName: string): string {
+function buildRescheduleMessage(appointment: AppointmentWithDetails, clientName: string): string {
   return [
     'Hola Cande! 🌸',
     '',
     `Soy *${clientName}* y quisiera reprogramar mi turno:`,
     '',
     `📋 *ID Turno:* #${appointment.id}`,
-    `💅 *Servicio:* ${appointment.service?.name ?? ''}`,
+    `💅 *Servicio:* ${appointment.service.name}`,
     `📅 *Fecha actual:* ${formatStudioLongDate(appointment.appointment_date)}`,
     `🕐 *Hora actual:* ${formatStudioTime(appointment.appointment_date)}`,
     '',
@@ -47,9 +46,9 @@ function buildRescheduleMessage(appointment: AppointmentHistoryItem, clientName:
 }
 
 interface AppointmentCardProps {
-  appointment: AppointmentHistoryItem
+  appointment: AppointmentWithDetails
   clientName: string
-  onCancel: (appointment: AppointmentHistoryItem) => void
+  onCancel: (appointment: AppointmentWithDetails) => void
 }
 
 function AppointmentCard({ appointment, clientName, onCancel }: AppointmentCardProps) {
@@ -59,8 +58,8 @@ function AppointmentCard({ appointment, clientName, onCancel }: AppointmentCardP
     <article className="turno-card">
       <div className="turno-card__header">
         <div>
-          <h3>{service?.name ?? `Turno #${appointment.id}`}</h3>
-          {service ? <div className="turno-card__category">{service.category}</div> : null}
+          <h3>{service.name}</h3>
+          <div className="turno-card__category">{service.category}</div>
         </div>
         <AppointmentStatusBadge status={status} />
       </div>
@@ -76,20 +75,16 @@ function AppointmentCard({ appointment, clientName, onCancel }: AppointmentCardP
           <dt>Hora</dt>
           <dd>{formatStudioTime(appointment.appointment_date)}</dd>
         </div>
-        {service ? (
-          <>
-            <div>
-              <i className="fas fa-hourglass-half" aria-hidden="true" />
-              <dt>Duración</dt>
-              <dd>{service.duration_minutes} min</dd>
-            </div>
-            <div>
-              <i className="fas fa-dollar-sign" aria-hidden="true" />
-              <dt>Precio</dt>
-              <dd>{formatPrice(service.price)}</dd>
-            </div>
-          </>
-        ) : null}
+        <div>
+          <i className="fas fa-hourglass-half" aria-hidden="true" />
+          <dt>Duración</dt>
+          <dd>{service.duration_minutes} min</dd>
+        </div>
+        <div>
+          <i className="fas fa-dollar-sign" aria-hidden="true" />
+          <dt>Precio</dt>
+          <dd>{formatPrice(service.price)}</dd>
+        </div>
         <div className="turno-card__payment">
           <i className="fas fa-credit-card" aria-hidden="true" />
           <dt>Pago</dt>
@@ -144,7 +139,7 @@ export function MisTurnosPage() {
   const { user } = useAuth()
   const { status, data, retry } = useAsyncResource('my-appointments', getMyAppointments)
   const [activeTab, setActiveTab] = useState<MisTurnosTab>('upcoming')
-  const [cancelTarget, setCancelTarget] = useState<AppointmentHistoryItem | null>(null)
+  const [cancelTarget, setCancelTarget] = useState<AppointmentWithDetails | null>(null)
   const [isCancelling, setIsCancelling] = useState(false)
   const [feedback, setFeedback] = useState<Feedback | null>(null)
 
@@ -163,24 +158,15 @@ export function MisTurnosPage() {
     try {
       await cancelAppointment(target.id, reason)
       setFeedback({ variant: 'success', message: '✅ Turno cancelado exitosamente.' })
+      retry()
     } catch (error) {
-      // El backend puede guardar la cancelación y aun así responder 500 (validación de
-      // fechas pasadas al serializar). Se verifica contra el historial antes de informar.
-      const refreshed = await getMyAppointments().catch(() => null)
-      const wasCancelled =
-        refreshed?.find((item) => item.id === target.id)?.status === AppointmentStatus.CANCELLED
-      setFeedback(
-        wasCancelled
-          ? { variant: 'success', message: '✅ Turno cancelado exitosamente.' }
-          : {
-              variant: 'error',
-              message: `Error al cancelar el turno${isApiError(error) ? `: ${error.message}` : '.'}`,
-            },
-      )
+      setFeedback({
+        variant: 'error',
+        message: `Error al cancelar el turno${isApiError(error) ? `: ${error.message}` : '.'}`,
+      })
     } finally {
       setIsCancelling(false)
       setCancelTarget(null)
-      retry()
     }
   }
 

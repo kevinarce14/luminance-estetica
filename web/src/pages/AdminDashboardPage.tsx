@@ -6,26 +6,25 @@ import { MetricsCards } from '../components/admin/MetricsCards.tsx'
 import { CancelAppointmentModal } from '../components/appointments/CancelAppointmentModal.tsx'
 import { ConfirmModal } from '../components/common/ConfirmModal.tsx'
 import { MessageBox, Spinner, type MessageVariant } from '../components/common/Feedback.tsx'
-import { useAuth } from '../context/AuthContext.tsx'
+import { DEFAULT_AGENDA_FILTERS } from '../constants/admin.ts'
+import { useAuth } from '../hooks/useAuth.ts'
 import { useAsyncResource } from '../hooks/useAsyncResource.ts'
+import { useDebouncedValue } from '../hooks/useDebouncedValue.ts'
 import {
-  AGENDA_DAYS_AHEAD,
-  getAdminAgenda,
+  AGENDA_LIMIT,
+  buildAgendaQuery,
+  getAdminAppointments,
   getDashboardMetrics,
-  getUsers,
 } from '../services/adminApi.ts'
 import { cancelAppointment, updateAppointmentStatus } from '../services/appointmentsApi.ts'
 import { createCashPayment } from '../services/paymentsApi.ts'
-import type { AgendaFilters, AppointmentPatch } from '../types/admin.ts'
+import type { AgendaFilters } from '../types/admin.ts'
 import { isApiError } from '../types/api.ts'
-import { AppointmentStatus, type AppointmentWithDetails } from '../types/appointment.ts'
-import type { User } from '../types/user.ts'
-import { buildAgendaRows, filterAgendaRows } from '../utils/appointments.ts'
+import { AppointmentStatus, type AdminAppointment } from '../types/appointment.ts'
 import { formatStudioLongDate, formatStudioTime, getStudioToday } from '../utils/studioTime.ts'
 import './AdminDashboardPage.css'
 
-const INITIAL_FILTERS: AgendaFilters = { date: '', status: 'all', search: '' }
-const EMPTY_USERS: User[] = []
+const SEARCH_DEBOUNCE_MS = 300
 
 interface Feedback {
   variant: MessageVariant
@@ -35,81 +34,54 @@ interface Feedback {
 /** Acción que requiere confirmación en modal (la cancelación usa su propio modal con motivo). */
 interface PendingConfirmation {
   action: Extract<AgendaAction, 'confirm-cash' | 'complete'>
-  appointment: AppointmentWithDetails
+  appointment: AdminAppointment
 }
 
-function describe(appointment: AppointmentWithDetails): string {
+function describe(appointment: AdminAppointment): string {
   return `#${appointment.id} · ${appointment.user.full_name} · ${appointment.service.name} — ${formatStudioLongDate(appointment.appointment_date)}, ${formatStudioTime(appointment.appointment_date)}`
 }
 
 export function AdminDashboardPage() {
   const { user } = useAuth()
-  const metrics = useAsyncResource('admin-metrics', getDashboardMetrics)
-  const agenda = useAsyncResource('admin-agenda', getAdminAgenda)
-  // Sin la lista de usuarios el buscador funciona igual, solo por nombre.
-  const users = useAsyncResource('admin-users', () => getUsers())
+  const [filters, setFilters] = useState<AgendaFilters>(DEFAULT_AGENDA_FILTERS)
+  const debouncedSearch = useDebouncedValue(filters.search, SEARCH_DEBOUNCE_MS)
+  const agendaQuery = buildAgendaQuery({ ...filters, search: debouncedSearch })
 
-  const [filters, setFilters] = useState<AgendaFilters>(INITIAL_FILTERS)
-  const [sessionPatches, setSessionPatches] = useState<ReadonlyMap<number, AppointmentPatch>>(
-    () => new Map(),
+  const metrics = useAsyncResource('admin-metrics', getDashboardMetrics)
+  const agenda = useAsyncResource(
+    JSON.stringify(agendaQuery),
+    () => getAdminAppointments(agendaQuery),
+    { keepPreviousData: true },
   )
+
   const [pendingConfirmation, setPendingConfirmation] = useState<PendingConfirmation | null>(null)
-  const [cancelTarget, setCancelTarget] = useState<AppointmentWithDetails | null>(null)
+  const [cancelTarget, setCancelTarget] = useState<AdminAppointment | null>(null)
   const [busyAppointmentId, setBusyAppointmentId] = useState<number | null>(null)
   const [feedback, setFeedback] = useState<Feedback | null>(null)
 
-  const rows = buildAgendaRows(
-    agenda.data?.appointments ?? [],
-    users.data ?? EMPTY_USERS,
-    sessionPatches,
-  )
-  const filteredRows = filterAgendaRows(rows, filters)
-
-  const applyPatch = (appointmentId: number, patch: AppointmentPatch) => {
-    setSessionPatches((previous) => {
-      const next = new Map(previous)
-      next.set(appointmentId, { ...previous.get(appointmentId), ...patch })
-      return next
-    })
-  }
-
-  /**
-   * Ejecuta un cambio de estado. Ante un 500 se avisa que el cambio pudo haberse guardado:
-   * el backend legado valida "fecha futura" también al responder y falla con turnos pasados.
-   */
   const runAction = async (
-    appointment: AppointmentWithDetails,
-    request: () => Promise<AppointmentPatch>,
+    appointment: AdminAppointment,
+    request: () => Promise<unknown>,
     successMessage: string,
   ) => {
     setBusyAppointmentId(appointment.id)
     setFeedback(null)
-
     try {
-      const patch = await request()
-      applyPatch(appointment.id, patch)
+      await request()
       setFeedback({ variant: 'success', message: successMessage })
+      agenda.retry()
+      metrics.retry()
     } catch (error) {
-      if (isApiError(error) && error.status >= 500) {
-        setFeedback({
-          variant: 'warning',
-          message:
-            'El servidor respondió con un error, pero el cambio puede haberse guardado (problema conocido del backend con turnos de fecha pasada). Se recargó la agenda para verificar.',
-        })
-        agenda.retry()
-      } else {
-        setFeedback({
-          variant: 'error',
-          message: isApiError(error) ? error.message : 'No se pudo completar la acción.',
-        })
-      }
+      setFeedback({
+        variant: 'error',
+        message: isApiError(error) ? error.message : 'No se pudo completar la acción.',
+      })
     } finally {
       setBusyAppointmentId(null)
-      metrics.retry()
     }
   }
 
-  const handleAction = (action: AgendaAction, appointment: AppointmentWithDetails) => {
+  const handleAction = (action: AgendaAction, appointment: AdminAppointment) => {
     if (action === 'cancel') {
       setCancelTarget(appointment)
     } else {
@@ -127,19 +99,13 @@ export function AdminDashboardPage() {
     if (action === 'confirm-cash') {
       void runAction(
         appointment,
-        async () => {
-          const payment = await createCashPayment(appointment.id)
-          return { status: AppointmentStatus.CONFIRMED, payment }
-        },
+        () => createCashPayment(appointment.id),
         `✅ Turno #${appointment.id} confirmado con pago en efectivo.`,
       )
     } else {
       void runAction(
         appointment,
-        async () => {
-          await updateAppointmentStatus(appointment.id, AppointmentStatus.COMPLETED)
-          return { status: AppointmentStatus.COMPLETED }
-        },
+        () => updateAppointmentStatus(appointment.id, AppointmentStatus.COMPLETED),
         `✅ Turno #${appointment.id} marcado como completado.`,
       )
     }
@@ -153,51 +119,43 @@ export function AdminDashboardPage() {
     setCancelTarget(null)
     void runAction(
       appointment,
-      async () => {
-        await cancelAppointment(appointment.id, reason)
-        return { status: AppointmentStatus.CANCELLED }
-      },
+      () => cancelAppointment(appointment.id, reason),
       `✅ Turno #${appointment.id} cancelado.`,
     )
   }
 
   const renderAgenda = () => {
+    if (agenda.status === 'error') {
+      return (
+        <MessageBox variant="error">
+          Error al cargar la agenda.{' '}
+          <button type="button" className="admin-link-button" onClick={agenda.retry}>
+            Reintentar
+          </button>
+        </MessageBox>
+      )
+    }
+
     if (!agenda.data) {
-      if (agenda.status === 'error') {
-        return (
-          <MessageBox variant="error">
-            Error al cargar la agenda.{' '}
-            <button type="button" className="admin-link-button" onClick={agenda.retry}>
-              Reintentar
-            </button>
-          </MessageBox>
-        )
-      }
       return <Spinner label="Cargando agenda..." size="large" />
+    }
+
+    if (agenda.data.length === 0) {
+      return <p className="admin-empty">No hay turnos que coincidan con los filtros.</p>
     }
 
     return (
       <>
-        {agenda.data.isPartial ? (
-          <MessageBox variant="warning">
-            Una de las fuentes de la agenda no respondió (los turnos de hoy ya pasados pueden no
-            aparecer por un problema conocido del backend).
-          </MessageBox>
-        ) : null}
-        <AgendaFiltersBar
-          filters={filters}
-          resultCount={filteredRows.length}
-          onChange={setFilters}
+        <AgendaTable
+          appointments={agenda.data}
+          busyAppointmentId={busyAppointmentId}
+          onAction={handleAction}
         />
-        {filteredRows.length === 0 ? (
-          <p className="admin-empty">No hay turnos que coincidan con los filtros.</p>
-        ) : (
-          <AgendaTable
-            rows={filteredRows}
-            busyAppointmentId={busyAppointmentId}
-            onAction={handleAction}
-          />
-        )}
+        {agenda.data.length >= AGENDA_LIMIT ? (
+          <p className="admin-section__hint">
+            Se muestran los primeros {AGENDA_LIMIT} turnos: usá los filtros para acotar la búsqueda.
+          </p>
+        ) : null}
       </>
     )
   }
@@ -214,7 +172,7 @@ export function AdminDashboardPage() {
           icon: '★',
           title: '¿Marcar como completado?',
           confirmLabel: 'Sí, completar',
-          body: 'El turno pasará a estado "Completado" y dejará de aparecer en la agenda activa.',
+          body: 'El turno pasará a estado "Completado".',
         }
 
   return (
@@ -271,11 +229,14 @@ export function AdminDashboardPage() {
             </button>
           </div>
           <p className="admin-section__hint">
-            Turnos pendientes y confirmados de hoy y los próximos {AGENDA_DAYS_AHEAD} días. Los que
-            completes o canceles en esta sesión se siguen mostrando con su nuevo estado. Los turnos
-            presenciales se registran desde la turnera (pago en efectivo automático; anotá el
-            nombre del cliente en las notas).
+            Los turnos presenciales se registran desde la turnera (pago en efectivo automático;
+            anotá el nombre del cliente en las notas).
           </p>
+          <AgendaFiltersBar
+            filters={filters}
+            resultCount={agenda.data ? agenda.data.length : null}
+            onChange={setFilters}
+          />
           {renderAgenda()}
         </section>
       </div>

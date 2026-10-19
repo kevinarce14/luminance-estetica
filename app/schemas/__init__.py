@@ -25,6 +25,7 @@ from app.schemas.appointment import (
     AppointmentUpdate,
     AppointmentResponse,
     AppointmentWithDetails,
+    AppointmentAdminView,
 )
 
 from app.schemas.payment import (
@@ -75,6 +76,7 @@ __all__ = [
     "AppointmentUpdate",
     "AppointmentResponse",
     "AppointmentWithDetails",
+    "AppointmentAdminView",
     # Payment
     "PaymentBase",
     "PaymentCreate",

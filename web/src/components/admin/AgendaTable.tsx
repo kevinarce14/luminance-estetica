@@ -1,17 +1,16 @@
-import type { AgendaRow } from '../../types/admin.ts'
-import { AppointmentStatus, type AppointmentWithDetails } from '../../types/appointment.ts'
+import { AppointmentStatus, type AdminAppointment } from '../../types/appointment.ts'
 import { formatStudioLongDate, formatStudioTime } from '../../utils/studioTime.ts'
 import { AppointmentStatusBadge, PaymentBadge } from '../appointments/StatusBadge.tsx'
 
 export type AgendaAction = 'confirm-cash' | 'complete' | 'cancel'
 
 interface AgendaTableProps {
-  rows: AgendaRow[]
+  appointments: AdminAppointment[]
   busyAppointmentId: number | null
-  onAction: (action: AgendaAction, appointment: AppointmentWithDetails) => void
+  onAction: (action: AgendaAction, appointment: AdminAppointment) => void
 }
 
-export function AgendaTable({ rows, busyAppointmentId, onAction }: AgendaTableProps) {
+export function AgendaTable({ appointments, busyAppointmentId, onAction }: AgendaTableProps) {
   return (
     <div className="admin-table-wrapper">
       <table className="admin-table">
@@ -27,9 +26,10 @@ export function AgendaTable({ rows, busyAppointmentId, onAction }: AgendaTablePr
           </tr>
         </thead>
         <tbody>
-          {rows.map(({ appointment, contact }) => {
+          {appointments.map((appointment) => {
             const isBusy = busyAppointmentId === appointment.id
             const disabled = busyAppointmentId !== null
+            const { user } = appointment
             return (
               <tr key={appointment.id} aria-busy={isBusy || undefined}>
                 <td data-label="ID">#{appointment.id}</td>
@@ -39,13 +39,11 @@ export function AgendaTable({ rows, busyAppointmentId, onAction }: AgendaTablePr
                   <strong>{formatStudioTime(appointment.appointment_date)}</strong>
                 </td>
                 <td data-label="Cliente">
-                  {appointment.user.full_name}
-                  {contact ? (
-                    <small className="admin-table__contact">
-                      {contact.email}
-                      {contact.phone ? ` · ${contact.phone}` : ''}
-                    </small>
-                  ) : null}
+                  {user.full_name}
+                  <small className="admin-table__contact">
+                    {user.email}
+                    {user.phone ? ` · ${user.phone}` : ''}
+                  </small>
                 </td>
                 <td data-label="Servicio">
                   {appointment.service.name}

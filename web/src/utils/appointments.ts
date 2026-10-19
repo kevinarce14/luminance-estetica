@@ -1,16 +1,4 @@
-import type {
-  AgendaFilters,
-  AgendaRow,
-  AppointmentPatch,
-  ClientContact,
-} from '../types/admin.ts'
-import {
-  AppointmentStatus,
-  type AppointmentHistoryItem,
-  type AppointmentWithDetails,
-} from '../types/appointment.ts'
-import type { User } from '../types/user.ts'
-import { getStudioDateKey } from './studioTime.ts'
+import { AppointmentStatus, type AppointmentWithDetails } from '../types/appointment.ts'
 
 const ACTIVE_STATUSES: readonly AppointmentStatus[] = [
   AppointmentStatus.PENDING,
@@ -27,8 +15,8 @@ export function canBeCancelled(status: AppointmentStatus): boolean {
 }
 
 interface SplitAppointments {
-  upcoming: AppointmentHistoryItem[]
-  history: AppointmentHistoryItem[]
+  upcoming: AppointmentWithDetails[]
+  history: AppointmentWithDetails[]
 }
 
 /**
@@ -36,11 +24,11 @@ interface SplitAppointments {
  * "Historial" = el resto (más reciente primero).
  */
 export function splitUpcomingAndHistory(
-  appointments: AppointmentHistoryItem[],
+  appointments: AppointmentWithDetails[],
   now: number = Date.now(),
 ): SplitAppointments {
-  const upcoming: AppointmentHistoryItem[] = []
-  const history: AppointmentHistoryItem[] = []
+  const upcoming: AppointmentWithDetails[] = []
+  const history: AppointmentWithDetails[] = []
 
   appointments.forEach((appointment) => {
     const isFuture = Date.parse(appointment.appointment_date) >= now
@@ -51,71 +39,8 @@ export function splitUpcomingAndHistory(
     }
   })
 
-  const byDate = (a: AppointmentHistoryItem, b: AppointmentHistoryItem) =>
+  const byDate = (a: AppointmentWithDetails, b: AppointmentWithDetails) =>
     Date.parse(a.appointment_date) - Date.parse(b.appointment_date)
 
   return { upcoming: upcoming.sort(byDate), history: history.sort((a, b) => byDate(b, a)) }
-}
-
-/** Cruza los turnos con el contacto del cliente y aplica los cambios hechos en la sesión. */
-export function buildAgendaRows(
-  appointments: AppointmentWithDetails[],
-  users: User[],
-  sessionPatches: ReadonlyMap<number, AppointmentPatch>,
-): AgendaRow[] {
-  const contacts = new Map<number, ClientContact>(
-    users.map((user) => [user.id, { email: user.email, phone: user.phone }]),
-  )
-
-  return appointments.map((appointment) => {
-    const patch = sessionPatches.get(appointment.id)
-    return {
-      appointment: patch ? { ...appointment, ...patch } : appointment,
-      contact: contacts.get(appointment.user_id) ?? null,
-    }
-  })
-}
-
-function normalize(text: string): string {
-  return text
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .trim()
-}
-
-/** Filtros de la agenda: fecha (en hora del studio), estado y búsqueda libre. */
-export function filterAgendaRows(rows: AgendaRow[], filters: AgendaFilters): AgendaRow[] {
-  const query = normalize(filters.search)
-  const digitsQuery = filters.search.replace(/\D/g, '')
-
-  return rows.filter(({ appointment, contact }) => {
-    if (filters.date && getStudioDateKey(appointment.appointment_date) !== filters.date) {
-      return false
-    }
-
-    if (filters.status !== 'all' && appointment.status !== filters.status) {
-      return false
-    }
-
-    if (!query) {
-      return true
-    }
-
-    const haystack = normalize(
-      [
-        `#${appointment.id}`,
-        appointment.user.full_name,
-        appointment.service.name,
-        contact?.email ?? '',
-        contact?.phone ?? '',
-      ].join(' '),
-    )
-    const phoneDigits = (contact?.phone ?? '').replace(/\D/g, '')
-
-    return (
-      haystack.includes(query) ||
-      (digitsQuery.length >= 3 && phoneDigits.includes(digitsQuery))
-    )
-  })
 }

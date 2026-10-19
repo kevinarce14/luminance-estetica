@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext.tsx'
+import { useAuth } from '../hooks/useAuth.ts'
 import type { TurneraLocationState } from '../types/navigation.ts'
 
 interface UseReserveServiceResult {

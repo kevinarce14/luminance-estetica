@@ -222,6 +222,13 @@
   margin-bottom: 20px;
 }
 
+.admin-filters__scope {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  gap: 10px;
+}
+
 .admin-filters__field {
   display: flex;
   flex-direction: column;

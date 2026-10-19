@@ -1,6 +1,6 @@
 import { Link, useSearchParams } from 'react-router-dom'
 import { Spinner } from '../components/common/Feedback.tsx'
-import { useAuth } from '../context/AuthContext.tsx'
+import { useAuth } from '../hooks/useAuth.ts'
 import { useAppointment } from '../hooks/useAppointment.ts'
 import { readMercadoPagoReturn } from '../utils/payments.ts'
 import { formatStudioLongDate, formatStudioTime } from '../utils/studioTime.ts'

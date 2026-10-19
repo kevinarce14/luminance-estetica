@@ -1,4 +1,4 @@
-import type { AppointmentStatus, AppointmentWithDetails } from './appointment.ts'
+import type { AppointmentStatus } from './appointment.ts'
 
 /** Respuesta de GET /admin/dashboard. */
 export interface DashboardMetrics {
@@ -25,33 +25,25 @@ export interface DashboardMetrics {
   }[]
 }
 
-/** Datos de contacto del cliente (cruzados desde GET /users/). */
-export interface ClientContact {
-  email: string
-  phone: string | null
-}
-
-/** Fila de la agenda del panel: turno + contacto del cliente si se pudo obtener. */
-export interface AgendaRow {
-  appointment: AppointmentWithDetails
-  contact: ClientContact | null
-}
-
-/** Cambio aplicado a un turno durante la sesión (sin volver a pedir la agenda). */
-export type AppointmentPatch = Partial<Pick<AppointmentWithDetails, 'status' | 'payment'>>
+/** Alcance temporal de la agenda: desde hoy en adelante o el historial completo. */
+export type AgendaScope = 'upcoming' | 'all'
 
 export type AgendaStatusFilter = AppointmentStatus | 'all'
 
 export interface AgendaFilters {
-  /** "YYYY-MM-DD" o '' para todas las fechas. */
+  scope: AgendaScope
+  /** "YYYY-MM-DD" o '' para no filtrar por un día puntual. */
   date: string
   status: AgendaStatusFilter
   search: string
 }
 
-/** Resultado de cargar la agenda combinando "hoy" + "próximos". */
-export interface AdminAgenda {
-  appointments: AppointmentWithDetails[]
-  /** Alguna de las fuentes falló (ej. bug de validación de fechas pasadas en /today). */
-  isPartial: boolean
+/** Query params de GET /admin/appointments. */
+export interface AdminAppointmentsQuery {
+  date?: string
+  date_from?: string
+  status?: AppointmentStatus
+  search?: string
+  order: 'asc' | 'desc'
+  limit: number
 }

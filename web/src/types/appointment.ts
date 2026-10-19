@@ -1,6 +1,6 @@
-import type { Payment, PaymentMethod, PaymentStatus } from './payment.ts'
+import type { Payment } from './payment.ts'
 import type { ServicePublic } from './service.ts'
-import type { UserPublic } from './user.ts'
+import type { UserContact, UserPublic } from './user.ts'
 
 export const AppointmentStatus = {
   PENDING: 'pending',
@@ -12,7 +12,7 @@ export const AppointmentStatus = {
 export type AppointmentStatus =
   (typeof AppointmentStatus)[keyof typeof AppointmentStatus]
 
-/** Turno / cita (schema AppointmentResponse). `appointment_date` llega en UTC con offset. */
+/** Turno / cita (schema AppointmentResponse). Las fechas llegan en UTC con offset. */
 export interface Appointment {
   id: number
   user_id: number
@@ -34,54 +34,24 @@ export interface AppointmentWithDetails extends Appointment {
   payment: Payment | null
 }
 
-/** Servicio dentro del historial (schema ServiceInHistory). */
-export interface ServiceInHistory {
-  id: number
-  name: string
-  description: string | null
-  duration_minutes: number
-  price: number
-  category: string
-  is_active: boolean
+/** Turno de la agenda admin: incluye contacto del cliente (schema AppointmentAdminView). */
+export interface AdminAppointment extends Appointment {
+  user: UserContact
+  service: ServicePublic
+  payment: Payment | null
 }
 
-/** Pago resumido dentro del historial (schema PaymentInHistory). */
-export interface PaymentInHistory {
-  id: number
-  amount: number
-  payment_method: PaymentMethod | null
-  status: PaymentStatus | null
-}
-
-/**
- * Turno del historial del cliente (GET /appointments/, schema AppointmentHistory).
- * El backend lo envía en UTC *sin* offset; `appointmentsApi` lo normaliza a ISO con "Z".
- */
-export interface AppointmentHistoryItem {
-  id: number
-  user_id: number
-  service_id: number
+/** Horario ocupado por un turno confirmado (GET /appointments/public/confirmed). */
+export interface PublicBookedSlot {
   appointment_date: string
-  status: AppointmentStatus
-  notes: string | null
-  reminder_sent: boolean
-  cancelled_at: string | null
-  cancellation_reason: string | null
-  created_at: string | null
-  service: ServiceInHistory | null
-  payment: PaymentInHistory | null
+  duration_minutes: number
 }
 
 /** Body de PUT /appointments/{id} para que un admin cambie el estado. */
 export interface AppointmentStatusUpdatePayload {
   status: AppointmentStatus
+  cancellation_reason?: string
 }
-
-/** Estados que un admin puede asignar desde el panel. */
-export type AdminStatusAction =
-  | typeof AppointmentStatus.CONFIRMED
-  | typeof AppointmentStatus.COMPLETED
-  | typeof AppointmentStatus.CANCELLED
 
 export interface AppointmentCreatePayload {
   service_id: number

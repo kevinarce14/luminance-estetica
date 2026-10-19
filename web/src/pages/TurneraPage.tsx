@@ -8,22 +8,21 @@ import { BookingStepper } from '../components/turnera/BookingStepper.tsx'
 import { BookingSummary } from '../components/turnera/BookingSummary.tsx'
 import { ServiceSelector } from '../components/turnera/ServiceSelector.tsx'
 import { TimeSlotPicker } from '../components/turnera/TimeSlotPicker.tsx'
-import { DEFAULT_APPOINTMENT_DURATION_MINUTES } from '../constants/booking.ts'
-import { useAuth } from '../context/AuthContext.tsx'
+import { useAuth } from '../hooks/useAuth.ts'
 import { useAsyncResource } from '../hooks/useAsyncResource.ts'
 import { useAvailableSlots } from '../hooks/useAvailableSlots.ts'
 import {
   createAppointment,
-  getConfirmedAppointments,
+  getBookedSlots,
 } from '../services/appointmentsApi.ts'
 import { createCashPayment } from '../services/paymentsApi.ts'
 import { getActiveServices } from '../services/servicesApi.ts'
 import { isApiError } from '../types/api.ts'
-import type { AppointmentWithDetails } from '../types/appointment.ts'
+import type { PublicBookedSlot } from '../types/appointment.ts'
 import type { AdminBookingResult, BookingStep } from '../types/booking.ts'
 import type { TurneraLocationState } from '../types/navigation.ts'
 import type { Service } from '../types/service.ts'
-import { countAppointmentsByDay } from '../utils/availability.ts'
+import { countBookedSlotsByDay } from '../utils/availability.ts'
 import { formatStudioLongDate, toStudioIsoDateTime } from '../utils/studioTime.ts'
 import './TurneraPage.css'
 
@@ -32,7 +31,7 @@ const SCROLL_DELAY_MS = 100
 const MAX_NOTES_LENGTH = 1000
 // Referencias estables para no recalcular derivados mientras no hay datos.
 const EMPTY_SERVICES: Service[] = []
-const EMPTY_APPOINTMENTS: AppointmentWithDetails[] = []
+const EMPTY_BOOKED_SLOTS: PublicBookedSlot[] = []
 
 function scrollToSection(element: HTMLElement | null): void {
   window.setTimeout(() => {
@@ -55,15 +54,12 @@ export function TurneraPage() {
   const servicesResource = useAsyncResource('services', getActiveServices)
   const services = servicesResource.data ?? EMPTY_SERVICES
 
-  // ===== Turnos confirmados (calendario + doble chequeo; si falla se sigue sin ellos) =====
-  const confirmedResource = useAsyncResource('confirmed-appointments', getConfirmedAppointments)
-  const confirmedAppointments = confirmedResource.data ?? EMPTY_APPOINTMENTS
-  const refreshConfirmed = confirmedResource.retry
+  // ===== Horarios ocupados (marcas del calendario) =====
+  const bookedResource = useAsyncResource('booked-slots', getBookedSlots)
+  const bookedSlots = bookedResource.data ?? EMPTY_BOOKED_SLOTS
+  const refreshBooked = bookedResource.retry
 
-  const busyDays = useMemo(
-    () => countAppointmentsByDay(confirmedAppointments),
-    [confirmedAppointments],
-  )
+  const busyDays = useMemo(() => countBookedSlotsByDay(bookedSlots), [bookedSlots])
 
   // ===== Selección del usuario =====
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
@@ -77,12 +73,7 @@ export function TurneraPage() {
   const isPreselected =
     preselectedServiceId !== null && selectedService?.id === preselectedServiceId
 
-  const availability = useAvailableSlots({
-    serviceId: selectedService?.id ?? null,
-    date: selectedDate,
-    durationMinutes: selectedService?.duration_minutes ?? DEFAULT_APPOINTMENT_DURATION_MINUTES,
-    confirmedAppointments,
-  })
+  const availability = useAvailableSlots(selectedService?.id ?? null, selectedDate)
 
   // Si el horario elegido deja de estar disponible (ej. al refrescar), se descarta.
   const slotIsStillAvailable = availability.slots.some(
@@ -155,7 +146,7 @@ export function TurneraPage() {
       setIsSubmitting(false)
       // El horario pudo ocuparse mientras tanto: se refresca la disponibilidad.
       availability.retry()
-      refreshConfirmed()
+      refreshBooked()
       return
     }
 
@@ -182,7 +173,7 @@ export function TurneraPage() {
       paymentConfirmed,
     })
     setIsSubmitting(false)
-    refreshConfirmed()
+    refreshBooked()
     scrollToSection(summarySectionRef.current)
   }
 

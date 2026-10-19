@@ -2,7 +2,7 @@ import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AuthCard } from '../components/auth/AuthCard.tsx'
 import { AuthField } from '../components/auth/AuthField.tsx'
-import { useAuth } from '../context/AuthContext.tsx'
+import { useAuth } from '../hooks/useAuth.ts'
 import type {
   FieldErrors,
   RegisterFormValues,

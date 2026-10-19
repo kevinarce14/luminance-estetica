@@ -71,7 +71,7 @@ class Settings(BaseSettings):
     BACKEND_URL: str = "http://localhost:8000"
     
     # ========== CORS ==========
-    CORS_ORIGINS: str = "https://luminance-estetica.vercel.app,http://localhost:5000"
+    CORS_ORIGINS: str = "https://luminance-estetica.vercel.app,http://localhost:5000,http://localhost:5173"
     
     @property
     def cors_origins_list(self) -> List[str]:

@@ -1,5 +1,6 @@
+import { DEFAULT_AGENDA_FILTERS } from '../../constants/admin.ts'
 import { AppointmentStatus } from '../../types/appointment.ts'
-import type { AgendaFilters, AgendaStatusFilter } from '../../types/admin.ts'
+import type { AgendaFilters, AgendaScope, AgendaStatusFilter } from '../../types/admin.ts'
 import { APPOINTMENT_STATUS_LABELS } from '../../utils/payments.ts'
 import { getStudioToday } from '../../utils/studioTime.ts'
 
@@ -11,13 +12,18 @@ const STATUS_OPTIONS: { value: AgendaStatusFilter; label: string }[] = [
   })),
 ]
 
+const SCOPE_OPTIONS: { value: AgendaScope; label: string }[] = [
+  { value: 'upcoming', label: 'Próximos' },
+  { value: 'all', label: 'Historial completo' },
+]
+
 function isStatusFilter(value: string): value is AgendaStatusFilter {
   return STATUS_OPTIONS.some((option) => option.value === value)
 }
 
 interface AgendaFiltersBarProps {
   filters: AgendaFilters
-  resultCount: number
+  resultCount: number | null
   onChange: (filters: AgendaFilters) => void
 }
 
@@ -27,6 +33,23 @@ export function AgendaFiltersBar({ filters, resultCount, onChange }: AgendaFilte
 
   return (
     <div className="admin-filters">
+      <div className="admin-filters__scope" role="radiogroup" aria-label="Alcance de la agenda">
+        {SCOPE_OPTIONS.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            role="radio"
+            aria-checked={filters.scope === option.value}
+            className={
+              filters.scope === option.value ? 'admin-chip admin-chip--active' : 'admin-chip'
+            }
+            onClick={() => update({ scope: option.value })}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+
       <div className="admin-filters__field admin-filters__field--search">
         <label htmlFor="agenda-search">Buscar cliente</label>
         <div className="admin-filters__search">
@@ -35,6 +58,7 @@ export function AgendaFiltersBar({ filters, resultCount, onChange }: AgendaFilte
             id="agenda-search"
             type="search"
             value={filters.search}
+            maxLength={100}
             placeholder="Nombre, email, teléfono, servicio o #ID"
             onChange={(event) => update({ search: event.target.value })}
           />
@@ -82,13 +106,15 @@ export function AgendaFiltersBar({ filters, resultCount, onChange }: AgendaFilte
         <button
           type="button"
           className="admin-chip"
-          onClick={() => onChange({ date: '', status: 'all', search: '' })}
+          onClick={() => onChange(DEFAULT_AGENDA_FILTERS)}
         >
           Limpiar filtros
         </button>
-        <span className="admin-filters__count" aria-live="polite">
-          {resultCount} {resultCount === 1 ? 'turno' : 'turnos'}
-        </span>
+        {resultCount !== null ? (
+          <span className="admin-filters__count" aria-live="polite">
+            {resultCount} {resultCount === 1 ? 'turno' : 'turnos'}
+          </span>
+        ) : null}
       </div>
     </div>
   )

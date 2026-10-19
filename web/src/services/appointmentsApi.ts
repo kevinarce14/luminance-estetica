@@ -1,12 +1,11 @@
 import type {
   Appointment,
   AppointmentCreatePayload,
-  AppointmentHistoryItem,
   AppointmentStatus,
   AppointmentStatusUpdatePayload,
   AppointmentWithDetails,
+  PublicBookedSlot,
 } from '../types/appointment.ts'
-import { toUtcIsoDateTime } from '../utils/studioTime.ts'
 import { apiRequest } from './apiClient.ts'
 
 /** POST /appointments/ — crea el turno en estado "pending". */
@@ -20,13 +19,8 @@ export function createAppointment(
 }
 
 /** GET /appointments/ — turnos del usuario autenticado (incluye completados y cancelados). */
-export async function getMyAppointments(): Promise<AppointmentHistoryItem[]> {
-  const appointments = await apiRequest<AppointmentHistoryItem[]>('/appointments/')
-  // AppointmentHistory serializa la fecha UTC sin offset.
-  return appointments.map((appointment) => ({
-    ...appointment,
-    appointment_date: toUtcIsoDateTime(appointment.appointment_date),
-  }))
+export function getMyAppointments(): Promise<AppointmentWithDetails[]> {
+  return apiRequest<AppointmentWithDetails[]>('/appointments/')
 }
 
 /** GET /appointments/{id} — solo el dueño o un admin. */
@@ -34,9 +28,9 @@ export function getAppointment(appointmentId: number): Promise<AppointmentWithDe
   return apiRequest<AppointmentWithDetails>(`/appointments/${appointmentId}`)
 }
 
-/** GET /appointments/public/confirmed — turnos confirmados (público, para el calendario). */
-export function getConfirmedAppointments(): Promise<AppointmentWithDetails[]> {
-  return apiRequest<AppointmentWithDetails[]>('/appointments/public/confirmed')
+/** GET /appointments/public/confirmed — horarios ocupados desde hoy (público, sin datos de clientes). */
+export function getBookedSlots(): Promise<PublicBookedSlot[]> {
+  return apiRequest<PublicBookedSlot[]>('/appointments/public/confirmed')
 }
 
 /** POST /appointments/{id}/cancel — el backend exige un motivo de 5 a 500 caracteres. */
@@ -50,7 +44,7 @@ export function cancelAppointment(
   })
 }
 
-/** PUT /appointments/{id} — solo admin puede cambiar el estado. */
+/** PUT /appointments/{id} — solo admin puede cambiar el estado (transiciones validadas en el backend). */
 export function updateAppointmentStatus(
   appointmentId: number,
   status: AppointmentStatus,

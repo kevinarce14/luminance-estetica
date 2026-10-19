@@ -28,6 +28,8 @@ import { formatStudioLongDate, toStudioIsoDateTime } from '../utils/studioTime.t
 import './TurneraPage.css'
 
 const SCROLL_DELAY_MS = 100
+/** `notes` de AppointmentCreate: max_length=1000. */
+const MAX_NOTES_LENGTH = 1000
 // Referencias estables para no recalcular derivados mientras no hay datos.
 const EMPTY_SERVICES: Service[] = []
 const EMPTY_APPOINTMENTS: AppointmentWithDetails[] = []
@@ -95,6 +97,8 @@ export function TurneraPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [adminResult, setAdminResult] = useState<AdminBookingResult | null>(null)
+  // Turnos presenciales: el backend crea el turno a nombre del admin, el cliente va en notas.
+  const [adminNotes, setAdminNotes] = useState('')
 
   const handleSelectDate = (date: string) => {
     setSelectedDate(date)
@@ -122,6 +126,7 @@ export function TurneraPage() {
     setSelectedSlot(null)
     setSubmitError(null)
     setAdminResult(null)
+    setAdminNotes('')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
@@ -138,6 +143,7 @@ export function TurneraPage() {
       const appointment = await createAppointment({
         service_id: selectedService.id,
         appointment_date: toStudioIsoDateTime(activeSlot),
+        ...(isAdmin && adminNotes.trim() ? { notes: adminNotes.trim() } : {}),
       })
       appointmentId = appointment.id
     } catch (error) {
@@ -279,6 +285,26 @@ export function TurneraPage() {
                 &quot;Pendiente de Pago&quot;. Deberás completar el pago para que tu turno quede
                 confirmado.
               </MessageBox>
+
+              {isAdmin ? (
+                <div className="turnera-admin-notes">
+                  <label htmlFor="turnera-admin-notes">
+                    <i className="fas fa-user-edit" aria-hidden="true" /> Turno presencial: cliente
+                    y notas (opcional)
+                  </label>
+                  <textarea
+                    id="turnera-admin-notes"
+                    value={adminNotes}
+                    maxLength={MAX_NOTES_LENGTH}
+                    placeholder="Ej: María Pérez — 11 5555-1234"
+                    onChange={(event) => setAdminNotes(event.target.value)}
+                  />
+                  <small>
+                    El turno queda registrado a tu nombre con pago en efectivo; estas notas se ven
+                    en la agenda del panel.
+                  </small>
+                </div>
+              ) : null}
 
               {submitError ? <MessageBox variant="error">{submitError}</MessageBox> : null}
 

@@ -1,0 +1,329 @@
+/* Estilos migrados de frontend/mis-turnos.html. */
+
+.mis-turnos-page {
+  min-height: 100%;
+  padding: 40px 0 80px;
+  background: linear-gradient(135deg, var(--rosa-claro) 0%, var(--lila-claro) 100%);
+}
+
+.mis-turnos-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.mis-turnos-header {
+  margin-bottom: 30px;
+  padding: 30px;
+  border-radius: var(--border-radius);
+  background: var(--blanco);
+  box-shadow: var(--sombra);
+  text-align: center;
+}
+
+.mis-turnos-header h1 {
+  margin: 0 0 10px;
+  font-family: var(--serif);
+  font-size: 2.5rem;
+  line-height: 1.2;
+  color: var(--violeta);
+}
+
+.mis-turnos-header h1 i {
+  margin-right: 10px;
+  color: var(--rosa-medio);
+}
+
+.mis-turnos-header p {
+  margin: 0;
+  color: var(--texto-medio);
+}
+
+/* ===== PESTAÑAS ===== */
+.mis-turnos-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 30px;
+  padding: 20px;
+  border-radius: var(--border-radius);
+  background: var(--blanco);
+  box-shadow: var(--sombra);
+}
+
+.mis-turnos-tab {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 150px;
+  padding: 15px 25px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: var(--gris-claro);
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--texto-medio);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mis-turnos-tab:hover {
+  background: var(--gris-medio);
+  transform: translateY(-2px);
+}
+
+.mis-turnos-tab--active,
+.mis-turnos-tab--active:hover {
+  background: linear-gradient(135deg, var(--rosa-medio), var(--lila-medio));
+  color: var(--blanco);
+}
+
+.mis-turnos-tab__count {
+  min-width: 24px;
+  padding: 1px 8px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 0.85rem;
+}
+
+.mis-turnos-tab--active .mis-turnos-tab__count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ===== TARJETAS ===== */
+.turnos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+}
+
+.turno-card {
+  position: relative;
+  overflow: hidden;
+  padding: 30px;
+  border-radius: var(--border-radius);
+  background: var(--blanco);
+  box-shadow: var(--sombra);
+  transition: all 0.3s ease;
+}
+
+.turno-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(135deg, var(--rosa-medio), var(--lila-medio));
+}
+
+.turno-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--sombra-hover);
+}
+
+.turno-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.turno-card__header h3 {
+  margin: 0 0 5px;
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: var(--violeta);
+}
+
+.turno-card__category {
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  color: var(--texto-medio);
+}
+
+.turno-card__details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin: 0 0 20px;
+  padding: 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--rosa-claro), var(--lila-claro));
+}
+
+.turno-card__details > div {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'icon label'
+    'icon value';
+  align-items: center;
+  column-gap: 10px;
+}
+
+.turno-card__details i {
+  grid-area: icon;
+  font-size: 1.3rem;
+  color: var(--rosa-medio);
+}
+
+.turno-card__details dt {
+  grid-area: label;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--texto-medio);
+}
+
+.turno-card__details dd {
+  grid-area: value;
+  margin: 0;
+  font-weight: 600;
+  color: var(--texto-oscuro);
+}
+
+.turno-card__details .turno-card__payment {
+  grid-column: 1 / -1;
+}
+
+.turno-card__notes {
+  margin: 0 0 20px;
+  padding: 15px;
+  border-radius: 8px;
+  background: var(--gris-claro);
+  font-size: 0.95rem;
+  color: var(--texto-medio);
+}
+
+.turno-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.turno-btn {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 120px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--blanco);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.turno-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sombra);
+}
+
+.turno-btn--primary {
+  background: linear-gradient(135deg, var(--rosa-medio), var(--rosa-fuerte));
+}
+
+.turno-btn--warning {
+  background: #fd7e14;
+}
+
+.turno-btn--danger {
+  background: #dc3545;
+}
+
+.turno-link-button {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ===== ESTADO VACÍO ===== */
+.turnos-empty {
+  padding: 60px 20px;
+  border-radius: var(--border-radius);
+  background: var(--blanco);
+  box-shadow: var(--sombra);
+  text-align: center;
+}
+
+.turnos-empty > i {
+  margin-bottom: 20px;
+  font-size: 4rem;
+  color: var(--lila-medio);
+}
+
+.turnos-empty h2 {
+  margin: 0 0 10px;
+  font-family: var(--serif);
+  color: var(--violeta);
+}
+
+.turnos-empty p {
+  margin: 0 0 25px;
+  color: var(--texto-medio);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .mis-turnos-page {
+    padding: 25px 0 60px;
+  }
+
+  .mis-turnos-container {
+    width: 100%;
+    padding: 0 15px;
+  }
+
+  .mis-turnos-header {
+    padding: 20px;
+  }
+
+  .mis-turnos-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .mis-turnos-tabs {
+    padding: 12px;
+  }
+
+  .mis-turnos-tab {
+    min-width: 0;
+    padding: 12px;
+  }
+
+  .turnos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .turno-card {
+    padding: 20px;
+  }
+
+  .turno-card__header {
+    flex-direction: column;
+  }
+
+  .turno-card__details {
+    grid-template-columns: 1fr;
+  }
+
+  .turno-card__actions {
+    flex-direction: column;
+  }
+}

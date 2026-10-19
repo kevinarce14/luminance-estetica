@@ -94,6 +94,11 @@ export function toStudioIsoDateTime(dateTime: string): string {
     : `${dateTime}${STUDIO_UTC_OFFSET}`
 }
 
+/** Para fuentes que envían UTC sin offset (ej. AppointmentHistory): agrega "Z". */
+export function toUtcIsoDateTime(dateTime: string): string {
+  return HAS_OFFSET_PATTERN.test(dateTime) ? dateTime : `${dateTime}Z`
+}
+
 export function parseStudioDateTime(dateTime: string): Date {
   return new Date(toStudioIsoDateTime(dateTime))
 }

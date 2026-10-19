@@ -443,6 +443,39 @@
   color: var(--texto-medio);
 }
 
+.turnera-admin-notes {
+  margin-bottom: 20px;
+}
+
+.turnera-admin-notes label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--violeta);
+}
+
+.turnera-admin-notes textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px 15px;
+  border: 2px solid var(--gris-medio);
+  border-radius: 10px;
+  font-family: var(--sans);
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.turnera-admin-notes textarea:focus {
+  outline: none;
+  border-color: var(--lila-medio);
+}
+
+.turnera-admin-notes small {
+  display: block;
+  margin-top: 6px;
+  color: var(--texto-medio);
+}
+
 .turnera-confirm {
   display: flex;
   align-items: center;

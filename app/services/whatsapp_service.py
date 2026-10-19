@@ -8,6 +8,7 @@ from typing import Optional
 from datetime import datetime
 
 from app.core.config import settings
+from app.core.time_utils import to_studio_time
 
 
 class WhatsAppService:
@@ -106,8 +107,8 @@ class WhatsAppService:
         """
         Envía confirmación de turno por WhatsApp.
         """
-        date_str = appointment_date.strftime("%d/%m/%Y")
-        time_str = appointment_date.strftime("%H:%M")
+        date_str = to_studio_time(appointment_date).strftime("%d/%m/%Y")
+        time_str = to_studio_time(appointment_date).strftime("%H:%M")
 
         message = f"""
 ✨ *Luminance Studio by Cande* ✨
@@ -139,7 +140,7 @@ Si necesitas cancelar o reprogramar, avísanos con 24hs de anticipación.
         """
         Envía recordatorio de turno por WhatsApp (24h antes).
         """
-        time_str = appointment_date.strftime("%H:%M")
+        time_str = to_studio_time(appointment_date).strftime("%H:%M")
 
         message = f"""
 🔔 *Recordatorio de Turno* 🔔

@@ -21,9 +21,15 @@ interface UseAsyncResourceResult<T> {
  * El estado "loading" se deriva comparando la petición en curso con la del último
  * resultado, sin setState sincrónico dentro del efecto. Ignora respuestas viejas.
  */
+interface UseAsyncResourceOptions {
+  /** Mantener el último dato también cuando cambia la `key` (ej. filtros de una tabla). */
+  keepPreviousData?: boolean
+}
+
 export function useAsyncResource<T>(
   key: string | null,
   load: () => Promise<T>,
+  { keepPreviousData = false }: UseAsyncResourceOptions = {},
 ): UseAsyncResourceResult<T> {
   const [attempt, setAttempt] = useState(0)
   const [result, setResult] = useState<ResourceResult<T> | null>(null)
@@ -60,7 +66,7 @@ export function useAsyncResource<T>(
   }
 
   if (result?.requestKey !== requestKey) {
-    const staleData = result?.key === key ? result.data : null
+    const staleData = keepPreviousData || result?.key === key ? (result?.data ?? null) : null
     return { status: 'loading', data: staleData, error: null, retry }
   }
 

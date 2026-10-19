@@ -8,29 +8,30 @@ import { BookingStepper } from '../components/turnera/BookingStepper.tsx'
 import { BookingSummary } from '../components/turnera/BookingSummary.tsx'
 import { ServiceSelector } from '../components/turnera/ServiceSelector.tsx'
 import { TimeSlotPicker } from '../components/turnera/TimeSlotPicker.tsx'
-import { DEFAULT_APPOINTMENT_DURATION_MINUTES } from '../constants/booking.ts'
-import { useAuth } from '../context/AuthContext.tsx'
+import { useAuth } from '../hooks/useAuth.ts'
 import { useAsyncResource } from '../hooks/useAsyncResource.ts'
 import { useAvailableSlots } from '../hooks/useAvailableSlots.ts'
 import {
   createAppointment,
-  getConfirmedAppointments,
+  getBookedSlots,
 } from '../services/appointmentsApi.ts'
 import { createCashPayment } from '../services/paymentsApi.ts'
 import { getActiveServices } from '../services/servicesApi.ts'
 import { isApiError } from '../types/api.ts'
-import type { AppointmentWithDetails } from '../types/appointment.ts'
+import type { PublicBookedSlot } from '../types/appointment.ts'
 import type { AdminBookingResult, BookingStep } from '../types/booking.ts'
 import type { TurneraLocationState } from '../types/navigation.ts'
 import type { Service } from '../types/service.ts'
-import { countAppointmentsByDay } from '../utils/availability.ts'
+import { countBookedSlotsByDay } from '../utils/availability.ts'
 import { formatStudioLongDate, toStudioIsoDateTime } from '../utils/studioTime.ts'
 import './TurneraPage.css'
 
 const SCROLL_DELAY_MS = 100
+/** `notes` de AppointmentCreate: max_length=1000. */
+const MAX_NOTES_LENGTH = 1000
 // Referencias estables para no recalcular derivados mientras no hay datos.
 const EMPTY_SERVICES: Service[] = []
-const EMPTY_APPOINTMENTS: AppointmentWithDetails[] = []
+const EMPTY_BOOKED_SLOTS: PublicBookedSlot[] = []
 
 function scrollToSection(element: HTMLElement | null): void {
   window.setTimeout(() => {
@@ -53,15 +54,12 @@ export function TurneraPage() {
   const servicesResource = useAsyncResource('services', getActiveServices)
   const services = servicesResource.data ?? EMPTY_SERVICES
 
-  // ===== Turnos confirmados (calendario + doble chequeo; si falla se sigue sin ellos) =====
-  const confirmedResource = useAsyncResource('confirmed-appointments', getConfirmedAppointments)
-  const confirmedAppointments = confirmedResource.data ?? EMPTY_APPOINTMENTS
-  const refreshConfirmed = confirmedResource.retry
+  // ===== Horarios ocupados (marcas del calendario) =====
+  const bookedResource = useAsyncResource('booked-slots', getBookedSlots)
+  const bookedSlots = bookedResource.data ?? EMPTY_BOOKED_SLOTS
+  const refreshBooked = bookedResource.retry
 
-  const busyDays = useMemo(
-    () => countAppointmentsByDay(confirmedAppointments),
-    [confirmedAppointments],
-  )
+  const busyDays = useMemo(() => countBookedSlotsByDay(bookedSlots), [bookedSlots])
 
   // ===== Selección del usuario =====
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
@@ -75,12 +73,7 @@ export function TurneraPage() {
   const isPreselected =
     preselectedServiceId !== null && selectedService?.id === preselectedServiceId
 
-  const availability = useAvailableSlots({
-    serviceId: selectedService?.id ?? null,
-    date: selectedDate,
-    durationMinutes: selectedService?.duration_minutes ?? DEFAULT_APPOINTMENT_DURATION_MINUTES,
-    confirmedAppointments,
-  })
+  const availability = useAvailableSlots(selectedService?.id ?? null, selectedDate)
 
   // Si el horario elegido deja de estar disponible (ej. al refrescar), se descarta.
   const slotIsStillAvailable = availability.slots.some(
@@ -95,6 +88,8 @@ export function TurneraPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [adminResult, setAdminResult] = useState<AdminBookingResult | null>(null)
+  // Turnos presenciales: el backend crea el turno a nombre del admin, el cliente va en notas.
+  const [adminNotes, setAdminNotes] = useState('')
 
   const handleSelectDate = (date: string) => {
     setSelectedDate(date)
@@ -122,6 +117,7 @@ export function TurneraPage() {
     setSelectedSlot(null)
     setSubmitError(null)
     setAdminResult(null)
+    setAdminNotes('')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
@@ -138,6 +134,7 @@ export function TurneraPage() {
       const appointment = await createAppointment({
         service_id: selectedService.id,
         appointment_date: toStudioIsoDateTime(activeSlot),
+        ...(isAdmin && adminNotes.trim() ? { notes: adminNotes.trim() } : {}),
       })
       appointmentId = appointment.id
     } catch (error) {
@@ -149,7 +146,7 @@ export function TurneraPage() {
       setIsSubmitting(false)
       // El horario pudo ocuparse mientras tanto: se refresca la disponibilidad.
       availability.retry()
-      refreshConfirmed()
+      refreshBooked()
       return
     }
 
@@ -176,7 +173,7 @@ export function TurneraPage() {
       paymentConfirmed,
     })
     setIsSubmitting(false)
-    refreshConfirmed()
+    refreshBooked()
     scrollToSection(summarySectionRef.current)
   }
 
@@ -279,6 +276,26 @@ export function TurneraPage() {
                 &quot;Pendiente de Pago&quot;. Deberás completar el pago para que tu turno quede
                 confirmado.
               </MessageBox>
+
+              {isAdmin ? (
+                <div className="turnera-admin-notes">
+                  <label htmlFor="turnera-admin-notes">
+                    <i className="fas fa-user-edit" aria-hidden="true" /> Turno presencial: cliente
+                    y notas (opcional)
+                  </label>
+                  <textarea
+                    id="turnera-admin-notes"
+                    value={adminNotes}
+                    maxLength={MAX_NOTES_LENGTH}
+                    placeholder="Ej: María Pérez — 11 5555-1234"
+                    onChange={(event) => setAdminNotes(event.target.value)}
+                  />
+                  <small>
+                    El turno queda registrado a tu nombre con pago en efectivo; estas notas se ven
+                    en la agenda del panel.
+                  </small>
+                </div>
+              ) : null}
 
               {submitError ? <MessageBox variant="error">{submitError}</MessageBox> : null}
 

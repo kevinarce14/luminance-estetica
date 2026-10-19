@@ -20,51 +20,19 @@ from app.schemas.appointment import (
     AppointmentUpdate,
     AppointmentResponse,
     AppointmentWithDetails,
-    AppointmentCancel
+    AppointmentCancel,
+    PublicBookedSlot,
 )
 from app.services.email_service import email_service
-from pydantic import BaseModel
-from typing import Optional, Any
-from decimal import Decimal
-
-# ✅ Schema del servicio para serializar dentro del historial
-class ServiceInHistory(BaseModel):
-    model_config = {"from_attributes": True}
-    id: int
-    name: str
-    description: Optional[str] = None
-    duration_minutes: int
-    price: float
-    category: str
-    is_active: bool = True
-
-# ✅ Schema del pago para serializar dentro del historial
-class PaymentInHistory(BaseModel):
-    model_config = {"from_attributes": True}
-    id: int
-    amount: float
-    payment_method: Optional[str] = None
-    status: Any = None
-
-# ✅ Schema para historial que NO valida fecha futura
-# AppointmentWithDetails rechaza fechas pasadas al serializar,
-# por eso usamos este schema propio para el endpoint GET /
-class AppointmentHistory(BaseModel):
-    model_config = {"from_attributes": True}
-    id: int
-    user_id: int
-    service_id: int
-    appointment_date: datetime
-    status: Any
-    notes: Optional[str] = None
-    reminder_sent: bool = False
-    cancelled_at: Optional[datetime] = None
-    cancellation_reason: Optional[str] = None
-    created_at: Optional[datetime] = None
-    service: Optional[ServiceInHistory] = None
-    payment: Optional[PaymentInHistory] = None
+from app.core.time_utils import studio_day_start_utc, studio_today, utc_now_naive
 
 router = APIRouter(prefix="/appointments", tags=["Turnos/Citas"])
+
+# Transiciones de estado que un admin puede aplicar vía PUT /appointments/{id}
+ALLOWED_STATUS_TRANSITIONS = {
+    AppointmentStatus.PENDING: {AppointmentStatus.CONFIRMED, AppointmentStatus.CANCELLED},
+    AppointmentStatus.CONFIRMED: {AppointmentStatus.COMPLETED, AppointmentStatus.CANCELLED},
+}
 
 
 def check_slot_availability(
@@ -231,7 +199,7 @@ def create_appointment(
     return db_appointment
 
 
-@router.get("/", response_model=List[AppointmentHistory])
+@router.get("/", response_model=List[AppointmentWithDetails])
 def list_my_appointments(
     skip: int = 0,
     limit: int = 100,
@@ -249,9 +217,6 @@ def list_my_appointments(
     
     Requiere autenticación.
     """
-    # ✅ Crear fecha actual naive para comparar con BD
-    now_naive = datetime.now(timezone.utc).replace(tzinfo=None)
-    
     query = db.query(Appointment).filter(
         Appointment.user_id == current_user.id
         # Sin filtro de fecha → muestra completados y cancelados también
@@ -309,10 +274,13 @@ def update_appointment(
     db: Session = Depends(get_db)
 ):
     """
-    Actualizar un turno (cambiar fecha/hora o notas).
-    
+    Actualizar un turno (cambiar fecha/hora, notas o estado).
+
     Solo se puede modificar si está en estado PENDING o CONFIRMED.
-    
+    Solo un admin puede cambiar el estado, respetando las transiciones válidas:
+    - PENDING → CONFIRMED | CANCELLED
+    - CONFIRMED → COMPLETED | CANCELLED
+
     Requiere autenticación.
     """
     appointment = db.query(Appointment).filter(Appointment.id == appointment_id).first()
@@ -336,7 +304,21 @@ def update_appointment(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No se puede modificar un turno que está completado o cancelado"
         )
-    
+
+    # Validar el cambio de estado antes de tocar nada
+    new_status = appointment_data.status
+    if new_status is not None and new_status != appointment.status:
+        if not current_user.is_admin:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Solo un administrador puede cambiar el estado del turno"
+            )
+        if new_status not in ALLOWED_STATUS_TRANSITIONS.get(appointment.status, set()):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"No se puede pasar un turno de '{appointment.status.value}' a '{new_status.value}'"
+            )
+
     # Guardar fecha anterior ANTES de actualizar (para email de reprogramación)
     old_date = appointment.appointment_date
 
@@ -367,10 +349,14 @@ def update_appointment(
     if appointment_data.notes is not None:
         appointment.notes = appointment_data.notes
     
-    if appointment_data.status and current_user.is_admin:
-        # Solo admin puede cambiar el estado directamente
-        appointment.status = appointment_data.status
-    
+    if new_status is not None and new_status != appointment.status:
+        appointment.status = new_status
+        if new_status == AppointmentStatus.CANCELLED:
+            appointment.cancelled_at = utc_now_naive()
+            appointment.cancellation_reason = (
+                appointment_data.cancellation_reason or "Cancelado por el administrador"
+            )
+
     db.commit()
     db.refresh(appointment)
     
@@ -432,7 +418,7 @@ def cancel_appointment(
     
     # Cancelar
     appointment.status = AppointmentStatus.CANCELLED
-    appointment.cancelled_at = datetime.now(timezone.utc).replace(tzinfo=None)  # ✅ Naive
+    appointment.cancelled_at = utc_now_naive()
     appointment.cancellation_reason = cancel_data.cancellation_reason
     
     db.commit()
@@ -489,18 +475,30 @@ def delete_appointment(
     return None
 
 
-@router.get("/public/confirmed", response_model=List[AppointmentWithDetails])
+@router.get("/public/confirmed", response_model=List[PublicBookedSlot])
 def list_confirmed_appointments_public(
     db: Session = Depends(get_db)
 ):
     """
-    Listar turnos confirmados (público, sin auth).
-    Para mostrar disponibilidad en calendario.
+    Horarios ocupados por turnos confirmados desde hoy (público, sin auth).
+    Para marcar disponibilidad en el calendario de la turnera.
+
+    Solo expone fecha y duración: no incluye datos de clientes.
     """
     appointments = (
         db.query(Appointment)
-        .filter(Appointment.status == AppointmentStatus.CONFIRMED)
+        .join(Service, Appointment.service_id == Service.id)
+        .filter(
+            Appointment.status == AppointmentStatus.CONFIRMED,
+            Appointment.appointment_date >= studio_day_start_utc(studio_today()),
+        )
         .order_by(Appointment.appointment_date)
         .all()
     )
-    return appointments
+    return [
+        PublicBookedSlot(
+            appointment_date=appointment.appointment_date,
+            duration_minutes=appointment.service.duration_minutes,
+        )
+        for appointment in appointments
+    ]

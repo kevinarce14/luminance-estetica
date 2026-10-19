@@ -1,7 +1,5 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -25,21 +23,7 @@ import type {
   LoginCredentials,
   RegisterPayload,
 } from '../types/auth.ts'
-import type { User } from '../types/user.ts'
-
-interface AuthContextValue {
-  user: User | null
-  token: string | null
-  isAuthenticated: boolean
-  isAdmin: boolean
-  /** Autentica, obtiene `/users/me` y persiste la sesión. Lanza `ApiError` si falla. */
-  login: (credentials: LoginCredentials) => Promise<User>
-  /** Crea la cuenta (no inicia sesión: RegisterPage hace el auto-login). Lanza `ApiError` si falla. */
-  register: (payload: RegisterPayload) => Promise<User>
-  logout: () => void
-}
-
-const AuthContext = createContext<AuthContextValue | null>(null)
+import { AuthContext, type AuthContextValue } from './authContextValue.ts'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthSession | null>(() =>
@@ -99,12 +83,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
-export function useAuth(): AuthContextValue {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth debe usarse dentro de AuthProvider')
-  }
-  return context
 }

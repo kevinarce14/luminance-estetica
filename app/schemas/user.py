@@ -100,6 +100,18 @@ class UserPublic(BaseModel):
     """
     id: int
     full_name: str
-    
+
+    class Config:
+        from_attributes = True
+
+
+class UserContact(UserPublic):
+    """
+    Usuario con datos de contacto. Solo para respuestas de administración
+    (agenda del panel admin).
+    """
+    email: str
+    phone: Optional[str] = None
+
     class Config:
         from_attributes = True

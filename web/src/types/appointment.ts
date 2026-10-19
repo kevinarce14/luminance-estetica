@@ -1,6 +1,6 @@
 import type { Payment } from './payment.ts'
 import type { ServicePublic } from './service.ts'
-import type { UserPublic } from './user.ts'
+import type { UserContact, UserPublic } from './user.ts'
 
 export const AppointmentStatus = {
   PENDING: 'pending',
@@ -12,7 +12,7 @@ export const AppointmentStatus = {
 export type AppointmentStatus =
   (typeof AppointmentStatus)[keyof typeof AppointmentStatus]
 
-/** Turno / cita (schema AppointmentResponse). `appointment_date` llega en UTC con offset. */
+/** Turno / cita (schema AppointmentResponse). Las fechas llegan en UTC con offset. */
 export interface Appointment {
   id: number
   user_id: number
@@ -32,6 +32,25 @@ export interface AppointmentWithDetails extends Appointment {
   user: UserPublic
   service: ServicePublic
   payment: Payment | null
+}
+
+/** Turno de la agenda admin: incluye contacto del cliente (schema AppointmentAdminView). */
+export interface AdminAppointment extends Appointment {
+  user: UserContact
+  service: ServicePublic
+  payment: Payment | null
+}
+
+/** Horario ocupado por un turno confirmado (GET /appointments/public/confirmed). */
+export interface PublicBookedSlot {
+  appointment_date: string
+  duration_minutes: number
+}
+
+/** Body de PUT /appointments/{id} para que un admin cambie el estado. */
+export interface AppointmentStatusUpdatePayload {
+  status: AppointmentStatus
+  cancellation_reason?: string
 }
 
 export interface AppointmentCreatePayload {

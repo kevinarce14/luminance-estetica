@@ -105,6 +105,8 @@ def init_db():
             _init_with_pooler()
         else:
             print("✓  Usando conexión directa...")
+            with engine.begin() as conn:
+                conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{SCHEMA_NAME}"'))
             Base.metadata.create_all(bind=engine)
             print("✅ Base de datos inicializada")
             
@@ -186,6 +188,7 @@ async def create_initial_data():
     from app.models.availability import Availability
     from app.models.service import Service
     from datetime import time
+    from email_validator import EmailNotValidError, validate_email
     
     db: Session = SessionLocal()
     
@@ -196,6 +199,14 @@ async def create_initial_data():
         
         # NORMALIZAR EMAIL (minúsculas y trim)
         admin_email_normalized = settings.INITIAL_ADMIN_EMAIL.strip().lower()
+        # Validar con la misma regla que las respuestas (EmailStr): un email inválido
+        # dejaría al admin sin poder usar /users/me (error 500 al serializar).
+        try:
+            validate_email(admin_email_normalized, check_deliverability=False)
+        except EmailNotValidError as exc:
+            raise RuntimeError(
+                f"INITIAL_ADMIN_EMAIL inválido ('{settings.INITIAL_ADMIN_EMAIL}'): {exc}"
+            ) from exc
         # ADMIN
         admin = db.query(User).filter(User.email == admin_email_normalized).first()
         if not admin:

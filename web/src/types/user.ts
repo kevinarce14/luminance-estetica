@@ -1,4 +1,4 @@
-/** Usuario autenticado (schema UserResponse del backend legado). */
+/** Usuario autenticado (schema UserResponse del backend). */
 export interface User {
   id: number
   email: string
@@ -12,6 +12,12 @@ export interface User {
 export interface UserPublic {
   id: number
   full_name: string
+}
+
+/** Usuario con datos de contacto (schema UserContact, solo respuestas de admin). */
+export interface UserContact extends UserPublic {
+  email: string
+  phone: string | null
 }
 
 export interface UserUpdatePayload {

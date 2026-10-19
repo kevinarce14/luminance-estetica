@@ -9,6 +9,7 @@ from typing import Dict
 from datetime import datetime
 
 from app.core.config import settings
+from app.core.time_utils import to_studio_time
 
 
 class EmailService:
@@ -165,8 +166,8 @@ class EmailService:
         self, user_name: str, service_name: str, appointment_date: datetime
     ) -> str:
         """Template de confirmación de turno"""
-        date_str = appointment_date.strftime("%d/%m/%Y")
-        time_str = appointment_date.strftime("%H:%M")
+        date_str = to_studio_time(appointment_date).strftime("%d/%m/%Y")
+        time_str = to_studio_time(appointment_date).strftime("%H:%M")
 
         return f"""
         <h2 style="color: #9c89b8;">✅ Turno Confirmado</h2>
@@ -196,7 +197,7 @@ class EmailService:
         self, user_name: str, service_name: str, appointment_date: datetime
     ) -> str:
         """Template de cancelación de turno"""
-        date_str = appointment_date.strftime("%d/%m/%Y a las %H:%M")
+        date_str = to_studio_time(appointment_date).strftime("%d/%m/%Y a las %H:%M")
 
         return f"""
         <h2 style="color: #636e72;">Turno Cancelado</h2>
@@ -217,7 +218,7 @@ class EmailService:
         self, user_name: str, service_name: str, amount: float, appointment_date: datetime
     ) -> str:
         """Template de confirmación de pago"""
-        date_str = appointment_date.strftime("%d/%m/%Y a las %H:%M")
+        date_str = to_studio_time(appointment_date).strftime("%d/%m/%Y a las %H:%M")
 
         return f"""
         <h2 style="color: #28a745;">💚 Pago Confirmado</h2>
@@ -278,8 +279,8 @@ class EmailService:
         self, user_name: str, service_name: str, appointment_date: datetime
     ) -> str:
         """Template de recordatorio de turno"""
-        date_str = appointment_date.strftime("%d/%m/%Y")
-        time_str = appointment_date.strftime("%H:%M")
+        date_str = to_studio_time(appointment_date).strftime("%d/%m/%Y")
+        time_str = to_studio_time(appointment_date).strftime("%H:%M")
 
         return f"""
         <h2 style="color: #9c89b8;">🔔 Recordatorio de Turno</h2>
@@ -453,8 +454,8 @@ class EmailService:
         new_date: datetime
     ) -> bool:
         """Envía email cuando un turno es reprogramado."""
-        old_date_str = old_date.strftime("%d/%m/%Y a las %H:%M")
-        new_date_str = new_date.strftime("%d/%m/%Y a las %H:%M")
+        old_date_str = to_studio_time(old_date).strftime("%d/%m/%Y a las %H:%M")
+        new_date_str = to_studio_time(new_date).strftime("%d/%m/%Y a las %H:%M")
         
         content = f"""
         <div class="content-box">

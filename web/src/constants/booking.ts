@@ -14,9 +14,6 @@ export const MIN_BOOKING_ADVANCE_HOURS = 2
 /** MAX_BOOKING_ADVANCE_DAYS del backend. */
 export const MAX_BOOKING_ADVANCE_DAYS = 30
 
-/** Duración usada para el doble chequeo de solapamiento cuando falta el dato del servicio. */
-export const DEFAULT_APPOINTMENT_DURATION_MINUTES = 60
-
 export const BOOKING_STEPS: BookingStepInfo[] = [
   { step: 1, label: 'Fecha' },
   { step: 2, label: 'Servicio' },

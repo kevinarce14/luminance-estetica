@@ -44,6 +44,9 @@ async def lifespan(app: FastAPI):
     # Crear datos iniciales (admin, horarios, servicios)
     print("🔧 Creando datos iniciales...")
     await create_initial_data()
+
+    # El scheduler arranca recién cuando las tablas existen (en una BD nueva fallaba al importar)
+    scheduler = init_scheduler()
     
     print("=" * 60)
     print("✅ API lista para recibir requests")
@@ -52,6 +55,8 @@ async def lifespan(app: FastAPI):
     print("=" * 60)
     
     yield
+
+    scheduler.shutdown(wait=False)
     
     # ========== SHUTDOWN ==========
     print("\n" + "=" * 60)
@@ -95,8 +100,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Inicializar scheduler al arrancar la app
-scheduler = init_scheduler()
 
 
 # ========== CORS MIDDLEWARE ==========

@@ -3,7 +3,7 @@
 Endpoints para gestión de pagos con MercadoPago.
 """
 
-from datetime import datetime
+from app.core.time_utils import utc_now
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from typing import List
@@ -197,7 +197,7 @@ async def mercadopago_webhook(
     
     if mp_status == "approved":
         db_payment.status = PaymentStatus.APPROVED
-        db_payment.approved_at = datetime.now()
+        db_payment.approved_at = utc_now()
         
         # Marcar el turno como confirmado
         appointment = db.query(Appointment).filter(
@@ -352,7 +352,7 @@ def update_payment_status(
 
     # Si se aprueba, confirmar el turno y notificar al cliente
     if status_update.status == PaymentStatus.APPROVED:
-        payment.approved_at = payment.approved_at or datetime.now()
+        payment.approved_at = payment.approved_at or utc_now()
         appointment = db.query(Appointment).filter(
             Appointment.id == payment.appointment_id
         ).first()
@@ -424,7 +424,7 @@ def create_cash_payment(
         # actualizarlo en vez de crear uno nuevo (evita UniqueViolation)
         existing_payment.payment_method = PaymentMethod.CASH
         existing_payment.status = PaymentStatus.APPROVED
-        existing_payment.approved_at = datetime.now()
+        existing_payment.approved_at = utc_now()
         
         appointment.status = AppointmentStatus.CONFIRMED
         
@@ -445,7 +445,7 @@ def create_cash_payment(
         currency="ARS",
         payment_method=PaymentMethod.CASH,
         status=PaymentStatus.APPROVED,
-        approved_at=datetime.now()
+        approved_at=utc_now()
     )
     
     db.add(db_payment)

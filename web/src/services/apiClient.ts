@@ -67,7 +67,9 @@ function extractErrorMessage(data: unknown): string {
 }
 
 function isAuthEndpoint(endpoint: string): boolean {
-  return ['/auth/login', '/auth/register', '/auth/google'].some((path) => endpoint.includes(path))
+  return ['/auth/login', '/auth/register', '/auth/google', '/auth/password-reset'].some((path) =>
+    endpoint.includes(path),
+  )
 }
 
 /**

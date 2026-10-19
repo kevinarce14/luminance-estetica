@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom'
 import { AuthCard } from '../components/auth/AuthCard.tsx'
 import { AuthField } from '../components/auth/AuthField.tsx'
 import { GoogleSignInButton } from '../components/auth/GoogleSignInButton.tsx'
@@ -8,6 +8,7 @@ import type { FieldErrors, LoginCredentials } from '../types/auth.ts'
 import type {
   AuthRedirectState,
   LoginLocationState,
+  PasswordResetLocationState,
 } from '../types/navigation.ts'
 import { getGoogleLoginErrorMessage, getLoginErrorMessage } from '../utils/authErrors.ts'
 import { hasFieldErrors, validateLogin } from '../utils/validators.ts'
@@ -16,6 +17,9 @@ export function LoginPage() {
   const { login, loginWithGoogle } = useAuth()
   const location = useLocation()
   const locationState = location.state as LoginLocationState | null
+  const [searchParams] = useSearchParams()
+  // Link del email de recuperación (login.html?token=… del backend)
+  const resetToken = searchParams.get('token')
 
   const [values, setValues] = useState<LoginCredentials>({
     email: locationState?.email ?? '',
@@ -66,6 +70,12 @@ export function LoginPage() {
   }
 
   const registerState: AuthRedirectState = { from: locationState?.from }
+  const forgotState: PasswordResetLocationState = { email: values.email.trim() || undefined }
+
+  if (resetToken) {
+    const resetState: PasswordResetLocationState = { token: resetToken }
+    return <Navigate to="/reset-password" replace state={resetState} />
+  }
 
   return (
     <AuthCard title="Bienvenida" subtitle="Ingresa a tu cuenta">
@@ -110,6 +120,12 @@ export function LoginPage() {
           {isSubmitting ? 'Iniciando sesión...' : 'Iniciar Sesión'}
         </button>
       </form>
+
+      <div className="auth-footer auth-footer--forgot">
+        <Link to="/forgot-password" state={forgotState}>
+          ¿Olvidaste tu contraseña?
+        </Link>
+      </div>
 
       <GoogleSignInButton
         text="continue_with"

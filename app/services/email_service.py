@@ -508,7 +508,6 @@ class EmailService:
     ) -> bool:
         """Envía email con link para resetear contraseña"""
         print(f"🔐 [PasswordReset] Iniciando envío a: {to_email} | usuario: {user_name}")
-        print(f"🔐 [PasswordReset] Token (primeros 20 chars): {reset_token[:20]}...")
         content = self._get_password_reset_content(user_name, reset_token)
         html = self._get_base_template(content, "Recuperá tu contraseña")
         result = self._send_email(to_email, "Recuperar Contraseña - Luminance Studio", html)

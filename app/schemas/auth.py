@@ -1,5 +1,7 @@
 # app/schemas/auth.py
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field, field_validator
+
+from app.schemas.user import PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, check_password_strength
 
 
 class Token(BaseModel):
@@ -39,8 +41,19 @@ class PasswordResetConfirm(BaseModel):
     
     El usuario ingresa el token recibido por email y su nueva contraseña.
     """
-    token: str
-    new_password: str
+    token: str = Field(..., min_length=10, max_length=2048)
+    new_password: str = Field(..., min_length=PASSWORD_MIN_LENGTH, max_length=PASSWORD_MAX_LENGTH)
+
+    @field_validator('token')
+    @classmethod
+    def strip_token(cls, v: str) -> str:
+        # El código se suele pegar desde el email: se toleran espacios y saltos de línea
+        return "".join(v.split())
+
+    @field_validator('new_password')
+    @classmethod
+    def validate_password_strength(cls, v: str) -> str:
+        return check_password_strength(v)
     
     class Config:
         json_schema_extra = {

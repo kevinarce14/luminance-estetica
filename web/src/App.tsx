@@ -12,6 +12,7 @@ import { AdminPaymentsPage } from './pages/admin/AdminPaymentsPage.tsx'
 import { AdminReportsPage } from './pages/admin/AdminReportsPage.tsx'
 import { AdminServicesPage } from './pages/admin/AdminServicesPage.tsx'
 import { AdminDashboardPage } from './pages/AdminDashboardPage.tsx'
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage.tsx'
 import { LoginPage } from './pages/LoginPage.tsx'
 import { Home } from './pages/Home.tsx'
 import { MisTurnosPage } from './pages/MisTurnosPage.tsx'
@@ -20,6 +21,7 @@ import { PagoExitosoPage } from './pages/PagoExitosoPage.tsx'
 import { PagoFallidoPage } from './pages/PagoFallidoPage.tsx'
 import { PagoPage } from './pages/PagoPage.tsx'
 import { RegisterPage } from './pages/RegisterPage.tsx'
+import { ResetPasswordPage } from './pages/ResetPasswordPage.tsx'
 import { StudioPage } from './pages/StudioPage.tsx'
 import { TurneraPage } from './pages/TurneraPage.tsx'
 
@@ -63,6 +65,22 @@ export default function App() {
             element={
               <GuestRoute>
                 <RegisterPage />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <GuestRoute>
+                <ForgotPasswordPage />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/reset-password"
+            element={
+              <GuestRoute>
+                <ResetPasswordPage />
               </GuestRoute>
             }
           />

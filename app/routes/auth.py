@@ -17,6 +17,7 @@ from app.core.security import (
     create_access_token,
     generate_password_reset_token,
     verify_password_reset_token,
+    password_fingerprint,
 )
 from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse
@@ -261,11 +262,12 @@ def request_password_reset(
         return {"message": message}
 
     if not user.hashed_password:
-        # Usuario que solo usa Google, no tiene contraseña
-        return {"message": "Esta cuenta solo puede acceder con Google"}
+        # Cuenta solo con Google: misma respuesta para no revelar qué emails existen
+        print(f"ℹ️ [PasswordReset] Cuenta de Google sin contraseña: {email_normalized}")
+        return {"message": message}
 
     print(f"✅ [PasswordReset] Usuario encontrado: {user.full_name} ({user.email})")
-    reset_token = generate_password_reset_token(user.email)
+    reset_token = generate_password_reset_token(user.email, user.hashed_password)
 
     try:
         sent = email_service.send_password_reset_email(
@@ -289,23 +291,27 @@ def confirm_password_reset(
     """
     Confirmar reseteo de contraseña con el token recibido por email.
     """
-    print(f"🔐 [PasswordResetConfirm] Verificando token...")
-    email = verify_password_reset_token(reset_data.token)
+    invalid_token = HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="El código es inválido o expiró. Solicitá uno nuevo."
+    )
 
-    if not email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Token inválido o expirado"
-        )
+    verified = verify_password_reset_token(reset_data.token)
+    if not verified:
+        raise invalid_token
+    email, fingerprint = verified
+
+    user = db.query(User).filter(User.email == email).first()
+    # Token de un solo uso: si la contraseña ya cambió, la huella no coincide
+    if (
+        not user
+        or not user.is_active
+        or not user.hashed_password
+        or password_fingerprint(user.hashed_password) != fingerprint
+    ):
+        raise invalid_token
 
     print(f"✅ [PasswordResetConfirm] Token válido para: {email}")
-    user = db.query(User).filter(User.email == email).first()
-
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuario no encontrado"
-        )
 
     user.hashed_password = get_password_hash(reset_data.new_password)
     db.commit()

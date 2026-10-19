@@ -1,7 +1,8 @@
 # app/core/security.py
 import logging
+import hashlib
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Tuple
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, status
@@ -128,40 +129,49 @@ def validate_password_strength(password: str) -> bool:
     return has_upper and has_lower and has_digit
 
 
-def generate_password_reset_token(email: str) -> str:
+PASSWORD_RESET_TOKEN_TYPE = "password_reset"
+
+
+def password_fingerprint(hashed_password: str) -> str:
+    """Huella corta del hash actual: el token de reset deja de servir al cambiar la contraseña."""
+    return hashlib.sha256(hashed_password.encode("utf-8")).hexdigest()[:16]
+
+
+def generate_password_reset_token(email: str, hashed_password: str) -> str:
     """
-    Genera un token temporal para resetear contraseña.
-    
-    Args:
-        email: Email del usuario
-        
-    Returns:
-        Token JWT con expiración de 1 hora
+    Genera un token temporal (1 hora) para resetear contraseña.
+
+    Incluye una huella de la contraseña actual, así que es de un solo uso:
+    una vez cambiada la contraseña, el mismo link deja de funcionar.
     """
     delta = timedelta(hours=1)
     return create_access_token(
-        data={"sub": email, "type": "password_reset"},
+        data={
+            "sub": email,
+            "type": PASSWORD_RESET_TOKEN_TYPE,
+            "pwd": password_fingerprint(hashed_password),
+        },
         expires_delta=delta
     )
 
 
-def verify_password_reset_token(token: str) -> Optional[str]:
+def verify_password_reset_token(token: str) -> Optional[Tuple[str, str]]:
     """
     Verifica un token de reseteo de contraseña.
-    
-    Args:
-        token: Token JWT
-        
+
     Returns:
-        Email del usuario si el token es válido, None si no
+        (email, huella de la contraseña) si el token es válido, None si no
     """
     try:
         payload = decode_access_token(token)
-        
-        if payload.get("type") != "password_reset":
-            return None
-        
-        return payload.get("sub")
-    
     except HTTPException:
         return None
+
+    if payload.get("type") != PASSWORD_RESET_TOKEN_TYPE:
+        return None
+
+    email = payload.get("sub")
+    fingerprint = payload.get("pwd")
+    if not email or not fingerprint:
+        return None
+    return email, fingerprint

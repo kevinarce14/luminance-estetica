@@ -1,0 +1,81 @@
+/* ===== BADGES DE ESTADO (turno y pago) ===== */
+.lm-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lm-badge--pending,
+.lm-badge--payment-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.lm-badge--confirmed,
+.lm-badge--payment-approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.lm-badge--completed,
+.lm-badge--payment-refunded {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.lm-badge--cancelled,
+.lm-badge--payment-rejected,
+.lm-badge--payment-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.lm-badge--no-payment {
+  background: var(--gris-medio);
+  color: var(--texto-medio);
+}
+
+/* ===== MODAL DE CANCELACIÓN ===== */
+.lm-cancel__label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--texto-oscuro);
+}
+
+.lm-cancel__textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px 15px;
+  border: 2px solid var(--gris-medio);
+  border-radius: 12px;
+  font-family: var(--sans);
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.lm-cancel__textarea:focus {
+  outline: none;
+  border-color: var(--lila-medio);
+}
+
+.lm-cancel__textarea[aria-invalid='true'] {
+  border-color: #e57373;
+}
+
+.lm-cancel__error {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.85rem;
+  text-align: left;
+  color: #c0392b;
+}
+
+.lm-cancel__textarea + .lm-modal__actions,
+.lm-cancel__error + .lm-modal__actions {
+  margin-top: 20px;
+}

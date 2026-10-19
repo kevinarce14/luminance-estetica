@@ -4,11 +4,11 @@ Servicio de notificaciones automáticas.
 Maneja recordatorios de turnos y otras notificaciones programadas.
 """
 
-from datetime import datetime, timedelta, time
-from zoneinfo import ZoneInfo
+from datetime import timedelta
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
+from app.core.time_utils import studio_day_range_utc, studio_today, to_studio_time, utc_now_naive
 from app.models.appointment import Appointment, AppointmentStatus
 from app.models.user import User
 from app.services.email_service import email_service
@@ -33,19 +33,15 @@ class NotificationService:
         Returns:
             Cantidad de recordatorios enviados
         """
-        # Turnos de mañana (día calendario en zona horaria del negocio)
-        tz = ZoneInfo(settings.TIMEZONE)
-        now_local = datetime.now(tz)
-        tomorrow = (now_local + timedelta(days=1)).date()
-        tomorrow_start = datetime.combine(tomorrow, time.min)
-        tomorrow_end = datetime.combine(tomorrow, time.max)
+        # Turnos de mañana (día calendario del studio, convertido a UTC como en la BD)
+        tomorrow_start, tomorrow_end = studio_day_range_utc(studio_today() + timedelta(days=1))
 
         appointments = (
             db.query(Appointment)
             .filter(
                 Appointment.status.in_([AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED]),
                 Appointment.appointment_date >= tomorrow_start,
-                Appointment.appointment_date <= tomorrow_end,
+                Appointment.appointment_date < tomorrow_end,
                 Appointment.reminder_sent == False,
             )
             .all()
@@ -103,7 +99,7 @@ class NotificationService:
         Returns:
             Dict con estadísticas de próximos turnos
         """
-        now = datetime.now()
+        now = utc_now_naive()
         future = now + timedelta(days=days)
 
         # Turnos próximos
@@ -117,9 +113,8 @@ class NotificationService:
             .count()
         )
 
-        # Turnos de hoy
-        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        today_end = today_start + timedelta(days=1)
+        # Turnos de hoy (día del studio)
+        today_start, today_end = studio_day_range_utc(studio_today())
 
         today = (
             db.query(Appointment)
@@ -132,8 +127,7 @@ class NotificationService:
         )
 
         # Turnos mañana
-        tomorrow_start = today_end
-        tomorrow_end = tomorrow_start + timedelta(days=1)
+        tomorrow_start, tomorrow_end = studio_day_range_utc(studio_today() + timedelta(days=1))
 
         tomorrow = (
             db.query(Appointment)
@@ -164,9 +158,7 @@ class NotificationService:
         stats = self.check_upcoming_appointments(db, days=7)
 
         # Obtener turnos de hoy
-        now = datetime.now()
-        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        today_end = today_start + timedelta(days=1)
+        today_start, today_end = studio_day_range_utc(studio_today())
 
         today_appointments = (
             db.query(Appointment)
@@ -192,7 +184,7 @@ class NotificationService:
 
         for appointment in today_appointments:
             user = db.query(User).filter(User.id == appointment.user_id).first()
-            time_str = appointment.appointment_date.strftime("%H:%M")
+            time_str = to_studio_time(appointment.appointment_date).strftime("%H:%M")
             message += f"\n- {time_str} - {appointment.service.name} - {user.full_name if user else 'Usuario desconocido'}"
 
         if not today_appointments:
@@ -220,7 +212,7 @@ class NotificationService:
         Returns:
             Cantidad de registros limpiados
         """
-        cutoff_date = datetime.now() - timedelta(days=days)
+        cutoff_date = utc_now_naive() - timedelta(days=days)
 
         # Resetear reminder_sent para turnos antiguos completados o cancelados
         updated = (

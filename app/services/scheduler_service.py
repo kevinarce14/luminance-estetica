@@ -7,6 +7,7 @@ from app.core.config import settings
 from sqlalchemy.orm import Session
 from app.models.appointment import Appointment, AppointmentStatus
 from app.core.database import SessionLocal
+from app.core.time_utils import utc_now_naive
 
 def update_appointments_status():
     """
@@ -16,8 +17,9 @@ def update_appointments_status():
     """
     db = SessionLocal()
     try:
-        now = datetime.now(timezone.utc)
-        
+        # La BD guarda los turnos en UTC sin timezone: se compara contra UTC naive.
+        now = utc_now_naive()
+
         print(f"🔄 Actualizando estados de turnos - {now.strftime('%Y-%m-%d %H:%M:%S')}")
         
         # 1. Turnos PENDING que ya pasaron → CANCELLED

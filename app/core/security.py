@@ -1,4 +1,5 @@
 # app/core/security.py
+import logging
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
@@ -6,6 +7,10 @@ from passlib.context import CryptContext
 from fastapi import HTTPException, status
 
 from app.core.config import settings
+
+# passlib 1.7.4 intenta leer bcrypt.__about__ (eliminado en bcrypt 4) y loguea un
+# traceback inofensivo al primer hash. El hashing funciona igual: se silencia ese aviso.
+logging.getLogger("passlib").setLevel(logging.ERROR)
 
 # Contexto para hashear contraseñas con bcrypt
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

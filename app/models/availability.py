@@ -13,8 +13,8 @@ class Availability(Base):
     
     1. **Disponibilidad Regular** (por día de la semana):
        - Define horarios fijos para cada día de la semana
-       - Ejemplo: Martes a Sábado de 9:00 a 20:00
-       - day_of_week: 0=Lunes, 1=Martes, ..., 6=Domingo
+       - Ejemplo: Lunes a Sábado de 9:00 a 20:00
+       - day_of_week: 0=Domingo, 1=Lunes, ..., 6=Sábado (convención de JS Date.getDay)
        - specific_date: NULL
     
     2. **Disponibilidad Específica** (excepciones/bloqueos):
@@ -31,7 +31,7 @@ class Availability(Base):
         - is_available: Si está disponible o bloqueado
     
     Ejemplos de uso:
-        # Horario regular de Martes
+        # Horario regular de Lunes
         day_of_week=1, start_time=09:00, end_time=20:00, is_available=True
         
         # Bloquear el 25 de diciembre (Navidad)

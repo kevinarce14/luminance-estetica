@@ -34,3 +34,9 @@ export interface RegisterFormValues {
 
 /** Errores de validación por campo de un formulario. */
 export type FieldErrors<T> = Partial<Record<keyof T, string>>
+
+/** Respuesta de GET /auth/google/config. */
+export interface GoogleAuthConfig {
+  enabled: boolean
+  client_id: string | null
+}

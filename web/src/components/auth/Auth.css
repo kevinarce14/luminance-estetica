@@ -262,3 +262,43 @@
     font-size: 16px; /* Evita zoom en iOS */
   }
 }
+
+/* ===== GOOGLE (login.html) ===== */
+.auth-google {
+  margin-top: 20px;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e8e8e8;
+}
+
+.auth-google__button {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.auth-google__button--disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.auth-google__error {
+  margin: 0;
+  font-size: 0.9rem;
+  text-align: center;
+  color: #c0392b;
+}

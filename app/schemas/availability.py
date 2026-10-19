@@ -5,7 +5,11 @@ from typing import Optional, List
 
 
 class AvailabilityBase(BaseModel):
-    """Schema base de Disponibilidad con campos comunes"""
+    """
+    Schema base de Disponibilidad con campos comunes.
+
+    day_of_week usa la convención 0=Domingo, 1=Lunes … 6=Sábado.
+    """
     day_of_week: Optional[int] = Field(None, ge=0, le=6)
     specific_date: Optional[date] = None
     start_time: Optional[time] = None
@@ -32,7 +36,11 @@ class AvailabilityCreate(AvailabilityBase):
         # No puede tener ambos
         if day_of_week is not None and specific_date is not None:
             raise ValueError('No puede especificar day_of_week y specific_date simultáneamente')
-        
+
+        # Una franja abierta necesita horario (sin él el cálculo de turnos no puede generar slots)
+        if self.is_available and (self.start_time is None or self.end_time is None):
+            raise ValueError('Una franja disponible debe tener start_time y end_time')
+
         return self
     
     @field_validator('end_time')

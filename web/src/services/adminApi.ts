@@ -1,5 +1,14 @@
-import type { AdminAppointmentsQuery, AgendaFilters, DashboardMetrics } from '../types/admin.ts'
+import type {
+  AdminAppointmentsQuery,
+  AdminPaymentsQuery,
+  AgendaFilters,
+  ClientSummary,
+  DashboardMetrics,
+  PaymentAdminView,
+  YearlyReport,
+} from '../types/admin.ts'
 import type { AdminAppointment } from '../types/appointment.ts'
+import type { User } from '../types/user.ts'
 import { getStudioToday } from '../utils/studioTime.ts'
 import { apiRequest } from './apiClient.ts'
 
@@ -38,11 +47,40 @@ export function buildAgendaQuery(filters: AgendaFilters): AdminAppointmentsQuery
 
 /** GET /admin/appointments — agenda completa con filtros resueltos en el backend. */
 export function getAdminAppointments(query: AdminAppointmentsQuery): Promise<AdminAppointment[]> {
+  return apiRequest<AdminAppointment[]>(`/admin/appointments?${toQueryString(query)}`)
+}
+
+function toQueryString(query: object): string {
   const params = new URLSearchParams()
   Object.entries(query).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (value !== undefined && value !== '') {
       params.set(key, String(value))
     }
   })
-  return apiRequest<AdminAppointment[]>(`/admin/appointments?${params.toString()}`)
+  return params.toString()
+}
+
+/** GET /admin/payments — pagos con cliente y turno. */
+export function getAdminPayments(query: AdminPaymentsQuery): Promise<PaymentAdminView[]> {
+  return apiRequest<PaymentAdminView[]>(`/admin/payments?${toQueryString(query)}`)
+}
+
+/** GET /admin/clients — clientes con métricas de su historial. */
+export function getClients(search: string): Promise<ClientSummary[]> {
+  return apiRequest<ClientSummary[]>(`/admin/clients?${toQueryString({ search: search.trim(), limit: 500 })}`)
+}
+
+/** Historial de turnos de un cliente (más reciente primero). */
+export function getClientAppointments(userId: number): Promise<AdminAppointment[]> {
+  return getAdminAppointments({ order: 'desc', limit: AGENDA_LIMIT, user_id: userId })
+}
+
+/** PUT /users/{id}/toggle-active — activar o desactivar la cuenta de un cliente. */
+export function toggleUserActive(userId: number): Promise<User> {
+  return apiRequest<User>(`/users/${userId}/toggle-active`, { method: 'PUT' })
+}
+
+/** GET /admin/reports/yearly */
+export function getYearlyReport(year: number): Promise<YearlyReport> {
+  return apiRequest<YearlyReport>(`/admin/reports/yearly?year=${year}`)
 }

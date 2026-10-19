@@ -2,17 +2,18 @@ import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { AuthCard } from '../components/auth/AuthCard.tsx'
 import { AuthField } from '../components/auth/AuthField.tsx'
+import { GoogleSignInButton } from '../components/auth/GoogleSignInButton.tsx'
 import { useAuth } from '../hooks/useAuth.ts'
 import type { FieldErrors, LoginCredentials } from '../types/auth.ts'
 import type {
   AuthRedirectState,
   LoginLocationState,
 } from '../types/navigation.ts'
-import { getLoginErrorMessage } from '../utils/authErrors.ts'
+import { getGoogleLoginErrorMessage, getLoginErrorMessage } from '../utils/authErrors.ts'
 import { hasFieldErrors, validateLogin } from '../utils/validators.ts'
 
 export function LoginPage() {
-  const { login } = useAuth()
+  const { login, loginWithGoogle } = useAuth()
   const location = useLocation()
   const locationState = location.state as LoginLocationState | null
 
@@ -49,6 +50,17 @@ export function LoginPage() {
       // La redirección la resuelve GuestRoute al cambiar el estado de sesión.
     } catch (error) {
       setSubmitError(getLoginErrorMessage(error))
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleGoogleCredential = async (credential: string) => {
+    setSubmitError(null)
+    setIsSubmitting(true)
+    try {
+      await loginWithGoogle(credential)
+    } catch (error) {
+      setSubmitError(getGoogleLoginErrorMessage(error))
       setIsSubmitting(false)
     }
   }
@@ -98,6 +110,13 @@ export function LoginPage() {
           {isSubmitting ? 'Iniciando sesión...' : 'Iniciar Sesión'}
         </button>
       </form>
+
+      <GoogleSignInButton
+        text="continue_with"
+        dividerLabel="o continuá con"
+        disabled={isSubmitting}
+        onCredential={(credential) => void handleGoogleCredential(credential)}
+      />
 
       <div className="auth-footer">
         ¿No tienes cuenta?{' '}

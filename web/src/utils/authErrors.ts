@@ -8,12 +8,23 @@ export function getLoginErrorMessage(error: unknown): string {
     return INVALID_CREDENTIALS_MESSAGE
   }
 
-  // 400/401: credenciales inválidas (el detalle del backend puede venir en inglés).
+  // 401 de una cuenta creada con Google: el backend explica cómo ingresar.
+  if (error.status === 401 && error.message.includes('Google')) {
+    return error.message
+  }
+
+  // 400/401: credenciales inválidas.
   if (error.status === 400 || error.status === 401) {
     return INVALID_CREDENTIALS_MESSAGE
   }
 
   return error.message
+}
+
+export function getGoogleLoginErrorMessage(error: unknown): string {
+  return isApiError(error) && error.message
+    ? error.message
+    : 'Error al iniciar sesión con Google. Intentá de nuevo.'
 }
 
 export function getRegisterErrorMessage(error: unknown): string {

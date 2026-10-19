@@ -8,8 +8,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 import httpx
-import os
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import (
     verify_password,
@@ -23,11 +23,18 @@ from app.schemas.user import UserCreate, UserResponse
 from app.schemas.auth import Token, PasswordReset, PasswordResetConfirm
 from app.services.email_service import email_service
 
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
-
-
 class GoogleLoginRequest(BaseModel):
     credential: str  # El id_token que entrega Google al frontend
+
+
+class GoogleAuthConfig(BaseModel):
+    """Configuración pública para que el frontend muestre el botón de Google."""
+    enabled: bool
+    client_id: str | None = None
+
+
+def _google_client_id() -> str:
+    return (settings.GOOGLE_CLIENT_ID or "").strip()
 
 
 router = APIRouter(prefix="/auth", tags=["Autenticación"])
@@ -82,6 +89,14 @@ def login(
 
     user = db.query(User).filter(User.email == email_normalized).first()
 
+    # Cuentas creadas con Google no tienen contraseña: se informa en lugar de fallar
+    if user and not user.hashed_password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Esta cuenta usa inicio de sesión con Google",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -103,6 +118,16 @@ def login(
     }
 
 
+@router.get("/google/config", response_model=GoogleAuthConfig)
+def google_auth_config():
+    """
+    Indica si el login con Google está habilitado y el Client ID público
+    que necesita Google Identity Services en el frontend.
+    """
+    client_id = _google_client_id()
+    return GoogleAuthConfig(enabled=bool(client_id), client_id=client_id or None)
+
+
 @router.post("/google", response_model=Token)
 async def google_login(
     body: GoogleLoginRequest,
@@ -118,7 +143,8 @@ async def google_login(
     - Si el usuario no existe → se crea automáticamente (sin contraseña)
     - Si el usuario existe → se hace login directamente
     """
-    if not GOOGLE_CLIENT_ID:
+    google_client_id = _google_client_id()
+    if not google_client_id:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Google OAuth no está configurado en el servidor"
@@ -148,7 +174,7 @@ async def google_login(
     print(f"✅ Google token verificado: {google_data.get('email')}")
 
     # Validar que el token fue emitido para ESTA app
-    if google_data.get("aud") != GOOGLE_CLIENT_ID:
+    if google_data.get("aud") != google_client_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token no corresponde a esta aplicación"

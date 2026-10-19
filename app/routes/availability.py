@@ -10,6 +10,7 @@ from datetime import datetime, date, time, timedelta, timezone as tz
 
 from app.core.database import get_db
 from app.core.config import settings
+from app.core.time_utils import studio_today
 from app.routes.deps import get_current_admin
 from app.models.availability import Availability
 from app.models.service import Service
@@ -24,6 +25,25 @@ from app.schemas.availability import (
 )
 
 router = APIRouter(prefix="/availability", tags=["Disponibilidad"])
+
+
+def studio_weekday(target_date: date) -> int:
+    """Día de la semana con la convención del sistema: 0=Domingo, 1=Lunes … 6=Sábado."""
+    return (target_date.weekday() + 1) % 7
+
+
+def _validate_resulting_schedule(availability: Availability) -> None:
+    """Valida el estado final de una franja tras aplicar un update parcial."""
+    if availability.is_available and (availability.start_time is None or availability.end_time is None):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Una franja disponible debe tener horario de inicio y fin"
+        )
+    if availability.start_time and availability.end_time and availability.end_time <= availability.start_time:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="La hora de fin debe ser posterior a la de inicio"
+        )
 
 
 
@@ -50,8 +70,8 @@ def get_available_slots_for_date(
     if not service:
         return []
     
-    # Obtener día de la semana (0=Lunes, 6=Domingo)
-    day_of_week = (target_date.weekday() + 1) % 7
+    # Día de la semana con la convención del sistema (0=Domingo … 6=Sábado)
+    day_of_week = studio_weekday(target_date)
     
     # Buscar disponibilidad específica para esta fecha
     specific_availability = db.query(Availability).filter(
@@ -274,7 +294,8 @@ def update_availability(
     update_data = availability_data.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(availability, field, value)
-    
+
+    _validate_resulting_schedule(availability)
     db.commit()
     db.refresh(availability)
     
@@ -408,7 +429,8 @@ def update_regular_schedule(
     update_data = availability_data.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(schedule, field, value)
-    
+
+    _validate_resulting_schedule(schedule)
     db.commit()
     db.refresh(schedule)
     
@@ -462,7 +484,7 @@ def get_exceptions(
     )
     
     if future_only:
-        today = date.today()
+        today = studio_today()
         query = query.filter(Availability.specific_date >= today)
     
     exceptions = query.order_by(Availability.specific_date).all()
@@ -578,7 +600,7 @@ def check_availability_for_date(
     if exception:
         return {
             "date": target_date,
-            "day_of_week": target_date.weekday(),
+            "day_of_week": studio_weekday(target_date),
             "is_available": exception.is_available,
             "start_time": str(exception.start_time) if exception.start_time else None,
             "end_time": str(exception.end_time) if exception.end_time else None,
@@ -586,7 +608,7 @@ def check_availability_for_date(
         }
     
     # No hay excepción, buscar horario regular
-    day_of_week = target_date.weekday()
+    day_of_week = studio_weekday(target_date)
     regular = db.query(Availability).filter(
         Availability.day_of_week == day_of_week
     ).first()

@@ -22,3 +22,9 @@ export interface Service {
   is_active: boolean
   created_at: string
 }
+
+/** Servicio embebido en un turno (schema ServicePublic). */
+export type ServicePublic = Pick<
+  Service,
+  'id' | 'name' | 'description' | 'duration_minutes' | 'price' | 'category' | 'image_url'
+>

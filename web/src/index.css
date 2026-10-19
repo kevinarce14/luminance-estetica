@@ -1,0 +1,182 @@
+/* ===== VARIABLES GLOBALES (paleta de frontend/studio.html) ===== */
+:root {
+  --rosa-claro: #f8d7e6;
+  --rosa-medio: #e75480;
+  --rosa-fuerte: #d81b60;
+  --lila-claro: #f4f0ff;
+  --lila-medio: #9c89b8;
+  --lila-oscuro: #7b4bbd;
+  --violeta: #6a4c93;
+  --dorado: #d4af37;
+  --dorado-claro: #f1c40f;
+  --blanco: #ffffff;
+  --gris-claro: #f8f9fa;
+  --gris-medio: #e9ecef;
+  --texto-oscuro: #2d3436;
+  --texto-medio: #636e72;
+  --sombra: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --sombra-hover: 0 20px 40px rgba(0, 0, 0, 0.12);
+  --transicion: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+  --border-radius: 15px;
+  --sans: 'Poppins', system-ui, sans-serif;
+  --serif: 'Playfair Display', Georgia, serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-width: 320px;
+  overflow-x: hidden;
+  font-family: var(--sans);
+  line-height: 1.7;
+  color: var(--texto-oscuro);
+  background: linear-gradient(135deg, var(--rosa-claro), var(--lila-claro) 50%, #f8e6ff);
+}
+
+a {
+  color: inherit;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ===== BOTONES (sistema de botones del legado) ===== */
+.btn {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 32px;
+  overflow: hidden;
+  border: none;
+  border-radius: 50px;
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transicion);
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: 0.5s;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn-rosa {
+  background: linear-gradient(135deg, var(--rosa-medio), var(--rosa-fuerte));
+  box-shadow: 0 6px 20px rgba(231, 84, 128, 0.3);
+  color: var(--blanco);
+}
+
+.btn-rosa:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(231, 84, 128, 0.4);
+}
+
+.btn-lila {
+  background: linear-gradient(135deg, var(--lila-medio), var(--lila-oscuro));
+  box-shadow: 0 6px 20px rgba(123, 75, 189, 0.3);
+  color: var(--blanco);
+}
+
+.btn-lila:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(123, 75, 189, 0.4);
+}
+
+.btn-dorado {
+  background: linear-gradient(135deg, var(--dorado), var(--dorado-claro));
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+  font-weight: 700;
+  color: var(--texto-oscuro);
+}
+
+.btn-dorado:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(212, 175, 55, 0.4);
+}
+
+.btn-violeta {
+  background: linear-gradient(135deg, var(--violeta), #8b6db8);
+  color: var(--blanco);
+}
+
+.btn-violeta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 51, 153, 0.3);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* ===== PLACEHOLDERS (páginas aún no migradas) ===== */
+.placeholder {
+  width: calc(100% - 48px);
+  max-width: 720px;
+  margin: 48px auto 80px;
+  padding: 40px;
+  border-radius: 24px;
+  background: var(--blanco);
+  box-shadow: var(--sombra);
+}
+
+.placeholder h1 {
+  margin: 0 0 12px;
+  font-family: var(--serif);
+}
+
+.placeholder__eyebrow {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lila-medio);
+}
+
+.placeholder__description {
+  line-height: 1.7;
+  color: var(--texto-medio);
+}
+
+.placeholder__legacy {
+  margin-top: 24px;
+  font-size: 0.9rem;
+  color: var(--texto-medio);
+}
+
+.placeholder code {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--gris-claro);
+}

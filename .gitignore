@@ -43,6 +43,7 @@ venv.bak/
 .env
 .env.local
 .env.*.local
+CLAUDE.md
 
 # Database
 *.sqlite
@@ -72,3 +73,9 @@ Thumbs.db
 *.tmp
 *.temp
 *.bak
+
+# Node / Frontend React (web/)
+node_modules/
+web/dist/
+web/.env
+web/.env.local

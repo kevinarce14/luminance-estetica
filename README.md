@@ -185,6 +185,28 @@ python -m http.server 5000
 
 ---
 
+## 🧪 Tests
+
+Los tests de backend y E2E necesitan una base **PostgreSQL descartable** en `TEST_DATABASE_URL`:
+borran y recrean el schema en cada corrida, y nunca usan el `.env` ni servicios externos
+(email, MercadoPago y Google se simulan).
+
+```bash
+# Backend (pytest)
+TEST_DATABASE_URL=postgresql://postgres@localhost:5432/luminance_test python -m pytest
+
+# Frontend: unitarios (Vitest)
+cd web && npm test
+
+# E2E (Playwright: navegador + Vite + FastAPI reales, puertos 5180 y 8800)
+cd web && npx playwright install chromium
+TEST_DATABASE_URL=postgresql://postgres@localhost:5432/luminance_e2e npm run test:e2e
+```
+
+GitHub Actions (`.github/workflows/ci.yml`) corre las tres suites en cada push y PR a `main` y `develop`.
+
+---
+
 ## 📡 Endpoints Destacados de la API
 
 * `POST /api/v1/auth/login` — Autenticación y emisión de JWT.

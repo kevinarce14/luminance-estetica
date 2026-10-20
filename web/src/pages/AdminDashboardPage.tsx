@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { AgendaFiltersBar } from '../components/admin/AgendaFiltersBar.tsx'
 import { AgendaTable, type AgendaAction } from '../components/admin/AgendaTable.tsx'
 import { MetricsCards } from '../components/admin/MetricsCards.tsx'
@@ -7,7 +6,6 @@ import { CancelAppointmentModal } from '../components/appointments/CancelAppoint
 import { ConfirmModal } from '../components/common/ConfirmModal.tsx'
 import { MessageBox, Spinner, type MessageVariant } from '../components/common/Feedback.tsx'
 import { DEFAULT_AGENDA_FILTERS } from '../constants/admin.ts'
-import { useAuth } from '../hooks/useAuth.ts'
 import { useAsyncResource } from '../hooks/useAsyncResource.ts'
 import { useDebouncedValue } from '../hooks/useDebouncedValue.ts'
 import {
@@ -21,8 +19,7 @@ import { createCashPayment } from '../services/paymentsApi.ts'
 import type { AgendaFilters } from '../types/admin.ts'
 import { isApiError } from '../types/api.ts'
 import { AppointmentStatus, type AdminAppointment } from '../types/appointment.ts'
-import { formatStudioLongDate, formatStudioTime, getStudioToday } from '../utils/studioTime.ts'
-import './AdminDashboardPage.css'
+import { formatStudioLongDate, formatStudioTime } from '../utils/studioTime.ts'
 
 const SEARCH_DEBOUNCE_MS = 300
 
@@ -42,7 +39,6 @@ function describe(appointment: AdminAppointment): string {
 }
 
 export function AdminDashboardPage() {
-  const { user } = useAuth()
   const [filters, setFilters] = useState<AgendaFilters>(DEFAULT_AGENDA_FILTERS)
   const debouncedSearch = useDebouncedValue(filters.search, SEARCH_DEBOUNCE_MS)
   const agendaQuery = buildAgendaQuery({ ...filters, search: debouncedSearch })
@@ -176,18 +172,7 @@ export function AdminDashboardPage() {
         }
 
   return (
-    <div className="admin-page">
-      <div className="admin-container">
-        <div className="admin-topbar">
-          <div>
-            <h1>Bienvenida, {user?.full_name ?? 'Admin'} 👋</h1>
-            <p>{formatStudioLongDate(getStudioToday())}</p>
-          </div>
-          <Link to="/turnera" className="btn btn-rosa">
-            <i className="fas fa-plus" aria-hidden="true" /> Registrar turno presencial
-          </Link>
-        </div>
-
+    <>
         {feedback ? <MessageBox variant={feedback.variant}>{feedback.message}</MessageBox> : null}
 
         <section className="admin-section" aria-labelledby="admin-metrics-title">
@@ -239,7 +224,6 @@ export function AdminDashboardPage() {
           />
           {renderAgenda()}
         </section>
-      </div>
 
       <ConfirmModal
         open={pendingConfirmation !== null}
@@ -260,6 +244,6 @@ export function AdminDashboardPage() {
         onConfirm={handleConfirmCancel}
         onClose={() => setCancelTarget(null)}
       />
-    </div>
+    </>
   )
 }

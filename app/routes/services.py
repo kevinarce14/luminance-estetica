@@ -157,6 +157,15 @@ def update_service(
     
     # Actualizar campos proporcionados
     update_data = service_data.model_dump(exclude_unset=True)
+
+    new_name = update_data.get("name")
+    if new_name and new_name != service.name:
+        duplicate = db.query(Service).filter(Service.name == new_name, Service.id != service_id).first()
+        if duplicate:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Ya existe un servicio con ese nombre"
+            )
     for field, value in update_data.items():
         setattr(service, field, value)
     

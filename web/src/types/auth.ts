@@ -34,3 +34,27 @@ export interface RegisterFormValues {
 
 /** Errores de validación por campo de un formulario. */
 export type FieldErrors<T> = Partial<Record<keyof T, string>>
+
+/** Respuesta de GET /auth/google/config. */
+export interface GoogleAuthConfig {
+  enabled: boolean
+  client_id: string | null
+}
+
+/** Body de POST /auth/password-reset/confirm. */
+export interface PasswordResetConfirmPayload {
+  token: string
+  new_password: string
+}
+
+/** Valores del formulario de nueva contraseña. */
+export interface ResetPasswordFormValues {
+  token: string
+  password: string
+  confirmPassword: string
+}
+
+/** Respuesta simple `{ message }` de los endpoints de recuperación. */
+export interface MessageResponse {
+  message: string
+}

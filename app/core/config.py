@@ -47,6 +47,10 @@ class Settings(BaseSettings):
     TWILIO_WHATSAPP_NUMBER: str | None = None
     STUDIO_WHATSAPP_NUMBER: str | None = None
     
+    # ========== GOOGLE OAUTH ==========
+    # Client ID de Google Identity Services (público). Vacío = login con Google deshabilitado.
+    GOOGLE_CLIENT_ID: str | None = None
+
     # ========== MERCADOPAGO ==========
     MERCADOPAGO_ACCESS_TOKEN: str
     MERCADOPAGO_PUBLIC_KEY: str | None = None
@@ -82,7 +86,7 @@ class Settings(BaseSettings):
     TIMEZONE: str = "America/Argentina/Buenos_Aires"
     BUSINESS_HOURS_START: str = "09:00"
     BUSINESS_HOURS_END: str = "20:00"
-    BUSINESS_DAYS: str = "1,2,3,4,5,6"  # Martes a Sábado
+    BUSINESS_DAYS: str = "1,2,3,4,5,6"  # 0=Domingo … 6=Sábado → Lunes a Sábado
     MIN_APPOINTMENT_DURATION: int = 30  # minutos
     MIN_BOOKING_ADVANCE_HOURS: int = 2
     MAX_BOOKING_ADVANCE_DAYS: int = 30

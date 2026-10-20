@@ -2,6 +2,7 @@ import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AuthCard } from '../components/auth/AuthCard.tsx'
 import { AuthField } from '../components/auth/AuthField.tsx'
+import { GoogleSignInButton } from '../components/auth/GoogleSignInButton.tsx'
 import { useAuth } from '../hooks/useAuth.ts'
 import type {
   FieldErrors,
@@ -12,7 +13,7 @@ import type {
   AuthRedirectState,
   LoginLocationState,
 } from '../types/navigation.ts'
-import { getRegisterErrorMessage } from '../utils/authErrors.ts'
+import { getGoogleLoginErrorMessage, getRegisterErrorMessage } from '../utils/authErrors.ts'
 import {
   hasFieldErrors,
   PASSWORD_HINT,
@@ -35,7 +36,7 @@ const SUBMIT_LABELS: Record<RegisterStatus, string> = {
 }
 
 export function RegisterPage() {
-  const { register, login } = useAuth()
+  const { register, login, loginWithGoogle } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const redirectState = location.state as AuthRedirectState | null
@@ -92,6 +93,18 @@ export function RegisterPage() {
         notice: '¡Tu cuenta fue creada! Iniciá sesión para continuar.',
       }
       navigate('/login', { replace: true, state: loginState })
+    }
+  }
+
+  const handleGoogleCredential = async (credential: string) => {
+    setSubmitError(null)
+    setStatus('logging-in')
+    try {
+      // Si la cuenta no existe, el backend la crea con los datos de Google.
+      await loginWithGoogle(credential)
+    } catch (error) {
+      setSubmitError(getGoogleLoginErrorMessage(error))
+      setStatus('idle')
     }
   }
 
@@ -160,6 +173,13 @@ export function RegisterPage() {
           {SUBMIT_LABELS[status]}
         </button>
       </form>
+
+      <GoogleSignInButton
+        text="signup_with"
+        dividerLabel="o registrate con"
+        disabled={isSubmitting}
+        onCredential={(credential) => void handleGoogleCredential(credential)}
+      />
 
       <div className="auth-footer">
         ¿Ya tienes cuenta?{' '}

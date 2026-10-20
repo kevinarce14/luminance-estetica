@@ -28,3 +28,28 @@ export type ServicePublic = Pick<
   Service,
   'id' | 'name' | 'description' | 'duration_minutes' | 'price' | 'category' | 'image_url'
 >
+
+/** Servicio completo para el panel admin (schema ServiceResponse). */
+export interface ServiceAdmin extends Service {
+  updated_at: string | null
+}
+
+/** Body de POST /services/ y PUT /services/{id}. */
+export interface ServicePayload {
+  name: string
+  description: string | null
+  duration_minutes: number
+  price: number
+  category: ServiceCategory
+  image_url: string | null
+}
+
+/** Valores del formulario de servicio (inputs controlados). */
+export interface ServiceFormValues {
+  name: string
+  description: string
+  duration_minutes: string
+  price: string
+  category: ServiceCategory
+  image_url: string
+}

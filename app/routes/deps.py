@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.security import decode_access_token
+from app.core.security import PASSWORD_RESET_TOKEN_TYPE, decode_access_token
 from app.core.config import settings
 from app.models.user import User
 
@@ -40,7 +40,15 @@ def get_current_user(
     # Decodificar token
     payload = decode_access_token(token)
     email: str = payload.get("sub")
-    
+
+    # Los tokens de recuperación de contraseña (que viajan por email) no son sesiones
+    if payload.get("type") == PASSWORD_RESET_TOKEN_TYPE:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No se pudo validar las credenciales",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     if not email:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -1,7 +1,9 @@
 # app/schemas/payment.py
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
-from typing import Optional, Any
+from typing import Literal, Optional, Any
+
+from app.models.payment import PaymentStatus
 
 
 class PaymentBase(BaseModel):
@@ -110,9 +112,15 @@ class MercadoPagoWebhook(BaseModel):
 class PaymentStatusUpdate(BaseModel):
     """
     Schema para actualizar el estado de un pago manualmente (admin).
+    Transiciones válidas: pending → approved | rejected | cancelled; approved → refunded.
     """
-    status: str = Field(..., min_length=3, max_length=50)
+    status: PaymentStatus
     notes: Optional[str] = Field(None, max_length=500)
+
+    @field_validator('status', mode='before')
+    @classmethod
+    def normalize_status(cls, v):
+        return v.lower() if isinstance(v, str) else v
     
     class Config:
         json_schema_extra = {
@@ -121,3 +129,14 @@ class PaymentStatusUpdate(BaseModel):
                 "notes": "Pago confirmado por transferencia bancaria"
             }
         }
+
+
+class ManualPaymentRequest(BaseModel):
+    """
+    Registrar un pago manual aprobado por el admin (efectivo en el estudio o transferencia).
+    Confirma el turno asociado.
+    """
+    appointment_id: int = Field(..., gt=0)
+    payment_method: Literal["cash", "transfer"] = "cash"
+    reference: Optional[str] = Field(None, max_length=255, description="Nro. de operación / comprobante")
+    notes: Optional[str] = Field(None, max_length=500)

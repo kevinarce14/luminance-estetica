@@ -262,3 +262,82 @@
     font-size: 16px; /* Evita zoom en iOS */
   }
 }
+
+/* ===== GOOGLE (login.html) ===== */
+.auth-google {
+  margin-top: 20px;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e8e8e8;
+}
+
+.auth-google__button {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.auth-google__button--disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.auth-google__error {
+  margin: 0;
+  font-size: 0.9rem;
+  text-align: center;
+  color: #c0392b;
+}
+
+/* ===== RECUPERAR CONTRASEÑA ===== */
+.auth-footer--forgot {
+  margin-top: 14px;
+}
+
+.auth-footer--forgot a {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--lila-medio);
+}
+
+.auth-submit--link {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.auth-text-button {
+  display: block;
+  margin: 14px auto 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--rosa-medio);
+  cursor: pointer;
+}
+
+.auth-text-button:hover {
+  text-decoration: underline;
+}
+
+.auth-alert a {
+  font-weight: 700;
+  color: inherit;
+}

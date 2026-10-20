@@ -4,6 +4,21 @@ from datetime import datetime
 from typing import Optional
 
 
+PASSWORD_MIN_LENGTH = 8
+PASSWORD_MAX_LENGTH = 100
+
+
+def check_password_strength(value: str) -> str:
+    """Política de contraseñas (registro y reseteo): mayúscula, minúscula y número."""
+    if not any(c.isupper() for c in value):
+        raise ValueError('La contraseña debe contener al menos una letra mayúscula')
+    if not any(c.islower() for c in value):
+        raise ValueError('La contraseña debe contener al menos una letra minúscula')
+    if not any(c.isdigit() for c in value):
+        raise ValueError('La contraseña debe contener al menos un número')
+    return value
+
+
 class UserBase(BaseModel):
     """Schema base de Usuario con campos comunes"""
     email: EmailStr
@@ -21,18 +36,12 @@ class UserCreate(UserBase):
         - password: Contraseña (mínimo 8 caracteres)
         - phone: Teléfono (opcional)
     """
-    password: str = Field(..., min_length=8, max_length=100)
+    password: str = Field(..., min_length=PASSWORD_MIN_LENGTH, max_length=PASSWORD_MAX_LENGTH)
     
     @validator('password')
     def validate_password_strength(cls, v):
         """Valida que la contraseña tenga al menos una mayúscula, una minúscula y un número"""
-        if not any(c.isupper() for c in v):
-            raise ValueError('La contraseña debe contener al menos una letra mayúscula')
-        if not any(c.islower() for c in v):
-            raise ValueError('La contraseña debe contener al menos una letra minúscula')
-        if not any(c.isdigit() for c in v):
-            raise ValueError('La contraseña debe contener al menos un número')
-        return v
+        return check_password_strength(v)
     
     @validator('phone')
     def validate_phone(cls, v):

@@ -19,3 +19,9 @@ export interface MainLayoutOutletContext {
   /** Contenedor del header donde una página puede montar su sub-navegación con un portal. */
   subnavContainer: HTMLElement | null
 }
+
+/** Estado de /forgot-password y /reset-password: email precargado y código del link del email. */
+export interface PasswordResetLocationState {
+  email?: string
+  token?: string
+}

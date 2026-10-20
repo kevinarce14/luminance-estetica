@@ -7,6 +7,7 @@ import {
 } from 'react'
 import {
   fetchCurrentUser,
+  requestGoogleLogin,
   requestLogin,
   requestRegister,
 } from '../services/authApi.ts'
@@ -49,8 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const login = useCallback(async (credentials: LoginCredentials) => {
-    const { access_token: token } = await requestLogin(credentials)
+  /** Con el JWT ya emitido: obtiene /users/me y persiste la sesión. */
+  const startSession = useCallback(async (token: string) => {
     const user = await fetchCurrentUser(token)
     const newSession: AuthSession = { token, user }
 
@@ -58,6 +59,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(newSession)
     return user
   }, [])
+
+  const login = useCallback(
+    async (credentials: LoginCredentials) => {
+      const { access_token: token } = await requestLogin(credentials)
+      return startSession(token)
+    },
+    [startSession],
+  )
+
+  const loginWithGoogle = useCallback(
+    async (credential: string) => {
+      const { access_token: token } = await requestGoogleLogin(credential)
+      return startSession(token)
+    },
+    [startSession],
+  )
 
   const register = useCallback(
     (payload: RegisterPayload) => requestRegister(payload),
@@ -76,10 +93,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: session !== null,
       isAdmin: session?.user.is_admin === true,
       login,
+      loginWithGoogle,
       register,
       logout,
     }),
-    [session, login, register, logout],
+    [session, login, loginWithGoogle, register, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

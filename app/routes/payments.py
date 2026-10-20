@@ -14,6 +14,7 @@ from app.models.user import User
 from app.models.payment import Payment, PaymentMethod, PaymentStatus
 from app.models.appointment import Appointment, AppointmentStatus
 from app.schemas.payment import (
+    ManualPaymentRequest,
     PaymentCreate,
     PaymentResponse,
     MercadoPagoPreference,
@@ -23,10 +24,12 @@ from app.schemas.payment import (
 from app.services.payment_service import payment_service
 from app.services.email_service import email_service
 
-from pydantic import BaseModel
 
-class CashPaymentRequest(BaseModel):
-    appointment_id: int
+# Transiciones manuales permitidas desde el panel admin
+ALLOWED_PAYMENT_TRANSITIONS = {
+    PaymentStatus.PENDING: {PaymentStatus.APPROVED, PaymentStatus.REJECTED, PaymentStatus.CANCELLED},
+    PaymentStatus.APPROVED: {PaymentStatus.REFUNDED},
+}
 
 router = APIRouter(prefix="/payments", tags=["Pagos"])
 
@@ -347,23 +350,41 @@ def update_payment_status(
             detail="Pago no encontrado"
         )
     
-    was_already_approved = payment.status == PaymentStatus.APPROVED
-    payment.status = status_update.status
+    new_status = status_update.status
+    if new_status == payment.status:
+        return payment
+    if new_status not in ALLOWED_PAYMENT_TRANSITIONS.get(payment.status, set()):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"No se puede pasar un pago de '{payment.status.value}' a '{new_status.value}'"
+        )
 
-    # Si se aprueba, confirmar el turno y notificar al cliente
-    if status_update.status == PaymentStatus.APPROVED:
-        payment.approved_at = payment.approved_at or utc_now()
-        appointment = db.query(Appointment).filter(
-            Appointment.id == payment.appointment_id
-        ).first()
-        if appointment:
+    appointment = db.query(Appointment).filter(Appointment.id == payment.appointment_id).first()
+    if new_status == PaymentStatus.APPROVED and appointment and appointment.status == AppointmentStatus.CANCELLED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No se puede aprobar el pago de un turno cancelado"
+        )
+
+    payment.status = new_status
+    if new_status == PaymentStatus.APPROVED:
+        payment.approved_at = utc_now()
+        payment.error_message = None
+        if status_update.notes:
+            payment.payment_details = status_update.notes
+        # Confirmar el turno y notificar al cliente
+        if appointment and appointment.status == AppointmentStatus.PENDING:
             appointment.status = AppointmentStatus.CONFIRMED
-            if not was_already_approved:
-                try:
-                    _send_payment_confirmation_email(db, appointment, payment)
-                except Exception as e:
-                    print(f"⚠️ Error enviando email de confirmación: {str(e)}")
-    
+        if appointment:
+            try:
+                _send_payment_confirmation_email(db, appointment, payment)
+            except Exception as e:
+                print(f"⚠️ Error enviando email de confirmación: {str(e)}")
+    elif new_status in (PaymentStatus.REJECTED, PaymentStatus.CANCELLED):
+        payment.error_message = status_update.notes or "Rechazado por el administrador"
+    elif status_update.notes:
+        payment.payment_details = status_update.notes
+
     db.commit()
     db.refresh(payment)
     
@@ -371,94 +392,72 @@ def update_payment_status(
 
 
 @router.post("/cash-payment", response_model=PaymentResponse, status_code=status.HTTP_201_CREATED)
-def create_cash_payment(
-    request: CashPaymentRequest,  # ← Cambio aquí
+def create_manual_payment(
+    request: ManualPaymentRequest,
     current_admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db)
 ):
     """
-    Crear y aprobar un pago en efectivo.
-    
-    Este endpoint es para que el admin confirme pagos en efectivo.
-    Crea el pago y lo marca como aprobado inmediatamente.
-    
+    Registrar un pago manual aprobado (efectivo en el estudio o transferencia bancaria).
+
+    - Si el turno ya tiene un pago (por ej. una preferencia de MP pendiente) se reutiliza
+      ese registro, porque cada turno tiene como máximo un pago.
+    - Confirma el turno y envía el email de confirmación.
+
     Requiere permisos de administrador.
     """
-    appointment_id = request.appointment_id  # ← Y aquí
-    
-    # Verificar que el turno existe
-    appointment = db.query(Appointment).filter(
-        Appointment.id == appointment_id
-    ).first()
-    
+    appointment = db.query(Appointment).filter(Appointment.id == request.appointment_id).first()
     if not appointment:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Turno no encontrado"
         )
-    
-    # Verificar que no tenga un pago ya (cualquier estado)
-    existing_payment = db.query(Payment).filter(
-        Payment.appointment_id == appointment_id
-    ).first()
-    
-    if existing_payment:
-        was_approved = existing_payment.status == PaymentStatus.APPROVED
-        needs_confirmation_email = not was_approved or appointment.status == AppointmentStatus.PENDING
+    if appointment.status == AppointmentStatus.CANCELLED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No se puede registrar un pago para un turno cancelado"
+        )
 
-        # Si ya existe un pago APPROVED, confirmar turno y reenviar email si aún estaba pending
-        if was_approved:
-            if appointment.status != AppointmentStatus.CONFIRMED:
-                appointment.status = AppointmentStatus.CONFIRMED
-                needs_confirmation_email = True
-            if needs_confirmation_email:
-                try:
-                    _send_payment_confirmation_email(db, appointment, existing_payment)
-                except Exception as e:
-                    print(f"⚠️ Error enviando email de confirmación: {str(e)}")
+    method = PaymentMethod.TRANSFER if request.payment_method == "transfer" else PaymentMethod.CASH
+    details = " · ".join(
+        part for part in [
+            f"Comprobante: {request.reference}" if request.reference else None,
+            request.notes,
+        ] if part
+    ) or None
+
+    payment = db.query(Payment).filter(Payment.appointment_id == appointment.id).first()
+    if payment and payment.status == PaymentStatus.APPROVED:
+        # Ya estaba pago: solo asegurar que el turno quede confirmado
+        if appointment.status == AppointmentStatus.PENDING:
+            appointment.status = AppointmentStatus.CONFIRMED
             db.commit()
-            db.refresh(existing_payment)
-            return existing_payment
-        
-        # Si existe un pago en otro estado (PENDING, CANCELLED, etc.)
-        # actualizarlo en vez de crear uno nuevo (evita UniqueViolation)
-        existing_payment.payment_method = PaymentMethod.CASH
-        existing_payment.status = PaymentStatus.APPROVED
-        existing_payment.approved_at = utc_now()
-        
+        db.refresh(payment)
+        return payment
+
+    if payment is None:
+        payment = Payment(
+            appointment_id=appointment.id,
+            user_id=appointment.user_id,
+            amount=appointment.service.price,
+            currency="ARS",
+        )
+        db.add(payment)
+
+    payment.payment_method = method
+    payment.status = PaymentStatus.APPROVED
+    payment.approved_at = utc_now()
+    payment.error_message = None
+    payment.payment_details = details
+
+    if appointment.status == AppointmentStatus.PENDING:
         appointment.status = AppointmentStatus.CONFIRMED
-        
-        try:
-            _send_payment_confirmation_email(db, appointment, existing_payment)
-        except Exception as e:
-            print(f"⚠️ Error enviando email de confirmación: {str(e)}")
-        
-        db.commit()
-        db.refresh(existing_payment)
-        return existing_payment
-    
-    # Crear pago en efectivo
-    db_payment = Payment(
-        appointment_id=appointment_id,
-        user_id=appointment.user_id,
-        amount=appointment.service.price,
-        currency="ARS",
-        payment_method=PaymentMethod.CASH,
-        status=PaymentStatus.APPROVED,
-        approved_at=utc_now()
-    )
-    
-    db.add(db_payment)
-    
-    # Confirmar el turno
-    appointment.status = AppointmentStatus.CONFIRMED
-    
+
     try:
-        _send_payment_confirmation_email(db, appointment, db_payment)
+        _send_payment_confirmation_email(db, appointment, payment)
     except Exception as e:
         print(f"⚠️ Error enviando email de confirmación: {str(e)}")
-    
+
     db.commit()
-    db.refresh(db_payment)
-    
-    return db_payment
+    db.refresh(payment)
+    return payment

@@ -2,6 +2,7 @@ import type {
   FieldErrors,
   LoginCredentials,
   RegisterFormValues,
+  ResetPasswordFormValues,
 } from '../types/auth.ts'
 
 // Límites alineados con app/schemas/user.py (UserCreate) del backend.
@@ -39,7 +40,7 @@ export function getPasswordIssues(password: string): string[] {
   return issues
 }
 
-function validateEmail(email: string): string | undefined {
+export function validateEmail(email: string): string | undefined {
   const value = email.trim()
   if (!value) {
     return 'Ingresá tu email'
@@ -113,4 +114,32 @@ export function validateRegister(
 
 export function hasFieldErrors<T>(errors: FieldErrors<T>): boolean {
   return Object.values(errors).some(Boolean)
+}
+
+/** Pega del email: se ignoran espacios y saltos de línea (igual que el backend). */
+export function normalizeResetToken(token: string): string {
+  return token.replace(/\s+/g, '')
+}
+
+export function validateResetPassword(
+  values: ResetPasswordFormValues,
+): FieldErrors<ResetPasswordFormValues> {
+  const errors: FieldErrors<ResetPasswordFormValues> = {}
+
+  if (normalizeResetToken(values.token).length < 10) {
+    errors.token = 'Pegá el código completo que recibiste por email'
+  }
+
+  const passwordIssues = getPasswordIssues(values.password)
+  if (passwordIssues.length > 0) {
+    errors.password = `La contraseña debe tener: ${passwordIssues.join(', ')}`
+  }
+
+  if (!values.confirmPassword) {
+    errors.confirmPassword = 'Repetí la nueva contraseña'
+  } else if (values.confirmPassword !== values.password) {
+    errors.confirmPassword = 'Las contraseñas no coinciden'
+  }
+
+  return errors
 }

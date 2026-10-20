@@ -4,8 +4,15 @@ import { GuestRoute } from './components/common/GuestRoute.tsx'
 import { LegacyRedirect } from './components/common/LegacyRedirect.tsx'
 import { ProtectedRoute } from './components/common/ProtectedRoute.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
+import { AdminLayout } from './layouts/AdminLayout.tsx'
 import { MainLayout } from './layouts/MainLayout.tsx'
+import { AdminAvailabilityPage } from './pages/admin/AdminAvailabilityPage.tsx'
+import { AdminClientsPage } from './pages/admin/AdminClientsPage.tsx'
+import { AdminPaymentsPage } from './pages/admin/AdminPaymentsPage.tsx'
+import { AdminReportsPage } from './pages/admin/AdminReportsPage.tsx'
+import { AdminServicesPage } from './pages/admin/AdminServicesPage.tsx'
 import { AdminDashboardPage } from './pages/AdminDashboardPage.tsx'
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage.tsx'
 import { LoginPage } from './pages/LoginPage.tsx'
 import { Home } from './pages/Home.tsx'
 import { MisTurnosPage } from './pages/MisTurnosPage.tsx'
@@ -14,6 +21,7 @@ import { PagoExitosoPage } from './pages/PagoExitosoPage.tsx'
 import { PagoFallidoPage } from './pages/PagoFallidoPage.tsx'
 import { PagoPage } from './pages/PagoPage.tsx'
 import { RegisterPage } from './pages/RegisterPage.tsx'
+import { ResetPasswordPage } from './pages/ResetPasswordPage.tsx'
 import { StudioPage } from './pages/StudioPage.tsx'
 import { TurneraPage } from './pages/TurneraPage.tsx'
 
@@ -60,6 +68,22 @@ export default function App() {
               </GuestRoute>
             }
           />
+          <Route
+            path="/forgot-password"
+            element={
+              <GuestRoute>
+                <ForgotPasswordPage />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/reset-password"
+            element={
+              <GuestRoute>
+                <ResetPasswordPage />
+              </GuestRoute>
+            }
+          />
           <Route element={<MainLayout />}>
             <Route path="/studio" element={<StudioPage />} />
             <Route
@@ -92,10 +116,17 @@ export default function App() {
               path="/admin"
               element={
                 <AdminRoute>
-                  <AdminDashboardPage />
+                  <AdminLayout />
                 </AdminRoute>
               }
-            />
+            >
+              <Route index element={<AdminDashboardPage />} />
+              <Route path="servicios" element={<AdminServicesPage />} />
+              <Route path="pagos" element={<AdminPaymentsPage />} />
+              <Route path="clientes" element={<AdminClientsPage />} />
+              <Route path="disponibilidad" element={<AdminAvailabilityPage />} />
+              <Route path="reportes" element={<AdminReportsPage />} />
+            </Route>
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>

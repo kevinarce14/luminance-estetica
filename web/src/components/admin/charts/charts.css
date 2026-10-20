@@ -1,0 +1,168 @@
+/*
+ * Gráficos del panel admin. Una sola serie por gráfico: marca en --chart-mark
+ * (rosa de la marca, validado contra la superficie blanca), textos en tinta.
+ */
+.lm-chart {
+  --chart-mark: #e75480;
+  --chart-mark-active: #c2406a;
+  --chart-grid: #ececec;
+  --chart-ink: var(--texto-oscuro);
+  --chart-ink-muted: var(--texto-medio);
+  margin: 0;
+}
+
+.lm-chart__title {
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: var(--chart-ink);
+}
+
+.lm-chart__plot {
+  position: relative;
+  overflow-x: auto;
+}
+
+.lm-chart__plot svg {
+  display: block;
+  width: 100%;
+  min-width: 520px;
+  height: auto;
+}
+
+.lm-chart__grid {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+
+.lm-chart__tick {
+  fill: var(--chart-ink-muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.lm-chart__value {
+  fill: var(--chart-ink);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lm-chart__bar {
+  fill: var(--chart-mark);
+  transition: fill 0.15s ease;
+}
+
+.lm-chart__bar--active {
+  fill: var(--chart-mark-active);
+}
+
+.lm-chart__hit {
+  fill: transparent;
+  cursor: default;
+  outline: none;
+}
+
+.lm-chart__hit:focus-visible {
+  stroke: var(--lila-oscuro);
+  stroke-width: 2;
+}
+
+.lm-chart__tooltip {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 120px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--blanco);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  font-size: 0.85rem;
+  color: var(--chart-ink);
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 10px));
+}
+
+.lm-chart__tooltip small {
+  color: var(--chart-ink-muted);
+}
+
+.lm-chart__empty {
+  margin: 0;
+  padding: 20px 0;
+  color: var(--chart-ink-muted);
+}
+
+/* ===== Barras horizontales ===== */
+.lm-barlist {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lm-barlist__row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.2fr) 2fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.lm-barlist__label {
+  overflow: hidden;
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--chart-ink);
+}
+
+.lm-barlist__track {
+  display: block;
+  height: 18px;
+}
+
+.lm-barlist__bar {
+  display: block;
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  background: var(--chart-mark);
+}
+
+.lm-barlist__value {
+  display: flex;
+  flex-direction: column;
+  min-width: 70px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--chart-ink);
+}
+
+.lm-barlist__value small {
+  font-weight: 400;
+  color: var(--chart-ink-muted);
+}
+
+@media (max-width: 600px) {
+  .lm-barlist__row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .lm-barlist__track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+@media (forced-colors: active) {
+  .lm-chart__bar,
+  .lm-barlist__bar {
+    fill: CanvasText;
+    background: CanvasText;
+  }
+}

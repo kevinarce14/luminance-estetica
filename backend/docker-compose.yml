@@ -1,0 +1,27 @@
+# PostgreSQL para desarrollo local.
+#   docker compose up -d      → levanta la base (datos persistidos en el volumen)
+#   docker compose down       → la detiene (agregar -v para borrar los datos)
+name: luminance
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: luminance-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: luminance
+      POSTGRES_PASSWORD: luminance
+      POSTGRES_DB: luminance
+      TZ: UTC
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U luminance -d luminance"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:

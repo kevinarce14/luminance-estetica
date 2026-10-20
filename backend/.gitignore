@@ -1,0 +1,15 @@
+# Dependencias y build
+node_modules
+dist
+coverage
+
+# Variables de entorno (usar .env.example como plantilla)
+.env
+.env.*
+!.env.example
+
+# Cliente generado por `prisma generate` (se regenera en postinstall)
+/src/generated/prisma
+
+# Logs
+*.log

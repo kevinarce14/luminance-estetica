@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../config/api.ts'
 import type { ApiError, ValidationErrorItem } from '../types/api.ts'
 import {
   AUTH_EXPIRED_EVENT,
@@ -10,12 +11,8 @@ const DEFAULT_ERROR_MESSAGE = 'Error en la petición'
 const NETWORK_ERROR_MESSAGE =
   'No se pudo conectar con el servidor. Revisá tu conexión e intentá de nuevo.'
 
-function getBaseUrl(): string {
-  return import.meta.env.VITE_API_BASE_URL ?? ''
-}
-
 export function getApiUrl(endpoint: string): string {
-  return `${getBaseUrl()}${API_PREFIX}${endpoint}`
+  return `${API_BASE_URL}${API_PREFIX}${endpoint}`
 }
 
 interface RequestOptions {

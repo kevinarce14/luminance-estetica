@@ -35,6 +35,8 @@ npm run start:dev           # http://localhost:3000/api
 | `db:migrate` | `prisma migrate deploy` |
 | `db:migrate:dev` | Crea una migración nueva a partir de cambios en `schema.prisma` |
 | `db:seed`, `db:studio` | Datos iniciales / explorador visual de Prisma |
+| `db:seed:prod` | Datos iniciales con el código compilado (dentro de la imagen Docker) |
+| `e2e:server` | API para la suite Playwright del frontend (ver abajo) |
 
 ## Estructura
 
@@ -178,10 +180,41 @@ camelCase; `@map` los traduce a las columnas snake_case.
 - **`1_column_defaults`**: agrega `DEFAULT` en la base para los valores que FastAPI ponía
   desde Python (`is_active`, `status`, `currency`, …). Es aditiva y no modifica datos.
 
-Para adoptar Prisma sobre la base existente (Neon) **sin recrear nada** (en una etapa
-posterior, con backup previo):
+Para adoptar Prisma sobre la base existente de Neon **sin recrear nada** (backup, diagnóstico,
+baseline de `0_init` y deploy de `1_column_defaults`) seguí [docs/DEPLOY.md](docs/DEPLOY.md):
+el procedimiento está validado contra una base creada por FastAPI con datos.
+
+## Docker
 
 ```bash
-npx prisma migrate resolve --applied 0_init   # marca la estructura existente como aplicada
-npx prisma migrate deploy                     # aplica solo 1_column_defaults
+docker build -t luminance-api backend/                       # API (imagen liviana, sin CLI de Prisma)
+docker build -t luminance-migrate --target migrate backend/   # job de migraciones (prisma migrate deploy)
 ```
+
+Imagen multistage sobre `node:24.13.0-alpine3.22`: compila en una etapa, copia solo `dist/` y
+las dependencias de producción, corre como usuario `node` y tiene `HEALTHCHECK` contra
+`/api/health`. Las migraciones van en una imagen aparte para no sumar el CLI de Prisma
+(+200 MB) a la API. Deploy en Render y variables: [docs/DEPLOY.md](docs/DEPLOY.md).
+
+## E2E del frontend contra esta API
+
+La suite Playwright de `web/e2e` corre contra NestJS por defecto (y contra FastAPI con
+`E2E_BACKEND=fastapi`). Playwright levanta `npm run e2e:server`
+([test/e2e-server](test/e2e-server)): la API real con email, Google y MercadoPago simulados,
+sobre una base descartable que se recrea en cada corrida, más las rutas auxiliares:
+
+| Ruta | Uso |
+|---|---|
+| `POST /__e2e__/reset-db` · `POST /__e2e__/seed` | Vaciar la base y recargar los datos iniciales |
+| `GET /__e2e__/reset-token?email=` | Token del último email de recuperación |
+| `GET /__e2e__/emails` | Emails "enviados" |
+| `POST /__e2e__/appointments/:id/move-to-past?status=` | Pasar un turno al pasado |
+
+Esas rutas **no existen en la app de producción**: viven en un entrypoint aparte que no se
+compila en `dist/` ni entra en la imagen Docker, y que se niega a arrancar con
+`NODE_ENV=production`.
+
+```bash
+cd web && TEST_DATABASE_URL=postgresql://luminance:luminance@localhost:5433/luminance_e2e npm run test:e2e
+```
+

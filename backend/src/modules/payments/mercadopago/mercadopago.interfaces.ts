@@ -47,7 +47,8 @@ export type MercadoPagoPaymentStatus =
 
 /** Respuesta de GET /v1/payments/:id (campos usados). */
 export interface MercadoPagoPayment {
-  id: number;
+  /** Numérico en MercadoPago; se acepta texto para los dobles de prueba. */
+  id: number | string;
   status: MercadoPagoPaymentStatus;
   status_detail?: string | null;
   external_reference?: string | null;

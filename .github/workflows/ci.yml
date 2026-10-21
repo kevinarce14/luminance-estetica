@@ -152,4 +152,4 @@ jobs:
       - run: docker build -t luminance-migrate --target migrate backend
       # La imagen de la API no debe incluir el CLI de Prisma ni el código de tests.
       - run: |
-          docker run --rm --entrypoint sh luminance-api -c             'test ! -d node_modules/prisma && test ! -d test && test "$(id -un)" = node'
+          docker run --rm --entrypoint sh luminance-api -c             'test ! -d node_modules/prisma && test ! -d test && test ! -d scripts && test "$(id -un)" = node'

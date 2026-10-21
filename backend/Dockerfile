@@ -40,6 +40,9 @@ RUN npm ci --omit=dev --omit=optional --omit=peer --ignore-scripts --no-audit --
 # ---- 4. Migraciones (job previo al deploy) --------------------------------------
 FROM deps AS migrate
 ENV NODE_ENV=production
+# Diagnóstico solo lectura previo al baseline: `docker run … luminance-migrate npm run db:diagnose`.
+COPY tsconfig.json ./
+COPY scripts ./scripts
 USER node
 CMD ["npx", "prisma", "migrate", "deploy"]
 

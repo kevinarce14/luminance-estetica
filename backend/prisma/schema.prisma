@@ -1,13 +1,16 @@
 // Schema de Luminance Estética.
 //
-// Mapea 1:1 las tablas que hoy crea el backend FastAPI (app/models/) en el schema
-// PostgreSQL "luminance-estetica": mismos nombres de tablas, columnas, enums,
-// índices y claves foráneas. Así Prisma puede trabajar sobre la base existente
-// (baseline) sin recrear nada. En el código se usan nombres camelCase y @map los
-// traduce a las columnas snake_case.
+// Mapea 1:1 las tablas de la base de producción (Neon) en el schema PostgreSQL
+// "luminance-estetica": mismos nombres de tablas, columnas, enums, índices y claves
+// foráneas. Así Prisma trabaja sobre la base existente (baseline) sin recrear nada.
+// En el código se usan nombres camelCase y @map los traduce a las columnas snake_case.
 //
-// Fechas: `appointments` usa timestamp SIN zona (UTC "naive", como el legado);
-// el resto de las tablas usa timestamptz.
+// Fechas: todas las columnas son timestamptz, como en producción. (El código actual de
+// FastAPI crea las de `appointments` sin zona; la migración 2_appointments_timestamptz
+// las convierte en esas bases y no hace nada donde ya son timestamptz.)
+//
+// El historial de migraciones (_prisma_migrations) también vive en "luminance-estetica":
+// prisma.config.ts fuerza ese schema para el CLI (la base de Neon es compartida).
 
 generator client {
   provider            = "prisma-client"
@@ -116,19 +119,19 @@ model Service {
   @@schema("luminance-estetica")
 }
 
-/// Turno reservado por un cliente. Las fechas se guardan en UTC sin zona.
+/// Turno reservado por un cliente.
 model Appointment {
   id                 Int               @id @default(autoincrement())
   userId             Int               @map("user_id")
   serviceId          Int               @map("service_id")
-  appointmentDate    DateTime          @map("appointment_date") @db.Timestamp(6)
+  appointmentDate    DateTime          @map("appointment_date") @db.Timestamptz(6)
   status             AppointmentStatus @default(PENDING)
   notes              String?           @db.Text
   reminderSent       Boolean           @default(false) @map("reminder_sent")
-  cancelledAt        DateTime?         @map("cancelled_at") @db.Timestamp(6)
+  cancelledAt        DateTime?         @map("cancelled_at") @db.Timestamptz(6)
   cancellationReason String?           @map("cancellation_reason") @db.Text
-  createdAt          DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt          DateTime?         @updatedAt @map("updated_at") @db.Timestamp(6)
+  createdAt          DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime?         @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   user    User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   service Service  @relation(fields: [serviceId], references: [id], onDelete: NoAction, onUpdate: NoAction)

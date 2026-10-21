@@ -12,7 +12,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,test,prisma}/**/*.ts\"",
+    "lint": "eslint \"{src,test,prisma,scripts}/**/*.ts\"",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -25,7 +25,8 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "e2e:server": "ts-node --transpile-only test/e2e-server/main.ts",
-    "db:seed:prod": "node dist/database/seed-cli.js"
+    "db:seed:prod": "node dist/database/seed-cli.js",
+    "db:diagnose": "ts-node --transpile-only scripts/db-diagnose.ts"
   },
   "dependencies": {
     "@nestjs/common": "11.2.7",

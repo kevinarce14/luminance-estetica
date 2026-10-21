@@ -25,3 +25,19 @@ export function toServicePublic(service: Service): ServicePublic {
     image_url: service.imageUrl,
   };
 }
+
+/** Servicio completo para el panel admin (schema ServiceResponse). */
+export interface ServiceAdmin extends ServicePublic {
+  is_active: boolean;
+  created_at: string;
+  updated_at: string | null;
+}
+
+export function toServiceAdmin(service: Service): ServiceAdmin {
+  return {
+    ...toServicePublic(service),
+    is_active: service.isActive,
+    created_at: service.createdAt.toISOString(),
+    updated_at: service.updatedAt?.toISOString() ?? null,
+  };
+}

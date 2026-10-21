@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { validateEnv } from './config/env.validation';
 import { HealthModule } from './health/health.module';
 import { MailModule } from './mail/mail.module';
+import { AdminModule } from './modules/admin/admin.module';
 import { AppointmentsModule } from './modules/appointments/appointments.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AvailabilityModule } from './modules/availability/availability.module';
@@ -23,6 +24,7 @@ import { UsersModule } from './modules/users/users.module';
     AvailabilityModule,
     AppointmentsModule,
     PaymentsModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

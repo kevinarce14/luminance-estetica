@@ -1,0 +1,17 @@
+# Solo entra al contexto lo necesario para compilar la API.
+node_modules
+dist
+coverage
+src/generated
+test
+.env
+.env.*
+!.env.example
+*.log
+.git
+.gitattributes
+Dockerfile
+.dockerignore
+docker-compose.yml
+README.md
+docs

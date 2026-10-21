@@ -1,0 +1,218 @@
+// Schema de Luminance Estética.
+//
+// Mapea 1:1 las tablas que hoy crea el backend FastAPI (app/models/) en el schema
+// PostgreSQL "luminance-estetica": mismos nombres de tablas, columnas, enums,
+// índices y claves foráneas. Así Prisma puede trabajar sobre la base existente
+// (baseline) sin recrear nada. En el código se usan nombres camelCase y @map los
+// traduce a las columnas snake_case.
+//
+// Fechas: `appointments` usa timestamp SIN zona (UTC "naive", como el legado);
+// el resto de las tablas usa timestamptz.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  // Proyecto CommonJS (NestJS): imports sin extensión para que tsc, Jest y ts-node los resuelvan.
+  moduleFormat        = "cjs"
+  importFileExtension = ""
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["luminance-estetica"]
+}
+
+// =====================================================================
+// ENUMS (los valores en la base son los nombres en mayúsculas)
+// =====================================================================
+
+/// Ciclo de vida de un turno: PENDING → CONFIRMED → COMPLETED (o CANCELLED).
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+
+  @@map("appointmentstatus")
+  @@schema("luminance-estetica")
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+  REFUNDED
+
+  @@map("paymentstatus")
+  @@schema("luminance-estetica")
+}
+
+enum PaymentMethod {
+  MERCADOPAGO
+  CASH
+  TRANSFER
+  CARD_POS
+
+  @@map("paymentmethod")
+  @@schema("luminance-estetica")
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+
+  @@map("discounttype")
+  @@schema("luminance-estetica")
+}
+
+// =====================================================================
+// MODELOS
+// Los índices sobre `id` son redundantes con la PK, pero existen en la base
+// actual: se declaran para que Prisma no intente borrarlos.
+// =====================================================================
+
+/// Clientes y administradores.
+model User {
+  id             Int       @id @default(autoincrement())
+  email          String    @unique(map: "ix_luminance-estetica_users_email") @db.VarChar(255)
+  fullName       String    @map("full_name") @db.VarChar(255)
+  phone          String?   @db.VarChar(50)
+  hashedPassword String    @map("hashed_password") @db.VarChar(255)
+  isActive       Boolean   @default(true) @map("is_active")
+  isAdmin        Boolean   @default(false) @map("is_admin")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  appointments Appointment[]
+  payments     Payment[]
+
+  @@index([id], map: "ix_luminance-estetica_users_id")
+  @@map("users")
+  @@schema("luminance-estetica")
+}
+
+/// Tratamientos del estudio (catálogo público).
+model Service {
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(255)
+  description     String?   @db.Text
+  durationMinutes Int       @map("duration_minutes")
+  /// Precio en ARS.
+  price           Float
+  /// pestañas | cejas | laser | facial | corporal | pies | otros
+  category        String    @db.VarChar(100)
+  isActive        Boolean   @default(true) @map("is_active")
+  imageUrl        String?   @map("image_url") @db.VarChar(500)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  appointments Appointment[]
+
+  @@index([category], map: "ix_luminance-estetica_services_category")
+  @@index([id], map: "ix_luminance-estetica_services_id")
+  @@index([name], map: "ix_luminance-estetica_services_name")
+  @@map("services")
+  @@schema("luminance-estetica")
+}
+
+/// Turno reservado por un cliente. Las fechas se guardan en UTC sin zona.
+model Appointment {
+  id                 Int               @id @default(autoincrement())
+  userId             Int               @map("user_id")
+  serviceId          Int               @map("service_id")
+  appointmentDate    DateTime          @map("appointment_date") @db.Timestamp(6)
+  status             AppointmentStatus @default(PENDING)
+  notes              String?           @db.Text
+  reminderSent       Boolean           @default(false) @map("reminder_sent")
+  cancelledAt        DateTime?         @map("cancelled_at") @db.Timestamp(6)
+  cancellationReason String?           @map("cancellation_reason") @db.Text
+  createdAt          DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt          DateTime?         @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  service Service  @relation(fields: [serviceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payment Payment?
+
+  @@index([appointmentDate], map: "ix_luminance-estetica_appointments_appointment_date")
+  @@index([id], map: "ix_luminance-estetica_appointments_id")
+  @@index([serviceId], map: "ix_luminance-estetica_appointments_service_id")
+  @@index([status], map: "ix_luminance-estetica_appointments_status")
+  @@index([userId], map: "ix_luminance-estetica_appointments_user_id")
+  @@map("appointments")
+  @@schema("luminance-estetica")
+}
+
+/// Horario del estudio. Dos tipos de fila:
+/// - Regular: dayOfWeek (0=Domingo … 6=Sábado) y specificDate NULL.
+/// - Excepción: specificDate (feriado, horario especial) y dayOfWeek NULL.
+/// startTime/endTime NULL con isAvailable=false bloquea el día completo.
+model Availability {
+  id           Int       @id @default(autoincrement())
+  dayOfWeek    Int?      @map("day_of_week")
+  specificDate DateTime? @map("specific_date") @db.Date
+  startTime    DateTime? @map("start_time") @db.Time(6)
+  endTime      DateTime? @map("end_time") @db.Time(6)
+  isAvailable  Boolean   @default(true) @map("is_available")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([dayOfWeek], map: "ix_luminance-estetica_availability_day_of_week")
+  @@index([id], map: "ix_luminance-estetica_availability_id")
+  @@index([specificDate], map: "ix_luminance-estetica_availability_specific_date")
+  @@map("availability")
+  @@schema("luminance-estetica")
+}
+
+/// Pago de un turno (uno por turno): MercadoPago o registrado a mano por el admin.
+model Payment {
+  id                      Int           @id @default(autoincrement())
+  appointmentId           Int           @unique(map: "ix_luminance-estetica_payments_appointment_id") @map("appointment_id")
+  userId                  Int           @map("user_id")
+  amount                  Float
+  currency                String        @default("ARS") @db.VarChar(10)
+  paymentMethod           PaymentMethod @default(MERCADOPAGO) @map("payment_method")
+  status                  PaymentStatus @default(PENDING)
+  mercadopagoId           String?       @map("mercadopago_id") @db.VarChar(255)
+  mercadopagoPreferenceId String?       @map("mercadopago_preference_id") @db.VarChar(255)
+  transactionId           String?       @unique @map("transaction_id") @db.VarChar(255)
+  /// JSON serializado con datos del medio de pago.
+  paymentDetails          String?       @map("payment_details") @db.Text
+  errorMessage            String?       @map("error_message") @db.Text
+  createdAt               DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt               DateTime?     @updatedAt @map("updated_at") @db.Timestamptz(6)
+  approvedAt              DateTime?     @map("approved_at") @db.Timestamptz(6)
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user        User        @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([id], map: "ix_luminance-estetica_payments_id")
+  @@index([mercadopagoId], map: "ix_luminance-estetica_payments_mercadopago_id")
+  @@index([status], map: "ix_luminance-estetica_payments_status")
+  @@index([userId], map: "ix_luminance-estetica_payments_user_id")
+  @@map("payments")
+  @@schema("luminance-estetica")
+}
+
+/// Cupones de descuento (existen en la base; el legado todavía no los usa).
+model Coupon {
+  id                Int          @id @default(autoincrement())
+  code              String       @unique(map: "ix_luminance-estetica_coupons_code") @db.VarChar(50)
+  description       String?      @db.VarChar(500)
+  discountType      DiscountType @map("discount_type")
+  /// Porcentaje (0–100) o monto fijo en ARS, según discountType.
+  discountValue     Float        @map("discount_value")
+  minPurchaseAmount Float        @default(0) @map("min_purchase_amount")
+  /// NULL = usos ilimitados.
+  maxUses           Int?         @map("max_uses")
+  usesCount         Int          @default(0) @map("uses_count")
+  validFrom         DateTime?    @map("valid_from") @db.Date
+  validUntil        DateTime?    @map("valid_until") @db.Date
+  isActive          Boolean      @default(true) @map("is_active")
+  createdAt         DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime?    @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([id], map: "ix_luminance-estetica_coupons_id")
+  @@map("coupons")
+  @@schema("luminance-estetica")
+}

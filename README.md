@@ -185,6 +185,29 @@ python -m http.server 5000
 
 ---
 
+## 🧪 Tests
+
+Los tests de backend y E2E necesitan una base **PostgreSQL descartable** en `TEST_DATABASE_URL`:
+borran y recrean el schema en cada corrida, y nunca usan el `.env` ni servicios externos
+(email, MercadoPago y Google se simulan).
+
+```bash
+# Backend (pytest)
+TEST_DATABASE_URL=postgresql://postgres@localhost:5432/luminance_test python -m pytest
+
+# Frontend: unitarios (Vitest)
+cd web && npm test
+
+# E2E (Playwright: navegador + Vite + backend reales, puertos 5180 y 8800)
+cd web && npx playwright install chromium
+TEST_DATABASE_URL=postgresql://postgres@localhost:5432/luminance_e2e npm run test:e2e                      # contra NestJS
+E2E_BACKEND=fastapi TEST_DATABASE_URL=postgresql://postgres@localhost:5432/luminance_e2e npm run test:e2e  # contra FastAPI
+```
+
+GitHub Actions (`.github/workflows/ci.yml`) corre en cada push y PR a `main` y `develop`: pytest, el backend NestJS (lint, build, unitarios, migraciones y e2e), el frontend (lint, build, Vitest), la suite Playwright contra **los dos backends** y la construcción de la imagen Docker.
+
+---
+
 ## 📡 Endpoints Destacados de la API
 
 * `POST /api/v1/auth/login` — Autenticación y emisión de JWT.

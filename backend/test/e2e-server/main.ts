@@ -28,8 +28,9 @@ async function recreateDatabase(databaseUrl: string): Promise<void> {
     await prisma.$executeRawUnsafe(
       'DROP SCHEMA IF EXISTS "luminance-estetica" CASCADE',
     );
-    // Prisma guarda el historial en el schema por defecto (public), no en el de la app:
-    // sin borrarlo, `migrate deploy` creería que las migraciones ya están aplicadas.
+    // El historial vive en "luminance-estetica" (prisma.config.ts) y se borra con el schema;
+    // las bases de antes de ese cambio lo tienen en public: sin borrarlo, `migrate deploy`
+    // creería que las migraciones ya están aplicadas.
     await prisma.$executeRawUnsafe(
       'DROP TABLE IF EXISTS public."_prisma_migrations"',
     );

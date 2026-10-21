@@ -35,6 +35,7 @@ npm run start:dev           # http://localhost:3000/api
 | `db:migrate` | `prisma migrate deploy` |
 | `db:migrate:dev` | Crea una migración nueva a partir de cambios en `schema.prisma` |
 | `db:seed`, `db:studio` | Datos iniciales / explorador visual de Prisma |
+| `db:diagnose` | Diagnóstico solo lectura de una base antes de migrar (docs/DEPLOY.md) |
 | `db:seed:prod` | Datos iniciales con el código compilado (dentro de la imagen Docker) |
 | `e2e:server` | API para la suite Playwright del frontend (ver abajo) |
 
@@ -64,7 +65,7 @@ src/
     └── admin/             # agenda, pagos, clientes, dashboard y reportes del panel
 prisma/
 ├── schema.prisma          # modelos: User, Service, Appointment, Availability, Payment, Coupon
-├── migrations/            # 0_init (estructura actual) + 1_column_defaults
+├── migrations/            # 0_init + 1_column_defaults + 2_appointments_timestamptz
 └── seed.ts
 ```
 
@@ -171,18 +172,25 @@ recuperación se muestra en la consola de la API para poder probar el flujo.
 
 ## Schema y migraciones
 
-`schema.prisma` mapea **1:1** las tablas que crea hoy FastAPI (verificado con
-`prisma migrate diff` contra una base creada por los modelos SQLAlchemy): mismos nombres de
-tablas, columnas, tipos, enums, índices y claves foráneas. En el código se usan nombres
-camelCase; `@map` los traduce a las columnas snake_case.
+`schema.prisma` mapea **1:1** las tablas de producción (Neon): mismos nombres de tablas,
+columnas, tipos, enums, índices y claves foráneas, verificado con `prisma migrate diff`. En el
+código se usan nombres camelCase; `@map` los traduce a las columnas snake_case.
 
-- **`0_init`**: la estructura exacta del legado.
+- **`0_init`**: la estructura que crea el código actual de FastAPI.
 - **`1_column_defaults`**: agrega `DEFAULT` en la base para los valores que FastAPI ponía
   desde Python (`is_active`, `status`, `currency`, …). Es aditiva y no modifica datos.
+- **`2_appointments_timestamptz`**: pasa las fechas de `appointments` a `timestamptz`, como
+  están en Neon. Solo convierte las columnas que sigan sin zona (interpretándolas como UTC,
+  así cada turno conserva su instante); en Neon no hace nada.
 
-Para adoptar Prisma sobre la base existente de Neon **sin recrear nada** (backup, diagnóstico,
-baseline de `0_init` y deploy de `1_column_defaults`) seguí [docs/DEPLOY.md](docs/DEPLOY.md):
-el procedimiento está validado contra una base creada por FastAPI con datos.
+El historial de Prisma (`_prisma_migrations`) vive en `luminance-estetica`, no en `public`:
+`prisma.config.ts` fuerza ese schema en el CLI porque la base de Neon es compartida con otros
+proyectos. (Una base local de antes de este cambio tiene el historial en `public`: se mueve con
+`ALTER TABLE public."_prisma_migrations" SET SCHEMA "luminance-estetica";`.)
+
+`npm run db:diagnose` revisa una base **en solo lectura** y dice si está lista para adoptar las
+migraciones, al día o con diferencias que bloquean. Para adoptar Prisma sobre Neon **sin
+recrear nada** seguí [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Docker
 

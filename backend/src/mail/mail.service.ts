@@ -5,7 +5,10 @@ import {
   parseFrontendOrigins,
   type EnvironmentVariables,
 } from '../config/env.validation';
+import { formatForHumans } from '../common/time/zoned-time';
 import {
+  appointmentCancelledEmail,
+  appointmentRescheduledEmail,
   passwordChangedEmail,
   passwordResetEmail,
   welcomeEmail,
@@ -47,6 +50,40 @@ export class MailService {
 
   sendPasswordChanged(to: string, userName: string): Promise<boolean> {
     return this.send(to, passwordChangedEmail(userName));
+  }
+
+  sendAppointmentCancelled(
+    to: string,
+    userName: string,
+    serviceName: string,
+    appointmentDate: Date,
+  ): Promise<boolean> {
+    return this.send(
+      to,
+      appointmentCancelledEmail(
+        userName,
+        serviceName,
+        this.studioTime(appointmentDate),
+      ),
+    );
+  }
+
+  sendAppointmentRescheduled(
+    to: string,
+    userName: string,
+    serviceName: string,
+    previousDate: Date,
+    newDate: Date,
+  ): Promise<boolean> {
+    return this.send(
+      to,
+      appointmentRescheduledEmail(
+        userName,
+        serviceName,
+        this.studioTime(previousDate),
+        this.studioTime(newDate),
+      ),
+    );
   }
 
   private async send(to: string, content: MailContent): Promise<boolean> {
@@ -109,6 +146,13 @@ export class MailService {
 
   private isDevelopment(): boolean {
     return this.config.get('NODE_ENV', { infer: true }) === NodeEnv.Development;
+  }
+
+  private studioTime(instant: Date): string {
+    return formatForHumans(
+      instant,
+      this.config.get('TIMEZONE', { infer: true }),
+    );
   }
 
   private frontendUrl(): string {

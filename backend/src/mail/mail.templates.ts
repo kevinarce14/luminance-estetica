@@ -72,3 +72,37 @@ export function passwordChangedEmail(userName: string): MailContent {
     ),
   };
 }
+
+/** Fechas ya formateadas en la hora del studio (ver formatForHumans). */
+export function appointmentCancelledEmail(
+  userName: string,
+  serviceName: string,
+  when: string,
+): MailContent {
+  return {
+    subject: `Turno Cancelado - ${serviceName}`,
+    html: layout(
+      'Turno cancelado',
+      `<p>Hola ${escapeHtml(userName)},</p>
+       <p>Tu turno de <strong>${escapeHtml(serviceName)}</strong> del ${escapeHtml(when)} fue cancelado.</p>
+       <p>Podés reservar un nuevo horario cuando quieras desde la web.</p>`,
+    ),
+  };
+}
+
+export function appointmentRescheduledEmail(
+  userName: string,
+  serviceName: string,
+  previousWhen: string,
+  newWhen: string,
+): MailContent {
+  return {
+    subject: `Turno Reprogramado - ${serviceName}`,
+    html: layout(
+      'Turno reprogramado',
+      `<p>Hola ${escapeHtml(userName)},</p>
+       <p>Tu turno de <strong>${escapeHtml(serviceName)}</strong> cambió de horario:</p>
+       <p>Antes: ${escapeHtml(previousWhen)}<br>Ahora: <strong>${escapeHtml(newWhen)}</strong></p>`,
+    ),
+  };
+}

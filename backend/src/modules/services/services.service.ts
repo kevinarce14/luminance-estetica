@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { Service } from '../../generated/prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ListServicesQueryDto } from './dto/list-services-query.dto';
-import type { ServicePublic } from './interfaces/service-public.interface';
+import {
+  toServicePublic,
+  type ServicePublic,
+} from './interfaces/service-public.interface';
 
 @Injectable()
 export class ServicesService {
@@ -33,16 +35,4 @@ export class ServicesService {
     }
     return toServicePublic(service);
   }
-}
-
-function toServicePublic(service: Service): ServicePublic {
-  return {
-    id: service.id,
-    name: service.name,
-    description: service.description,
-    duration_minutes: service.durationMinutes,
-    price: service.price,
-    category: service.category,
-    image_url: service.imageUrl,
-  };
 }

@@ -106,3 +106,22 @@ export function appointmentRescheduledEmail(
     ),
   };
 }
+
+export function paymentConfirmedEmail(
+  userName: string,
+  serviceName: string,
+  amount: string,
+  when: string,
+): MailContent {
+  return {
+    subject: `✅ Pago Confirmado - ${serviceName}`,
+    html: layout(
+      'Pago confirmado',
+      `<p>Hola ${escapeHtml(userName)},</p>
+       <p>Recibimos tu pago exitosamente. Tu turno está 100% confirmado.</p>
+       <p><strong>Servicio:</strong> ${escapeHtml(serviceName)}<br>
+          <strong>Monto pagado:</strong> ${escapeHtml(amount)}<br>
+          <strong>Turno:</strong> ${escapeHtml(when)}</p>`,
+    ),
+  };
+}

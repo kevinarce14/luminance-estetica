@@ -1,5 +1,9 @@
 import { Transform, Type } from 'class-transformer';
 import {
+  toBoolean,
+  toTrimmedLowercase,
+} from '../../../common/transformers/query.transformers';
+import {
   IsBoolean,
   IsInt,
   IsOptional,
@@ -8,13 +12,6 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-
-/** Convierte los valores de query string ("true", "1", "false", "0") a boolean. */
-function toBoolean({ value }: { value: unknown }): unknown {
-  if (value === 'true' || value === '1') return true;
-  if (value === 'false' || value === '0') return false;
-  return value;
-}
 
 /** Query params de GET /api/services (mismos nombres que el backend FastAPI). */
 export class ListServicesQueryDto {
@@ -32,9 +29,7 @@ export class ListServicesQueryDto {
   limit = 100;
 
   @IsOptional()
-  @Transform(({ value }: { value: unknown }) =>
-    typeof value === 'string' ? value.trim().toLowerCase() : value,
-  )
+  @Transform(toTrimmedLowercase)
   @IsString()
   @MaxLength(100)
   category?: string;

@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import type { Service } from '../generated/prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import type { Service } from '../../generated/prisma/client';
+import { PrismaService } from '../../prisma/prisma.service';
 import { ListServicesQueryDto } from './dto/list-services-query.dto';
 import { ServicesService } from './services.service';
 

@@ -73,11 +73,11 @@ describe('API (e2e)', () => {
     expect(response.body).toHaveLength(2);
   });
 
-  it('ValidationPipe: rechaza query params inválidos o desconocidos', async () => {
+  it('ValidationPipe: rechaza con 422 query params inválidos o desconocidos', async () => {
     const invalid = await request(app.getHttpServer())
       .get('/api/services')
       .query({ limit: 0, is_active: 'quizas' })
-      .expect(400);
+      .expect(422);
     expect((invalid.body as { message: string[] }).message).toEqual(
       expect.arrayContaining([
         'limit debe ser al menos 1',
@@ -88,10 +88,10 @@ describe('API (e2e)', () => {
     await request(app.getHttpServer())
       .get('/api/services')
       .query({ orden: 'precio' })
-      .expect(400);
+      .expect(422);
   });
 
-  it('GET /api/services/:id: 404 en español y 400 si el id no es numérico', async () => {
+  it('GET /api/services/:id: 404 en español y 422 si el id no es numérico', async () => {
     const missing = await request(app.getHttpServer())
       .get('/api/services/999999')
       .expect(404);
@@ -99,6 +99,6 @@ describe('API (e2e)', () => {
       'Servicio no encontrado',
     );
 
-    await request(app.getHttpServer()).get('/api/services/abc').expect(400);
+    await request(app.getHttpServer()).get('/api/services/abc').expect(422);
   });
 });

@@ -1,12 +1,13 @@
 /**
- * Datos iniciales (idempotente): catálogo de servicios y horario semanal,
- * los mismos que crea el backend FastAPI al arrancar (create_initial_data).
- * El admin inicial se agrega en la feature de autenticación (requiere bcrypt).
+ * Datos iniciales (idempotente): administrador inicial, catálogo de servicios y
+ * horario semanal, los mismos que crea el backend FastAPI al arrancar
+ * (create_initial_data). El admin se toma de INITIAL_ADMIN_* (ver .env.example).
  *
  *   npm run db:seed
  */
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { hash } from 'bcryptjs';
 import { Prisma, PrismaClient } from '../src/generated/prisma/client';
 
 const SERVICES: Prisma.ServiceCreateInput[] = [
@@ -98,6 +99,30 @@ async function main(): Promise<void> {
   });
 
   try {
+    const adminEmail = (
+      process.env.INITIAL_ADMIN_EMAIL ?? 'admin@luminancestudio.com'
+    )
+      .trim()
+      .toLowerCase();
+    const adminExists = await prisma.user.findUnique({
+      where: { email: adminEmail },
+    });
+    if (!adminExists) {
+      await prisma.user.create({
+        data: {
+          email: adminEmail,
+          fullName: process.env.INITIAL_ADMIN_NAME ?? 'Admin',
+          phone: '',
+          // Mismo costo que PasswordService (y que passlib en el legado).
+          hashedPassword: await hash(
+            process.env.INITIAL_ADMIN_PASSWORD ?? 'ChangeThisPassword123!',
+            12,
+          ),
+          isAdmin: true,
+        },
+      });
+    }
+
     let createdServices = 0;
     for (const data of SERVICES) {
       const exists = await prisma.service.findFirst({
@@ -123,7 +148,7 @@ async function main(): Promise<void> {
     }
 
     console.log(
-      `Seed listo: ${createdServices} servicios y ${createdDays} días de horario creados.`,
+      `Seed listo: admin ${adminExists ? 'existente' : 'creado'} (${adminEmail}), ${createdServices} servicios y ${createdDays} días de horario creados.`,
     );
   } finally {
     await prisma.$disconnect();

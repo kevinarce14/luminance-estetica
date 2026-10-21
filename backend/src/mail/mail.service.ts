@@ -10,6 +10,7 @@ import {
   appointmentCancelledEmail,
   appointmentRescheduledEmail,
   passwordChangedEmail,
+  paymentConfirmedEmail,
   passwordResetEmail,
   welcomeEmail,
   type MailContent,
@@ -146,6 +147,28 @@ export class MailService {
 
   private isDevelopment(): boolean {
     return this.config.get('NODE_ENV', { infer: true }) === NodeEnv.Development;
+  }
+
+  sendPaymentConfirmed(
+    to: string,
+    userName: string,
+    serviceName: string,
+    amount: number,
+    appointmentDate: Date,
+  ): Promise<boolean> {
+    const formattedAmount = new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS',
+    }).format(amount);
+    return this.send(
+      to,
+      paymentConfirmedEmail(
+        userName,
+        serviceName,
+        formattedAmount,
+        this.studioTime(appointmentDate),
+      ),
+    );
   }
 
   private studioTime(instant: Date): string {

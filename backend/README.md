@@ -57,7 +57,8 @@ src/
     ├── services/          # catálogo público
     ├── availability/      # horarios semanales, excepciones y grilla de horarios libres
     ├── appointments/      # reservas, cancelación y consultas de turnos
-    └── payments/          # (por ahora) contrato de respuesta de pagos
+    └── payments/          # MercadoPago (preferencia + webhook) y pagos manuales
+        └── mercadopago/   # cliente REST tipado y validación de la firma de webhooks
 prisma/
 ├── schema.prisma          # modelos: User, Service, Appointment, Availability, Payment, Coupon
 ├── migrations/            # 0_init (estructura actual) + 1_column_defaults
@@ -91,6 +92,11 @@ Todas bajo `/api`, con el mismo contrato (rutas, JSON snake_case, mensajes) que 
 | `PUT /appointments/:id` | dueño o admin | Reprogramar o editar notas; el estado solo lo cambia el admin |
 | `DELETE /appointments/:id` | admin | Borrado (si no tiene pago registrado) |
 | `GET /appointments/public/confirmed` | público | Horarios ocupados desde hoy: solo fecha y duración |
+| `POST /payments/create-preference` (alias `/payments/mercadopago/preference`) | dueño del turno | Checkout de MercadoPago → `{ preference_id, init_point, sandbox_init_point }` |
+| `POST /payments/webhook` (alias `/payments/mercadopago/webhook`) | MercadoPago | Notificaciones de pago (Webhooks e IPN) |
+| `POST /payments/cash-payment` (alias `/payments/cash`) | admin | Pago manual ya cobrado (efectivo o transferencia): confirma el turno |
+| `PUT /payments/:id/status` | admin | Aprobar, rechazar, cancelar o reembolsar |
+| `GET /payments` · `GET /payments/:id` · `GET /payments/all/payments` | autenticado / admin | Consultas de pagos |
 | `GET /health` | público | Estado de la API y la base |
 
 ### Compatibilidad con el backend FastAPI
@@ -118,6 +124,25 @@ Configurables con `TIMEZONE`, `MIN_APPOINTMENT_DURATION`, `MIN_BOOKING_ADVANCE_H
 - Los bloques que no se pueden reservar (antes de ahora + 2 h, después de 30 días, ocupados)
   se devuelven con `is_available: false`: una lista vacía significa día cerrado.
 - Al reservar se valida además que el turno entre en el horario de atención de ese día.
+
+### Pagos con MercadoPago
+
+1. El cliente elige Mercado Pago en `/pago`: la API crea la preferencia con el **precio del
+   servicio guardado en la base** (el monto que envía el navegador no se usa) y
+   `external_reference` = ID del turno. Un turno tiene un solo pago: reintentar reutiliza
+   el registro.
+2. MercadoPago redirige a `FRONTEND_URL/pago/exitoso`, `/pago/fallido` o `/pago` y notifica a
+   `BACKEND_URL/api/payments/webhook` (solo si `BACKEND_URL` es HTTPS; en local no puede llegar).
+3. El webhook valida la firma `x-signature` (si hay `MERCADOPAGO_WEBHOOK_SECRET`), consulta el
+   estado real en la API de MercadoPago y aplica la transición. Es idempotente y tolera
+   notificaciones desordenadas: un pago aprobado no vuelve atrás (salvo reembolso).
+4. Aprobado → turno **confirmado** y email al cliente. Si el monto es menor al precio, si el
+   turno estaba cancelado o si el horario ya lo ocupa otro turno confirmado, el cobro queda
+   registrado con un `error_message` para que el admin lo resuelva.
+
+Rechazar un pago desde el panel deja el turno **pendiente de pago** (el cliente puede reintentar),
+como indica el panel admin. Para pruebas locales se usa un Access Token `TEST-…` y las
+tarjetas de prueba de MercadoPago; los tests e2e usan un MercadoPago simulado por HTTP.
 
 Sin credenciales de Mailjet los emails no se envían; en desarrollo, el link de
 recuperación se muestra en la consola de la API para poder probar el flujo.

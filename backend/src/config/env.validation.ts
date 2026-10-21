@@ -108,6 +108,25 @@ export class EnvironmentVariables {
   @IsInt()
   @Min(1)
   MAX_BOOKING_ADVANCE_DAYS = 30;
+
+  // ===== MercadoPago (sin access token, el pago online queda deshabilitado) =====
+  @IsOptional()
+  @IsString()
+  MERCADOPAGO_ACCESS_TOKEN?: string;
+
+  /** Clave secreta de la sección Webhooks: si está, se valida la firma x-signature. */
+  @IsOptional()
+  @IsString()
+  MERCADOPAGO_WEBHOOK_SECRET?: string;
+
+  /** Base de la API REST (se cambia solo para apuntar a un MercadoPago simulado en tests). */
+  @IsString()
+  MERCADOPAGO_API_URL = 'https://api.mercadopago.com';
+
+  /** URL pública de esta API: MercadoPago envía las notificaciones a BACKEND_URL/api/payments/webhook. */
+  @IsOptional()
+  @IsString()
+  BACKEND_URL?: string;
 }
 
 export function validateEnv(

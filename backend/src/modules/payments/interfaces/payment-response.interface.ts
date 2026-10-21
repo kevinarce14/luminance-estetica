@@ -1,5 +1,28 @@
 import type { Payment } from '../../../generated/prisma/client';
 
+export const PAYMENT_STATUSES = [
+  'pending',
+  'approved',
+  'rejected',
+  'cancelled',
+  'refunded',
+] as const;
+
+export type PaymentStatusValue = (typeof PAYMENT_STATUSES)[number];
+
+/** Respuesta de POST /api/payments/create-preference. */
+export interface MercadoPagoPreferenceResponse {
+  preference_id: string;
+  init_point: string;
+  sandbox_init_point: string | null;
+}
+
+/** Respuesta del webhook (MercadoPago solo mira el código HTTP; el cuerpo ayuda a depurar). */
+export interface WebhookResult {
+  status: 'ok' | 'ignored' | 'error';
+  reason?: string;
+}
+
 /** Pago tal como lo expone la API (schema PaymentResponse). Estados y métodos en minúsculas. */
 export interface PaymentResponse {
   id: number;

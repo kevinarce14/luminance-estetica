@@ -54,11 +54,12 @@ src/
     │   ├── guards/        # JwtAuthGuard, AdminGuard
     │   └── decorators/    # @Authenticated(), @AdminOnly(), @CurrentUser()
     ├── users/             # perfil propio y administración de usuarios; PasswordService (bcrypt)
-    ├── services/          # catálogo público
+    ├── services/          # catálogo público y ABM del admin
     ├── availability/      # horarios semanales, excepciones y grilla de horarios libres
     ├── appointments/      # reservas, cancelación y consultas de turnos
-    └── payments/          # MercadoPago (preferencia + webhook) y pagos manuales
+    ├── payments/          # MercadoPago (preferencia + webhook) y pagos manuales
         └── mercadopago/   # cliente REST tipado y validación de la firma de webhooks
+    └── admin/             # agenda, pagos, clientes, dashboard y reportes del panel
 prisma/
 ├── schema.prisma          # modelos: User, Service, Appointment, Availability, Payment, Coupon
 ├── migrations/            # 0_init (estructura actual) + 1_column_defaults
@@ -81,6 +82,7 @@ Todas bajo `/api`, con el mismo contrato (rutas, JSON snake_case, mensajes) que 
 | `GET /users` · `GET /users/:id` | admin | Listado con filtros `is_active`, `is_admin`, `skip`, `limit` |
 | `PUT /users/:id/toggle-active` · `PUT /users/:id/make-admin` | admin | Activar/desactivar y promover a admin |
 | `GET /services` · `/services/:id` · `/services/category/:category` | público | Catálogo |
+| `GET /services/admin/all` · `POST /services` · `PUT /services/:id` · `PUT /services/:id/toggle-active` · `DELETE /services/:id` (alias `/admin/services`) | admin | ABM del catálogo (no se borra un servicio con turnos) |
 | `POST /availability/available-slots` (alias `GET ?service_id=&date=`) | público | Grilla de horarios de un servicio en una fecha |
 | `GET /availability/check/:date` | público | Horario efectivo de una fecha |
 | `GET` · `POST /availability/regular` · `PUT` · `DELETE /availability/regular/:id` | admin | Horarios semanales |
@@ -97,6 +99,11 @@ Todas bajo `/api`, con el mismo contrato (rutas, JSON snake_case, mensajes) que 
 | `POST /payments/cash-payment` (alias `/payments/cash`) | admin | Pago manual ya cobrado (efectivo o transferencia): confirma el turno |
 | `PUT /payments/:id/status` | admin | Aprobar, rechazar, cancelar o reembolsar |
 | `GET /payments` · `GET /payments/:id` · `GET /payments/all/payments` | autenticado / admin | Consultas de pagos |
+| `GET /admin/dashboard` | admin | Turnos de hoy/semana/mes, pendientes, cobrado vs. estimado, servicios más reservados |
+| `GET /admin/appointments` (`/upcoming`, `/today`) | admin | Agenda: `date`, `date_from`, `date_to`, `status`, `search`, `user_id`, `order`, `skip`, `limit` |
+| `GET /admin/payments` | admin | Pagos con cliente y turno: `status`, `method`, `search` |
+| `GET /admin/clients` | admin | Clientes con turnos, completados, cancelados, último turno y total pagado |
+| `GET /admin/reports/yearly?year=` · `/admin/reports/monthly?year=&month=` | admin | Ingresos y turnos por mes, servicios y medios de pago |
 | `GET /health` | público | Estado de la API y la base |
 
 ### Compatibilidad con el backend FastAPI
@@ -110,6 +117,19 @@ Mientras convivan, ambas APIs pueden compartir base y `SECRET_KEY`:
   deja de servir.
 - **Errores**: `{ statusCode, message, error }`; validaciones con **422** y mensajes en
   español (el frontend ya interpreta este formato).
+
+### Panel admin
+
+Las **lecturas** del panel están en `/admin/*`; las **acciones** reutilizan los endpoints de
+cada dominio con sus reglas (transiciones, superposición de horarios, emails): confirmar,
+completar o cancelar con `PUT /appointments/:id` y `POST /appointments/:id/cancel`, cobrar con
+`POST /payments/cash-payment`, aprobar o rechazar con `PUT /payments/:id/status`,
+activar/desactivar cuentas con `PUT /users/:id/toggle-active` y la disponibilidad con
+`/availability/regular` y `/availability/exceptions`.
+
+El buscador acepta nombre, email, servicio, notas, `#ID` y teléfono (también solo dígitos:
+`44447788` encuentra `11 4444-7788`). Los reportes agrupan por mes en la zona del studio:
+ingresos por fecha de aprobación del pago y turnos por fecha del turno.
 
 ### Reglas de reserva
 

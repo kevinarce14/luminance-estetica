@@ -1,3 +1,4 @@
-# Prisma guarda un checksum de cada migración: fijar LF evita diferencias entre Windows y Linux.
+# Prettier escribe LF: se fija LF también al hacer checkout en Windows (evita diffs fantasma).
+* text=auto eol=lf
+# Prisma guarda un checksum de cada migración: LF evita diferencias entre Windows y Linux.
 prisma/migrations/**/*.sql text eol=lf
-prisma/migrations/migration_lock.toml text eol=lf

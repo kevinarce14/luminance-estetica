@@ -47,14 +47,17 @@ src/
 ├── prisma/                # PrismaModule global + PrismaService
 ├── mail/                  # MailModule global: emails transaccionales con Mailjet
 ├── health/                # GET /api/health (503 si la base no responde)
-├── common/                # validadores, transformers y pipes compartidos
+├── common/                # validadores, transformers, pipes y zona horaria (time/)
 └── modules/               # dominios: cada uno con Module + Controller + Service, dto/ e interfaces/
     ├── auth/              # registro, login, Google, recuperación de contraseña
     │   ├── strategies/    # JwtStrategy (Passport)
     │   ├── guards/        # JwtAuthGuard, AdminGuard
     │   └── decorators/    # @Authenticated(), @AdminOnly(), @CurrentUser()
     ├── users/             # perfil propio y administración de usuarios; PasswordService (bcrypt)
-    └── services/          # catálogo público
+    ├── services/          # catálogo público
+    ├── availability/      # horarios semanales, excepciones y grilla de horarios libres
+    ├── appointments/      # reservas, cancelación y consultas de turnos
+    └── payments/          # (por ahora) contrato de respuesta de pagos
 prisma/
 ├── schema.prisma          # modelos: User, Service, Appointment, Availability, Payment, Coupon
 ├── migrations/            # 0_init (estructura actual) + 1_column_defaults
@@ -77,6 +80,17 @@ Todas bajo `/api`, con el mismo contrato (rutas, JSON snake_case, mensajes) que 
 | `GET /users` · `GET /users/:id` | admin | Listado con filtros `is_active`, `is_admin`, `skip`, `limit` |
 | `PUT /users/:id/toggle-active` · `PUT /users/:id/make-admin` | admin | Activar/desactivar y promover a admin |
 | `GET /services` · `/services/:id` · `/services/category/:category` | público | Catálogo |
+| `POST /availability/available-slots` (alias `GET ?service_id=&date=`) | público | Grilla de horarios de un servicio en una fecha |
+| `GET /availability/check/:date` | público | Horario efectivo de una fecha |
+| `GET` · `POST /availability/regular` · `PUT` · `DELETE /availability/regular/:id` | admin | Horarios semanales |
+| `GET` · `POST /availability/exceptions` · `DELETE /availability/exceptions/:id` | admin | Feriados y horarios especiales |
+| `POST /appointments` | autenticado | Reserva (queda `pending`) |
+| `GET /appointments` · `GET /appointments/:id` | autenticado | Turnos propios con servicio y pago (el admin ve cualquiera) |
+| `GET /users/me/appointments?when=upcoming\|past` | autenticado | Turnos propios; `when` separa próximos y pasados |
+| `POST /appointments/:id/cancel` (alias `PATCH`) | dueño o admin | Cancelación con motivo (5–500 caracteres) |
+| `PUT /appointments/:id` | dueño o admin | Reprogramar o editar notas; el estado solo lo cambia el admin |
+| `DELETE /appointments/:id` | admin | Borrado (si no tiene pago registrado) |
+| `GET /appointments/public/confirmed` | público | Horarios ocupados desde hoy: solo fecha y duración |
 | `GET /health` | público | Estado de la API y la base |
 
 ### Compatibilidad con el backend FastAPI
@@ -90,6 +104,20 @@ Mientras convivan, ambas APIs pueden compartir base y `SECRET_KEY`:
   deja de servir.
 - **Errores**: `{ statusCode, message, error }`; validaciones con **422** y mensajes en
   español (el frontend ya interpreta este formato).
+
+### Reglas de reserva
+
+Configurables con `TIMEZONE`, `MIN_APPOINTMENT_DURATION`, `MIN_BOOKING_ADVANCE_HOURS` y
+`MAX_BOOKING_ADVANCE_DAYS` (por defecto Buenos Aires, bloques cada 30 min, 2 h y 30 días).
+
+- Los horarios de atención están en la hora del studio; la base guarda los turnos en UTC.
+  La grilla devuelve horas locales sin offset (`2026-10-22T09:00:00`) y los turnos, UTC (`…Z`).
+- Un día usa su **excepción** si existe (cerrado u horario especial); si no, la franja semanal.
+- Solo un turno **confirmado** ocupa el horario, durante la duración de **su** servicio,
+  y bloquea a todos los servicios (el studio atiende de a uno).
+- Los bloques que no se pueden reservar (antes de ahora + 2 h, después de 30 días, ocupados)
+  se devuelven con `is_available: false`: una lista vacía significa día cerrado.
+- Al reservar se valida además que el turno entre en el horario de atención de ese día.
 
 Sin credenciales de Mailjet los emails no se envían; en desarrollo, el link de
 recuperación se muestra en la consola de la API para poder probar el flujo.

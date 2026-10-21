@@ -8,8 +8,28 @@ import {
   IsString,
   Max,
   Min,
+  ValidateBy,
   validateSync,
 } from 'class-validator';
+
+/** Zona horaria IANA válida para Intl (ej. America/Argentina/Buenos_Aires). */
+function IsTimeZone(): PropertyDecorator {
+  return ValidateBy({
+    name: 'isTimeZone',
+    validator: {
+      validate: (value: unknown) => {
+        if (typeof value !== 'string' || !value) return false;
+        try {
+          new Intl.DateTimeFormat('en-US', { timeZone: value });
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      defaultMessage: () => 'TIMEZONE debe ser una zona horaria IANA válida',
+    },
+  });
+}
 
 export enum NodeEnv {
   Development = 'development',
@@ -67,6 +87,27 @@ export class EnvironmentVariables {
 
   @IsString()
   FROM_NAME = 'Luminance Studio by Cande';
+
+  // ===== Reglas de reserva (mismos valores por defecto que el legado) =====
+  /** Zona horaria del studio: los horarios de atención están expresados en ella. */
+  @IsTimeZone()
+  TIMEZONE = 'America/Argentina/Buenos_Aires';
+
+  /** Cada cuántos minutos arranca un bloque en la grilla de horarios. */
+  @Type(() => Number)
+  @IsInt()
+  @Min(5)
+  MIN_APPOINTMENT_DURATION = 30;
+
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  MIN_BOOKING_ADVANCE_HOURS = 2;
+
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  MAX_BOOKING_ADVANCE_DAYS = 30;
 }
 
 export function validateEnv(

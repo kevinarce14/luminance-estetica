@@ -1,6 +1,9 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { EnvironmentVariables } from './config/env.validation';
+import {
+  parseFrontendOrigins,
+  type EnvironmentVariables,
+} from './config/env.validation';
 
 /**
  * Configuración global de la app. La usan main.ts y los tests e2e,
@@ -14,11 +17,7 @@ export function configureApp(app: INestApplication): void {
   app.setGlobalPrefix('api');
 
   app.enableCors({
-    origin: config
-      .get('FRONTEND_URL', { infer: true })
-      .split(',')
-      .map((origin) => origin.trim())
-      .filter(Boolean),
+    origin: parseFrontendOrigins(config.get('FRONTEND_URL', { infer: true })),
     credentials: true,
   });
 
@@ -29,6 +28,8 @@ export function configureApp(app: INestApplication): void {
       forbidNonWhitelisted: true,
       // Convierte el payload en instancias del DTO (aplica @Type y @Transform).
       transform: true,
+      // 422 como FastAPI: el frontend lo muestra como "Datos inválidos: …".
+      errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
     }),
   );
 }

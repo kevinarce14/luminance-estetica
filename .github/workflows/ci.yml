@@ -88,10 +88,15 @@ jobs:
       - run: npm run db:seed
       - run: npm run test:e2e
 
+  # La misma suite de Playwright (web/e2e) contra cada backend.
   e2e:
-    name: E2E (Playwright)
+    name: E2E Playwright (${{ matrix.backend }})
     runs-on: ubuntu-latest
-    needs: [backend, frontend]
+    needs: [backend, backend-nest, frontend]
+    strategy:
+      fail-fast: false
+      matrix:
+        backend: [nest, fastapi]
     services:
       postgres:
         image: postgres:17
@@ -107,25 +112,44 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
+        if: matrix.backend == 'fastapi'
         with:
           python-version: "3.12"
           cache: pip
       - run: pip install -r ../requirements.txt
+        if: matrix.backend == 'fastapi'
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: npm
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: |
+            web/package-lock.json
+            backend/package-lock.json
+      - run: npm ci --prefix ../backend
+        if: matrix.backend == 'nest'
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
         env:
+          E2E_BACKEND: ${{ matrix.backend }}
           PYTHON: python
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.backend }}
           path: |
             web/playwright-report
             web/test-results
           retention-days: 7
+
+  docker:
+    name: Imagen Docker de la API
+    runs-on: ubuntu-latest
+    needs: [backend-nest]
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t luminance-api backend
+      - run: docker build -t luminance-migrate --target migrate backend
+      # La imagen de la API no debe incluir el CLI de Prisma ni el código de tests.
+      - run: |
+          docker run --rm --entrypoint sh luminance-api -c             'test ! -d node_modules/prisma && test ! -d test && test "$(id -un)" = node'

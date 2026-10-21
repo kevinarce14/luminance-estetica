@@ -1,10 +1,13 @@
 import { defineConfig, devices } from '@playwright/test'
 
 /**
- * Pruebas E2E: navegador real + frontend (Vite) + backend FastAPI real + PostgreSQL descartable.
+ * Pruebas E2E: navegador real + frontend (Vite) + backend real + PostgreSQL descartable.
  *
- *   TEST_DATABASE_URL=postgresql://... npm run test:e2e
+ *   TEST_DATABASE_URL=postgresql://... npm run test:e2e                      → backend NestJS (backend/)
+ *   E2E_BACKEND=fastapi TEST_DATABASE_URL=postgresql://... npm run test:e2e  → backend FastAPI (app/)
  *
+ * Los mismos tests validan ambos backends: los dos exponen el mismo contrato y las rutas
+ * auxiliares /__e2e__/* (backend/test/e2e-server y tests/e2e_server.py).
  * Usa puertos propios (backend 8800, frontend 5180) y nunca reutiliza servidores ya
  * levantados: así no puede conectarse por error a un backend de desarrollo con datos reales.
  */
@@ -12,6 +15,16 @@ const BACKEND_PORT = 8800
 const FRONTEND_PORT = 5180
 const FRONTEND_URL = `http://localhost:${FRONTEND_PORT}`
 const PYTHON = process.env.PYTHON ?? 'python'
+const BACKEND = process.env.E2E_BACKEND ?? 'nest'
+
+if (BACKEND !== 'nest' && BACKEND !== 'fastapi') {
+  throw new Error(`E2E_BACKEND debe ser "nest" o "fastapi" (recibido: "${BACKEND}").`)
+}
+
+const backendCommand =
+  BACKEND === 'nest'
+    ? `npm --prefix ../backend run e2e:server -- --port ${BACKEND_PORT} --frontend-url ${FRONTEND_URL}`
+    : `${PYTHON} ../tests/e2e_server.py --port ${BACKEND_PORT} --frontend-url ${FRONTEND_URL}`
 
 if (!process.env.TEST_DATABASE_URL) {
   throw new Error(
@@ -40,7 +53,7 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: [
     {
-      command: `${PYTHON} ../tests/e2e_server.py --port ${BACKEND_PORT} --frontend-url ${FRONTEND_URL}`,
+      command: backendCommand,
       url: `${E2E_API_URL}/api/health`,
       reuseExistingServer: false,
       timeout: 120_000,

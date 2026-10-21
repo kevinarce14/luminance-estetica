@@ -198,12 +198,13 @@ TEST_DATABASE_URL=postgresql://postgres@localhost:5432/luminance_test python -m 
 # Frontend: unitarios (Vitest)
 cd web && npm test
 
-# E2E (Playwright: navegador + Vite + FastAPI reales, puertos 5180 y 8800)
+# E2E (Playwright: navegador + Vite + backend reales, puertos 5180 y 8800)
 cd web && npx playwright install chromium
-TEST_DATABASE_URL=postgresql://postgres@localhost:5432/luminance_e2e npm run test:e2e
+TEST_DATABASE_URL=postgresql://postgres@localhost:5432/luminance_e2e npm run test:e2e                      # contra NestJS
+E2E_BACKEND=fastapi TEST_DATABASE_URL=postgresql://postgres@localhost:5432/luminance_e2e npm run test:e2e  # contra FastAPI
 ```
 
-GitHub Actions (`.github/workflows/ci.yml`) corre las tres suites en cada push y PR a `main` y `develop`.
+GitHub Actions (`.github/workflows/ci.yml`) corre en cada push y PR a `main` y `develop`: pytest, el backend NestJS (lint, build, unitarios, migraciones y e2e), el frontend (lint, build, Vitest), la suite Playwright contra **los dos backends** y la construcción de la imagen Docker.
 
 ---
 

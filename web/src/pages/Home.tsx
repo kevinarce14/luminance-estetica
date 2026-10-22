@@ -1,4 +1,8 @@
 import { Link, Navigate } from 'react-router-dom'
+import {
+  DEMO_DISCLAIMER,
+  WHATSAPP_DISPLAY_SHORT,
+} from '../constants/contact.ts'
 import { useAuth } from '../hooks/useAuth.ts'
 import './Home.css'
 
@@ -140,12 +144,13 @@ export function Home() {
       <footer className="home-footer">
         <div className="home-footer__content">
           <p>© 2024 Luminance Studio by Cande. Todos los derechos reservados.</p>
+          <p className="home-footer__disclaimer">{DEMO_DISCLAIMER}</p>
           <p>
             Especialista en belleza natural con{' '}
             <strong>resultados profesionales garantizados</strong>
           </p>
           <p>
-            WhatsApp: <strong>11 6281-5014</strong>
+            WhatsApp: <strong>{WHATSAPP_DISPLAY_SHORT}</strong>
           </p>
           <nav className="home-social-links" aria-label="Redes sociales">
             <a

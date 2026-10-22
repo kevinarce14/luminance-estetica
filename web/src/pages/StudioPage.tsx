@@ -11,6 +11,7 @@ import { useOutletContext } from 'react-router-dom'
 import { LoginRequiredModal } from '../components/common/LoginRequiredModal.tsx'
 import {
   buildWhatsappUrl,
+  DEMO_DISCLAIMER,
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
   WHATSAPP_DISPLAY,
@@ -844,10 +845,7 @@ export function StudioPage() {
               © 2024 Luminance Studio by Cande. Todos los derechos reservados. |
               Especialista en estética con 5 años de experiencia
             </p>
-            <p className="studio-footer__credits">
-              Sitio web diseñado profesionalmente para mostrar servicios y
-              cursos de estética
-            </p>
+            <p className="studio-footer__credits">{DEMO_DISCLAIMER}</p>
           </div>
         </div>
       </footer>

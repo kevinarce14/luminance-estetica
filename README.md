@@ -4,6 +4,11 @@
 > las clientas reservan y pagan sus turnos online, y el estudio administra agenda, cobros,
 > clientes, servicios y horarios desde un panel con reportes.
 
+> [!NOTE]
+> **Proyecto personal de portfolio.** *Luminance Studio by Cande* es un estudio ficticio: los nombres,
+> testimonios, servicios y precios que aparecen en el sitio y en el código son de demostración y no
+> corresponden a personas ni a un negocio real. El WhatsApp de contacto es el del autor.
+
 [![CI](https://github.com/kevinarce14/luminance-estetica/actions/workflows/ci.yml/badge.svg)](https://github.com/kevinarce14/luminance-estetica/actions/workflows/ci.yml)
 ![React](https://img.shields.io/badge/React_19-20232A?style=flat&logo=react&logoColor=61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
@@ -249,4 +254,4 @@ luminance-estetica/
 **Kevin Arce** — Desarrollador Fullstack
 GitHub: [@kevinarce14](https://github.com/kevinarce14)
 
-Proyecto desarrollado para **Luminance Studio by Cande**.
+Proyecto personal de portfolio. *Luminance Studio by Cande* es una marca ficticia creada para la demo.

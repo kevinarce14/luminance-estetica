@@ -1,5 +1,10 @@
 # Deploy de la API NestJS y migración de la base de Neon
 
+> **Estado (22/10/2026):** migración completada. Neon quedó adoptada por Prisma el 21/10/2026
+> (backups verificados, baseline de `0_init` y deploy de `1_` y `2_`, sin cambios en los datos)
+> y el frontend en Vercel usa la API NestJS en Render desde el 22/10/2026. Esta guía queda como
+> registro del procedimiento y como referencia para futuros deploys y migraciones.
+
 Guía para poner en producción `backend/` **sobre la base actual de Neon** (la que hoy usa
 FastAPI), sin recrear tablas ni perder datos.
 
@@ -41,6 +46,11 @@ Relevado con el diagnóstico solo lectura (paso 2) el 21/10/2026:
     no deben pasar por el pooler (PgBouncer en modo transacción).
   - **Pooled** (host con `-pooler`): para la API en producción.
   - Ambas con `?sslmode=require`. No hace falta agregar `schema=`: `prisma.config.ts` lo fuerza.
+  - En la URL **directa** agregar `&connect_timeout=30`. Neon suspende la base tras unos
+    minutos sin uso y tarda unos segundos en despertarla; el CLI de Prisma espera 5 s por
+    defecto y falla con `P1001: Can't reach database server` (pasó en el diagnóstico y en el
+    primer intento del baseline real). Con 30 s alcanza. Un `P1001` no escribe nada en la base:
+    se puede reintentar sin riesgo.
 - Construir las imágenes (o usar `npm run …` / `npx prisma …` desde `backend/` con las
   dependencias instaladas):
 
@@ -55,7 +65,7 @@ Relevado con el diagnóstico solo lectura (paso 2) el 21/10/2026:
 > comandos de desarrollo que pueden borrar datos, y la base es compartida con otros proyectos.
 
 ```bash
-export NEON_DIRECT_URL='postgresql://USUARIO:CLAVE@ep-xxxx.sa-east-1.aws.neon.tech/neondb?sslmode=require'
+export NEON_DIRECT_URL='postgresql://USUARIO:CLAVE@ep-xxxx.sa-east-1.aws.neon.tech/neondb?sslmode=require&connect_timeout=30'
 MIGRATE="docker run --rm -e DATABASE_URL=$NEON_DIRECT_URL luminance-migrate"
 ```
 
@@ -98,8 +108,9 @@ Fechas de appointments: appointment_date=con zona, cancelled_at=con zona, …
 
 **Si aparece alguna línea `✖ BLOQUEA`** o el veredicto es `NO SEGUIR`, la base tiene una
 diferencia que ninguna migración cubre: **no seguir** y generar una migración de ajuste antes
-del baseline. (Así se detectó que las fechas de Neon eran `timestamptz`.) Si Neon estaba
-suspendida, el primer intento puede fallar con `P1001`: reintentar.
+del baseline. (Así se detectó que las fechas de Neon eran `timestamptz`.) Un `P1001` significa
+que Neon estaba suspendida y no alcanzó a despertar: revisar que la URL tenga
+`connect_timeout=30` y reintentar.
 
 ## 3. Baseline: adoptar la estructura existente
 

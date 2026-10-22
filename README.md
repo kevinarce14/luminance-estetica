@@ -1,233 +1,204 @@
-# 💅 Luminance Estética — Sistema Web de Gestión de Turnos & Pagos
+# 💅 Luminance Estética — Sistema de turnos y pagos online
 
-> **Plataforma Web Full Stack** para la reserva automatizada de citas, procesamiento de señas/pagos online y administración integral del centro de estética **Luminance Studio by Cande**.
+> Plataforma **fullstack en producción** para el centro de estética **Luminance Studio by Cande**:
+> las clientas reservan y pagan sus turnos online, y el estudio administra agenda, cobros,
+> clientes, servicios y horarios desde un panel con reportes.
 
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white)
-![Render](https://img.shields.io/badge/Render-Deployed-46E3B7?style=for-the-badge&logo=render&logoColor=white)
+[![CI](https://github.com/kevinarce14/luminance-estetica/actions/workflows/ci.yml/badge.svg)](https://github.com/kevinarce14/luminance-estetica/actions/workflows/ci.yml)
+![React](https://img.shields.io/badge/React_19-20232A?style=flat&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
+![NestJS](https://img.shields.io/badge/NestJS_11-E0234E?style=flat&logo=nestjs&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma_7-2D3748?style=flat&logo=prisma&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL_17-4169E1?style=flat&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
+![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=flat&logo=playwright&logoColor=white)
 
----
+| | |
+|---|---|
+| 🌐 **Sitio** | **https://luminance-estetica.vercel.app** |
+| ⚙️ **API** | https://luminance-api-nest.onrender.com/api/health |
+| ✅ **Tests** | **179** automatizados en cada push (Vitest · NestJS · Playwright) |
 
-## 🎯 ¿De qué trata el proyecto?
-
-El sistema soluciona de forma punta a punta la agenda y recaudación de un estudio de estética, eliminando el manejo manual de mensajes para coordinar turnos. Permite a las clientas reservar su cita de forma autónoma con validación de horarios en tiempo real, pagar la seña a través de MercadoPago y recibir confirmaciones automáticas.
-
----
-
-## 🌟 Características Principales
-
-### 📅 Cliente & Reserva de Turnos
-- **Calendario dinámico:** Selección de fecha y hora con cálculo de disponibilidad en tiempo real.
-- **Reserva multi-servicio:** Selección de tratamientos (Pestañas, Cejas, Limpieza facial, etc.).
-- **Gestión de Mis Turnos:** Vista para que la clienta consulte, controle o cancele sus reservas.
-- **Notificaciones automáticas:** Confirmaciones inmediatas vía Email (SendGrid / Resend) y WhatsApp (Twilio API).
-
-### 💳 Pagos & Pasarela Online
-- **Integración con MercadoPago:** Generación automática de preferencia de pago/seña y sincronización mediante **Webhooks** asíncronos.
-- **Control de estados:** Registro de transacciones (Aprobado, Pendiente, Fallido).
-
-### ⚙️ Administración & Automatización
-- **Admin Dashboard:** Panel privado para consultar turnos del día, cambiar estados y visualizar métricas principales.
-- **Gestión de Agenda:** Configuración flexible de días u horarios no laborables y bloqueo de agenda.
-- **Tareas Programadas (APScheduler):** Proceso en segundo plano que libera turnos impagos o vencidos automáticamente.
+> ⏳ **Plan gratuito:** la API corre en el plan free de Render, que suspende el servicio tras unos
+> minutos sin uso. **La primera petición puede tardar entre 30 y 60 segundos** mientras el servidor
+> despierta; después responde con normalidad.
 
 ---
 
-## 🏗️ Arquitectura de Deploy (Cloud)
+## ✨ Funcionalidades
 
-El proyecto está diseñado bajo una arquitectura distribuida sin costo operativo:
+**Clientas**
+- **Turnera interactiva**: calendario, servicios del catálogo y horarios libres calculados en la
+  zona horaria del estudio (anticipación mínima de 2 h, hasta 30 días).
+- **Pago online con MercadoPago** (checkout + confirmación automática por webhook) o en efectivo
+  coordinado por WhatsApp.
+- **Mis Turnos**: próximos e historial, estado del pago y cancelación con motivo.
+- Registro, login con email o **Google**, recuperación de contraseña por email y sesión persistente.
 
+**Administración**
+- **Agenda** con filtros por día, estado y buscador (nombre, email, teléfono, servicio o `#ID`);
+  confirmar, completar, cancelar y cobrar en efectivo.
+- **Pagos**: aprobar o rechazar, registrar transferencias con comprobante.
+- **Clientes**: historial, métricas (turnos, último turno, total pagado) y activación de cuentas.
+- **Servicios** (ABM) y **disponibilidad**: horario semanal y fechas bloqueadas o especiales.
+- **Dashboard y reportes**: turnos del día/semana/mes, cobrado vs. por cobrar, servicios más
+  pedidos, medios de pago e ingresos por mes con gráficos propios.
 
+## 🧰 Stack
+
+| Capa | Tecnologías |
+|---|---|
+| **Frontend** (`web/`) | React 19 · TypeScript estricto · Vite · React Router · Context API · CSS propio |
+| **Backend** (`backend/`) | NestJS 11 · TypeScript estricto · Prisma 7 (adapter `pg`) · class-validator · Passport JWT |
+| **Base de datos** | PostgreSQL 17 en Neon (producción) · Docker Compose (desarrollo) |
+| **Integraciones** | MercadoPago (Checkout + Webhooks firmados) · Google Identity Services · Mailjet |
+| **Testing** | Vitest · Jest + Supertest (NestJS) · Playwright (E2E con navegador real) |
+| **CI/CD e infraestructura** | GitHub Actions · Docker multistage · Render (API) · Vercel (frontend) |
+
+## 🏗️ Arquitectura
+
+```mermaid
+flowchart LR
+    U[Navegador] -->|SPA| V[Vercel<br/>React 19 + Vite]
+    V -->|HTTPS /api · JWT| R[Render<br/>API NestJS en Docker]
+    R -->|Prisma| N[(Neon<br/>PostgreSQL 17)]
+    R -->|preferencia de pago| MP[MercadoPago]
+    MP -->|webhook firmado| R
+    U -->|id_token| G[Google Identity]
+    R -->|verifica id_token| G
+    R -->|emails transaccionales| M[Mailjet]
 ```
 
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│  VERCEL (Frontend)              RENDER (Backend + BD)  │
-│  ┌──────────────┐               ┌──────────────────┐   │
-│  │ HTML5 + JS   │───────────────│  Docker Container│   │
-│  │ Vanilla      │   API REST    │  - FastAPI       │   │
-│  └──────────────┘               │  - PostgreSQL    │   │
-│                                 └──────────────────┘   │
-└─────────────────────────────────────────────────────────┘
+**Backend modular** (un módulo de Nest por dominio: `auth`, `users`, `services`, `availability`,
+`appointments`, `payments`, `admin`), con DTOs validados, guards de JWT y de rol admin, y
+configuración validada al arrancar. El detalle de endpoints y reglas está en
+[backend/README.md](backend/README.md).
 
-```
+## 🔍 Decisiones técnicas destacadas
 
-- **Frontend:** Estojado y servido de forma ultra rápida en **Vercel**.
-- **Backend API:** Contenedorized con **Docker** e instanciado en **Render**.
-- **Base de Datos:** **PostgreSQL 15** relacional alojado en Render.
+- **Migración sin cortar el servicio.** El proyecto empezó con HTML/JS + FastAPI. Primero se migró el
+  frontend a React manteniendo el backend; después se reescribió la API en NestJS **con el mismo
+  contrato HTTP**, de modo que el frontend cambió solo la URL base. Ambas APIs convivieron sobre la
+  misma base, con JWT y hashes de contraseña compatibles, y la misma suite de Playwright validó
+  los dos backends antes del corte.
+- **Adopción de Prisma sobre una base de producción compartida.** Un diagnóstico de solo lectura
+  ([`npm run db:diagnose`](backend/scripts/db-diagnose.ts)) detectó diferencias reales entre
+  producción y el esquema esperado antes de tocar nada. La migración se hizo con baseline, backups
+  restaurados y verificados, el historial aislado en el schema de la app y checksums que confirmaron
+  que no cambió ningún dato. Procedimiento completo en [backend/docs/DEPLOY.md](backend/docs/DEPLOY.md).
+- **Pagos robustos.** Se cobra el precio guardado en la base (no el que envía el navegador). El
+  webhook valida la firma HMAC de MercadoPago, consulta el estado real del pago, es idempotente y
+  tolera notificaciones repetidas o desordenadas. Montos menores, turnos cancelados u horarios ya
+  ocupados quedan registrados para revisión en lugar de confirmarse a ciegas.
+- **Fechas sin ambigüedad.** La base guarda instantes UTC (`timestamptz`); la grilla de horarios y
+  los reportes se calculan en la hora de Buenos Aires con `Intl`, sin dependencias.
+- **Imagen Docker liviana y segura.** Build multistage sobre Node 24 Alpine: la imagen de la API no
+  incluye el CLI de Prisma, tests ni scripts, corre sin root y tiene healthcheck. Las migraciones
+  corren desde un target aparte.
 
----
+## ✅ Calidad y CI/CD
 
-## 🛠️ Stack Tecnológico
+Cada push y pull request a `main` y `develop` ejecuta en GitHub Actions:
 
-### Backend
-- **Lenguaje:** Python 3.12
-- **Framework Web:** FastAPI (API REST con OpenAPI/Swagger interactivo)
-- **Base de Datos & ORM:** PostgreSQL + SQLAlchemy 2.0 (Relacional, `cascade="all, delete-orphan"`)
-- **Validación de Datos:** Pydantic v2
-- **Seguridad & Auth:** JWT (`python-jose`) + Hashing de contraseñas con `Bcrypt`
-- **Tareas Background:** APScheduler
+| Suite | Herramienta | Tests |
+|---|---|---|
+| Unitarios del frontend | Vitest | 19 |
+| Unitarios del backend | Jest | 70 |
+| E2E de la API contra PostgreSQL real | Jest + Supertest | 73 |
+| E2E con navegador real (frontend + API + base) | Playwright | 17 |
+| **Total** | | **179** |
 
-### Frontend
-- **Arquitectura:** Single Page Logic / Asíncrono
-- **Lenguajes:** HTML5 Semantic, CSS3 (Diseño Responsive) y JavaScript Vanilla (ES6+ Fetch API)
+Además: lint y build de ambos proyectos, migraciones sobre una base limpia, chequeo de que
+`schema.prisma` no se desvíe de las migraciones y build de las imágenes Docker. Los servicios
+externos (MercadoPago, Google, email) se simulan en los tests: nada sale a internet.
 
-### Servicios Integrados
-- **Pagos:** MercadoPago SDK
-- **Email Transaccional:** SendGrid / Resend
-- **Notificaciones SMS/WhatsApp:** Twilio API
+## 🚀 Ejecución local
 
----
-
-## 📁 Estructura del Repositorio
-
-```text
-luminance-estetica/
-├── frontend/                     # Interfaz de usuario y panel administrativo
-│   ├── admin-dashboard.html      # Panel de administración
-│   ├── api.js                    # Cliente de conexión API (Fetch)
-│   ├── index.html                # Página principal / Landing
-│   ├── login.html                # Autenticación de usuarios/admin
-│   ├── mis-turnos.html           # Gestión de turnos del cliente
-│   ├── turnera.html              # Flujo interactivo de reserva
-│   └── ...                       # Pantallas de pago y estilos
-├── app/                          # Código fuente del Backend (FastAPI)
-│   ├── main.py                   # Punto de entrada de la aplicación
-│   ├── core/                     # Configuración central, DB y Seguridad JWT
-│   ├── models/                   # Modelos SQLAlchemy (User, Appointment, Service, etc.)
-│   ├── schemas/                  # Validaciones y DTOs con Pydantic
-│   ├── routes/                   # Endpoints de la API REST
-│   └── services/                 # Lógica de negocio (MercadoPago, Emails, Scheduler)
-├── Dockerfile                    # Configuración de imagen Docker para Backend
-├── render.yaml                   # Configuración de despliegue Infrastructure-as-Code
-├── requirements.txt              # Dependencias de Python
-└── DEPLOY_GRATUITO_VERCEL_RENDER.md # Guía paso a paso de deploy
-
-```
-
----
-
-## 💻 Instalación y Ejecución Local
-
-### Prerrequisitos
-
-* Python 3.11+
-* PostgreSQL corriendo localmente (o un string de conexión remoto)
-* Git
-
-### 1. Clonar el repositorio
+**Requisitos:** Node.js 24 y Docker.
 
 ```bash
 git clone https://github.com/kevinarce14/luminance-estetica.git
 cd luminance-estetica
 
+# 1. API + base de datos
+cd backend
+cp .env.example .env            # valores de desarrollo listos para usar
+docker compose up -d            # PostgreSQL 17 en localhost:5433
+npm install                     # también genera el cliente de Prisma
+npm run db:migrate              # aplica las migraciones
+npm run db:seed                 # admin inicial, servicios y horario semanal
+npm run start:dev               # API en http://localhost:3000/api
+
+# 2. Frontend (en otra terminal)
+cd web
+npm install
+npm run dev                     # http://localhost:5173 (el proxy de Vite apunta a la API local)
 ```
 
-### 2. Configurar el Entorno Virtual de Python
+Usuario administrador del seed: `admin@luminancestudio.com` / `ChangeThisPassword123!`
+(configurable con `INITIAL_ADMIN_*` en `backend/.env`). Sin credenciales de MercadoPago, Google o
+Mailjet esas integraciones quedan deshabilitadas; en desarrollo el link de recuperación de
+contraseña se muestra en la consola de la API.
+
+### Tests
 
 ```bash
-# Crear entorno virtual
-python -m venv venv
-
-# Activar en Windows:
-venv\Scripts\activate
-
-# Activar en Linux/Mac:
-source venv/bin/activate
-
-# Instalar dependencias
-pip install -r requirements.txt
-
-```
-
-### 3. Configurar Variables de Entorno (`.env`)
-
-Crea un archivo `.env` en la raíz del proyecto basándote en la siguiente estructura:
-
-```env
-DATABASE_URL=postgresql://tu_usuario:tu_password@localhost:5432/luminance_db
-SECRET_KEY=tu_clave_secreta_jwt
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=10080
-
-MERCADOPAGO_ACCESS_TOKEN=APP_USR-xxx
-SENDGRID_API_KEY=SG.xxx
-TWILIO_ACCOUNT_SID=ACxxx
-TWILIO_AUTH_TOKEN=xxx
-
-```
-
-### 4. Iniciar el Backend (Servidor API)
-
-```bash
-python -m uvicorn app.main:app --reload
-
-```
-
-> La API quedará escuchando en `http://localhost:8000`.
-> Puedes ver la **documentación interactiva** en `http://localhost:8000/docs`.
-
-### 5. Iniciar el Frontend
-
-En otra terminal, navega a la carpeta `frontend` y levanta un servidor HTTP simple:
-
-```bash
-cd frontend
-python -m http.server 5000
-
-```
-
-> Accede a la aplicación desde tu navegador en `http://localhost:5000`.
-
----
-
-## 🧪 Tests
-
-Los tests de backend y E2E necesitan una base **PostgreSQL descartable** en `TEST_DATABASE_URL`:
-borran y recrean el schema en cada corrida, y nunca usan el `.env` ni servicios externos
-(email, MercadoPago y Google se simulan).
-
-```bash
-# Backend (pytest)
-TEST_DATABASE_URL=postgresql://postgres@localhost:5432/luminance_test python -m pytest
-
-# Frontend: unitarios (Vitest)
-cd web && npm test
-
-# E2E (Playwright: navegador + Vite + backend reales, puertos 5180 y 8800)
+cd backend && npm test && npm run test:e2e        # unitarios + E2E de la API (usa la base de Docker)
+cd web && npm test                                # unitarios del frontend
 cd web && npx playwright install chromium
-TEST_DATABASE_URL=postgresql://postgres@localhost:5432/luminance_e2e npm run test:e2e                      # contra NestJS
-E2E_BACKEND=fastapi TEST_DATABASE_URL=postgresql://postgres@localhost:5432/luminance_e2e npm run test:e2e  # contra FastAPI
+TEST_DATABASE_URL=postgresql://luminance:luminance@localhost:5433/luminance_e2e npm run test:e2e
 ```
 
-GitHub Actions (`.github/workflows/ci.yml`) corre en cada push y PR a `main` y `develop`: pytest, el backend NestJS (lint, build, unitarios, migraciones y e2e), el frontend (lint, build, Vitest), la suite Playwright contra **los dos backends** y la construcción de la imagen Docker.
+La suite de Playwright usa una base **descartable** (se borra y recrea en cada corrida).
 
----
+## ☁️ Despliegue
 
-## 📡 Endpoints Destacados de la API
+| Componente | Plataforma | Cómo se despliega |
+|---|---|---|
+| Frontend | **Vercel** (`web/` como raíz) | Build de Vite en cada push a `main`; `vercel.json` resuelve las rutas de la SPA |
+| API | **Render** (Docker, `backend/`) | Imagen multistage del [Dockerfile](backend/Dockerfile); healthcheck en `/api/health` |
+| Base de datos | **Neon** (PostgreSQL 17) | Migraciones con `prisma migrate deploy` desde la imagen `migrate` |
+| Pagos | **MercadoPago** | Webhook a `/api/payments/webhook` con firma `x-signature` |
 
-* `POST /api/v1/auth/login` — Autenticación y emisión de JWT.
-* `GET /api/v1/appointments/available` — Consulta de horarios disponibles en tiempo real.
-* `POST /api/v1/appointments` — Creación de reservas.
-* `POST /api/v1/payments/webhook` — Recepción de eventos de pago MercadoPago.
-* `GET /api/v1/admin/dashboard` — Métricas generales para el administrador.
+- El frontend en producción usa la API de Render por defecto (`web/src/config/api.ts`);
+  `VITE_API_BASE_URL` permite apuntar a otra.
+- Variables de entorno, migraciones y rollback: [backend/docs/DEPLOY.md](backend/docs/DEPLOY.md).
+- **Plan gratuito**: tanto Render como Neon suspenden los servicios sin tráfico, por eso la primera
+  petición después de un rato puede tardar hasta un minuto.
 
----
+## 📁 Estructura
 
-## 🚀 Despliegue en Producción
+```
+luminance-estetica/
+├── web/                    # Frontend React 19 + TypeScript (Vite)
+│   ├── src/
+│   │   ├── pages/          # Home, Studio, Turnera, Pago, Mis Turnos, Auth y panel admin
+│   │   ├── components/     # UI reutilizable, turnera, panel y gráficos
+│   │   ├── context/        # Sesión (AuthContext)
+│   │   ├── services/       # Cliente HTTP tipado por recurso
+│   │   └── types/          # Contratos de la API
+│   └── e2e/                # Suite Playwright
+├── backend/                # API NestJS + Prisma
+│   ├── src/modules/        # auth, users, services, availability, appointments, payments, admin
+│   ├── prisma/             # schema, migraciones y seed
+│   ├── test/               # E2E de la API y servidor para Playwright
+│   ├── docs/DEPLOY.md      # Deploy y migración de producción
+│   └── Dockerfile
+└── .github/workflows/      # CI
+```
 
-Para conocer el procedimiento exacto de cómo desplegar este proyecto a producción sin costos (usando **Docker + Render + Vercel**), consulta nuestra guía paso a paso:
+## 🗺️ Evolución del proyecto
 
-📄 **[Manual Completo de Deploy Gratis (./DEPLOY_GRATUITO_VERCEL_RENDER.md)]
+| Versión | Hito |
+|---|---|
+| `1.0.0` | Primera versión: HTML/CSS/JS + FastAPI + PostgreSQL |
+| `v1.0.0-fastapi-react` · `v1.0.1` | Frontend migrado a React 19 + TypeScript, con paridad completa |
+| `v2.0.0-nestjs` | API reescrita en NestJS + Prisma, Docker y CI con E2E sobre ambos backends |
+| actual | Producción 100 % NestJS y repositorio sin código legado (disponible en el historial y los tags) |
 
----
+## 👤 Autor
 
-## 👤 Autor & Contacto
+**Kevin Arce** — Desarrollador Fullstack
+GitHub: [@kevinarce14](https://github.com/kevinarce14)
 
-* **Desarrollador:** Kevin Arce
-* **GitHub:** [@kevinarce14](https://github.com/kevinarce14)
-* **Proyecto desarrollado para:** Luminance Studio by Cande
+Proyecto desarrollado para **Luminance Studio by Cande**.

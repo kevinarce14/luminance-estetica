@@ -60,14 +60,14 @@
 
 ```mermaid
 flowchart LR
-    U[Navegador] -->|SPA| V[Vercel<br/>React 19 + Vite]
-    V -->|HTTPS /api · JWT| R[Render<br/>API NestJS en Docker]
-    R -->|Prisma| N[(Neon<br/>PostgreSQL 17)]
-    R -->|preferencia de pago| MP[MercadoPago]
-    MP -->|webhook firmado| R
-    U -->|id_token| G[Google Identity]
-    R -->|verifica id_token| G
-    R -->|emails transaccionales| M[Mailjet]
+    U[Navegador] -->|"SPA"| V[Vercel<br/>React 19 + Vite]
+    V -->|"HTTPS /api · JWT"| R[Render<br/>API NestJS en Docker]
+    R -->|"Prisma"| N[(Neon<br/>PostgreSQL 17)]
+    R -->|"preferencia de pago"| MP[MercadoPago]
+    MP -->|"webhook firmado"| R
+    U -->|"id_token"| G[Google Identity]
+    R -->|"verifica id_token"| G
+    R -->|"emails transaccionales"| M[Mailjet]
 ```
 
 **Backend modular** (un módulo de Nest por dominio: `auth`, `users`, `services`, `availability`,

@@ -1,8 +1,9 @@
 # Luminance API — NestJS + Prisma
 
-Nuevo backend de Luminance Estética (Etapa 2 de la migración). Reemplaza progresivamente
-a la API FastAPI de `app/` manteniendo el **mismo contrato HTTP** (prefijo `/api`, JSON en
-snake_case), para que el frontend `web/` solo tenga que cambiar la URL base.
+API de Luminance Estética, en producción en https://luminance-api-nest.onrender.com/api.
+Reemplazó a la API original en FastAPI (`v1.x`, disponible en el historial y en el tag
+`v2.0.0-nestjs`) manteniendo el **mismo contrato HTTP** (prefijo `/api`, JSON en snake_case),
+así el frontend `web/` migró cambiando solo la URL base.
 
 | | |
 |---|---|
@@ -109,9 +110,10 @@ Todas bajo `/api`, con el mismo contrato (rutas, JSON snake_case, mensajes) que 
 | `GET /admin/reports/yearly?year=` · `/admin/reports/monthly?year=&month=` | admin | Ingresos y turnos por mes, servicios y medios de pago |
 | `GET /health` | público | Estado de la API y la base |
 
-### Compatibilidad con el backend FastAPI
+### Compatibilidad con la API anterior (FastAPI)
 
-Mientras convivan, ambas APIs pueden compartir base y `SECRET_KEY`:
+La migración se hizo sin cortar el servicio: ambas APIs compartieron base y `SECRET_KEY`
+mientras convivieron.
 
 - **JWT**: mismo formato (`sub` = email, HS256, 24 h). Un token emitido por una sirve en la otra.
 - **Contraseñas**: bcrypt `$2b$` costo 12; los hashes de passlib se verifican sin cambios.
@@ -206,8 +208,7 @@ las dependencias de producción, corre como usuario `node` y tiene `HEALTHCHECK`
 
 ## E2E del frontend contra esta API
 
-La suite Playwright de `web/e2e` corre contra NestJS por defecto (y contra FastAPI con
-`E2E_BACKEND=fastapi`). Playwright levanta `npm run e2e:server`
+La suite Playwright de `web/e2e` corre contra esta API. Playwright levanta `npm run e2e:server`
 ([test/e2e-server](test/e2e-server)): la API real con email, Google y MercadoPago simulados,
 sobre una base descartable que se recrea en cada corrida, más las rutas auxiliares:
 

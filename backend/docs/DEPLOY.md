@@ -1,5 +1,10 @@
 # Deploy de la API NestJS y migración de la base de Neon
 
+> **Estado (22/10/2026):** migración completada. Neon quedó adoptada por Prisma el 21/10/2026
+> (backups verificados, baseline de `0_init` y deploy de `1_` y `2_`, sin cambios en los datos)
+> y el frontend en Vercel usa la API NestJS en Render desde el 22/10/2026. Esta guía queda como
+> registro del procedimiento y como referencia para futuros deploys y migraciones.
+
 Guía para poner en producción `backend/` **sobre la base actual de Neon** (la que hoy usa
 FastAPI), sin recrear tablas ni perder datos.
 

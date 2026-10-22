@@ -11,7 +11,7 @@ import type {
   TimelineEntry,
 } from '../types/studio.ts'
 
-/** Contenido estático de `frontend/studio.html`. */
+/** Contenido estático de la página del estudio (migrado de la versión original). */
 
 export const STUDIO_SECTION_LINKS: StudioSectionLink[] = [
   { id: 'cursos', label: 'Cursos' },

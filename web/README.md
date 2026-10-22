@@ -1,32 +1,20 @@
-# React + TypeScript + Vite
+# Luminance — Frontend (React 19 + TypeScript)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+SPA de [Luminance Estética](../README.md), publicada en https://luminance-estetica.vercel.app.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev        # http://localhost:5173 · /api va por el proxy de Vite a la API local (:3000)
+npm run build      # verifica tipos (incluye e2e y configs) y genera dist/
+npm run lint       # oxlint
+npm test           # Vitest
+npm run test:e2e   # Playwright: requiere TEST_DATABASE_URL (base descartable)
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+- **URL de la API**: `src/config/api.ts` la resuelve sola (proxy en desarrollo, API de Render en
+  producción). `VITE_API_BASE_URL` la fuerza y `API_PROXY_TARGET` cambia el destino del proxy
+  (ver `.env.example`).
+- **Estructura**: `pages/` (rutas), `components/`, `context/` (sesión), `hooks/`, `services/`
+  (cliente HTTP por recurso), `types/` (contratos de la API) y `utils/` (fechas en la zona del
+  estudio, reglas de la turnera).
+- **Deploy**: Vercel con `web/` como raíz; `vercel.json` hace el fallback de la SPA a `index.html`.

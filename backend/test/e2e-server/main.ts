@@ -1,6 +1,6 @@
 /**
- * Servidor NestJS para la suite Playwright del frontend (web/e2e), equivalente a
- * tests/e2e_server.py del backend FastAPI:
+ * Servidor NestJS para la suite Playwright del frontend (web/e2e): levanta la API real
+ * con los servicios externos simulados, como hacía el harness del backend FastAPI original.
  *
  *   TEST_DATABASE_URL=postgresql://… npm run e2e:server -- --port 8800 --frontend-url http://localhost:5180
  *

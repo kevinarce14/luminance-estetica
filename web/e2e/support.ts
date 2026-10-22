@@ -1,7 +1,7 @@
 import { test as base, expect, type APIRequestContext, type Page } from '@playwright/test'
 import { addDays, formatStudioLongDate, getStudioToday, getWeekday } from '../src/utils/studioTime.ts'
 
-/** Backend de E2E (tests/e2e_server.py), el mismo que levanta playwright.config.ts. */
+/** API de E2E (backend/test/e2e-server), la misma que levanta playwright.config.ts. */
 export const API_URL = 'http://127.0.0.1:8800'
 export const ADMIN = { email: 'admin@example.com', password: 'Admin1234' }
 export const MP_CHECKOUT = 'https://mercadopago.test/checkout'

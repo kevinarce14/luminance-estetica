@@ -1,81 +1,26 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
+# Dependencias y builds (cada proyecto tiene además su propio .gitignore)
+node_modules/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+coverage/
 
-# Virtual Environment
-venv/
-env/
-ENV/
-env.bak/
-venv.bak/
+# Variables de entorno: solo se versionan los .env.example
 .env
+.env.*
+!.env.example
 
-# IDE
+# Instrucciones locales del asistente de código
+CLAUDE.md
+
+# IDE y sistema operativo
 .vscode/
 .idea/
 *.swp
-*.swo
 *~
-.DS_Store
-
-# Environment variables
-.env
-.env.local
-.env.*.local
-CLAUDE.md
-
-# Database
-*.sqlite
-*.db
-*.db-journal
-
-# Alembic
-alembic/versions/*.py
-!alembic/versions/__init__.py
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-.nox/
-
-# Logs
-*.log
-logs/
-
-# OS
 .DS_Store
 Thumbs.db
 
-# Temporary files
+# Logs y temporales
+*.log
+logs/
 *.tmp
-*.temp
 *.bak
-
-# Node / Frontend React (web/)
-node_modules/
-web/dist/
-web/.env
-web/.env.local

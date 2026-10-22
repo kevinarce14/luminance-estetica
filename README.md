@@ -54,6 +54,7 @@
 | **Integraciones** | MercadoPago (Checkout + Webhooks firmados) · Google Identity Services · Mailjet |
 | **Testing** | Vitest · Jest + Supertest (NestJS) · Playwright (E2E con navegador real) |
 | **CI/CD e infraestructura** | GitHub Actions · Docker multistage · Render (API) · Vercel (frontend) |
+| **Flujo de trabajo** | Git con **GitFlow** (`main`, `develop`, `feature/*`, `fix/*`) gestionado en **GitKraken** · commits convencionales en español · tags de versión |
 
 ## 🏗️ Arquitectura
 
@@ -73,6 +74,52 @@ flowchart LR
 `appointments`, `payments`, `admin`), con DTOs validados, guards de JWT y de rol admin, y
 configuración validada al arrancar. El detalle de endpoints y reglas está en
 [backend/README.md](backend/README.md).
+
+## 📐 Arquitectura y Diseño del Sistema
+
+Documentación de diseño en [`docs/architecture/`](docs/architecture/README.md), con diagramas en
+Mermaid que GitHub muestra como gráficos y que se versionan junto con el código:
+
+| Diagrama | Qué muestra |
+|---|---|
+| 🗃️ [Entidad-Relación](docs/architecture/der.md) | Modelo de Prisma (`User`, `Service`, `Appointment`, `Payment`, `Availability`), relaciones y estados de turnos y pagos |
+| ☁️ [Despliegue](docs/architecture/deployment.md) | Vercel (React), Render (Docker/NestJS), Neon (PostgreSQL), GitHub Actions, MercadoPago, Google y Mailjet |
+| 🔄 [Secuencia de reserva y pago](docs/architecture/sequence-booking-payment.md) | Desde elegir un horario hasta la confirmación del turno por el webhook de MercadoPago |
+| 👥 [Casos de uso](docs/architecture/use-cases.md) | Qué puede hacer el visitante, la clienta y la administradora, con los servicios externos |
+
+## 🔀 Metodología de trabajo
+
+El proyecto se desarrolló con **GitFlow**, gestionando ramas, merges y releases desde **GitKraken**:
+cada funcionalidad o corrección se trabajó en su propia rama (`feature/*`, `fix/*`) a partir de
+`develop`, con commits convencionales en español (`feat:`, `fix:`, `chore:`…) y el CI en verde
+antes de integrar. `main` refleja producción y cada versión estable queda marcada con un tag.
+
+```mermaid
+gitGraph
+    commit id: "v1.0.1" tag: "v1.0.1"
+    branch develop
+    checkout develop
+    branch feature/backend-nest-auth
+    checkout feature/backend-nest-auth
+    commit id: "feat: auth JWT"
+    checkout develop
+    merge feature/backend-nest-auth
+    branch feature/backend-nest-payments
+    checkout feature/backend-nest-payments
+    commit id: "feat: MercadoPago"
+    checkout develop
+    merge feature/backend-nest-payments
+    checkout main
+    merge develop tag: "v2.0.0-nestjs"
+    checkout develop
+    branch feature/neon-timestamptz-baseline
+    checkout feature/neon-timestamptz-baseline
+    commit id: "fix: baseline Neon"
+    checkout develop
+    merge feature/neon-timestamptz-baseline
+    checkout main
+    merge develop
+```
 
 ## 🔍 Decisiones técnicas destacadas
 
@@ -178,6 +225,7 @@ luminance-estetica/
 │   │   ├── services/       # Cliente HTTP tipado por recurso
 │   │   └── types/          # Contratos de la API
 │   └── e2e/                # Suite Playwright
+├── docs/architecture/      # Diagramas: ER, despliegue, secuencia y casos de uso
 ├── backend/                # API NestJS + Prisma
 │   ├── src/modules/        # auth, users, services, availability, appointments, payments, admin
 │   ├── prisma/             # schema, migraciones y seed

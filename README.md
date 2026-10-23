@@ -23,6 +23,7 @@
 | 🌐 **Sitio** | **https://luminance-estetica.vercel.app** |
 | ⚙️ **API** | https://luminance-api-nest.onrender.com/api/health |
 | ✅ **Tests** | **179** automatizados en cada push (Vitest · NestJS · Playwright) |
+| 📘 **Manual** | [Manual de usuario](docs/MANUAL_DE_USUARIO.md) con capturas, para clientas y administración |
 
 > ⏳ **Plan gratuito:** la API corre en el plan free de Render, que suspende el servicio tras unos
 > minutos sin uso. **La primera petición puede tardar entre 30 y 60 segundos** mientras el servidor
@@ -79,6 +80,16 @@ flowchart LR
 `appointments`, `payments`, `admin`), con DTOs validados, guards de JWT y de rol admin, y
 configuración validada al arrancar. El detalle de endpoints y reglas está en
 [backend/README.md](backend/README.md).
+
+## 📘 Manual de usuario
+
+El [**Manual de Usuario**](docs/MANUAL_DE_USUARIO.md) explica el uso del sistema paso a paso, con
+capturas de cada pantalla:
+
+- **Clientas:** cuenta e inicio de sesión, catálogo, reserva en 4 pasos, pago con Mercado Pago o
+  efectivo, panel «Mis Turnos» y emails automáticos.
+- **Administración:** agenda y estados de turnos, catálogo de servicios, auditoría de pagos,
+  clientes, horarios de atención y lectura de los reportes.
 
 ## 📐 Arquitectura y Diseño del Sistema
 
@@ -230,7 +241,10 @@ luminance-estetica/
 │   │   ├── services/       # Cliente HTTP tipado por recurso
 │   │   └── types/          # Contratos de la API
 │   └── e2e/                # Suite Playwright
-├── docs/architecture/      # Diagramas: ER, despliegue, secuencia y casos de uso
+├── docs/
+│   ├── MANUAL_DE_USUARIO.md # Manual para clientas y administración
+│   ├── user-manual/        # Capturas del manual
+│   └── architecture/       # Diagramas: ER, despliegue, secuencia y casos de uso
 ├── backend/                # API NestJS + Prisma
 │   ├── src/modules/        # auth, users, services, availability, appointments, payments, admin
 │   ├── prisma/             # schema, migraciones y seed

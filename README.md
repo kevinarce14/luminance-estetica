@@ -29,6 +29,14 @@
 > minutos sin uso. **La primera petición puede tardar entre 30 y 60 segundos** mientras el servidor
 > despierta; después responde con normalidad.
 
+### 🎬 Demo en 50 segundos
+
+Reserva de un turno, pago con Mercado Pago, «Mis Turnos» y el panel de administración con sus reportes.
+
+https://github.com/user-attachments/assets/0e6c3a8f-08ee-4ba9-87de-8250b15c237e
+
+<sub>Grabado en un entorno local con datos de demostración; el checkout de Mercado Pago está simulado.</sub>
+
 ---
 
 ## ✨ Funcionalidades
